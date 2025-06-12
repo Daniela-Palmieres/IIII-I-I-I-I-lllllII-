@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site-Hack</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .noise {
+            display: none;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            margin-bottom: 50px;
+            perspective: 1000px;
+        }
+
+        .hero-content {
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(5deg); }
+            100% { transform: translateY(0px) rotateX(0deg); }
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+        }
+
+        .hero h1::before,
+        .hero h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #00ffea;
+            animation: glitch-before 3s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        .hero h1::after {
+            left: -2px;
+            text-shadow: 1px 0 #ff00c1;
+            animation: glitch-after 2s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        @keyframes glitch-before {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(30% 0 25% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes glitch-after {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(10% 0 40% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+        }
+
+        .hero-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .hero-btn:hover::before {
+            left: 100%;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .grid-item {
+            position: relative;
+            height: 250px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 1);
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(255, 20, 147, 0.3);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .grid-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            z-index: 1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .grid-item:hover::before {
+            transform: scaleX(1);
+        }
+
+        .grid-item i {
+            font-size: 50px;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .grid-item:hover i {
+            transform: scale(1.2);
+            color: #ff1493;
+            text-shadow: 0 0 15px rgba(255, 20, 147, 0.7);
+        }
+
+        .grid-item h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ff69b4;
+            transition: all 0.3s ease;
+        }
+
+        .grid-item:hover h3 {
+            color: #fff;
+            text-shadow: 0 0 5px rgba(255, 105, 180, 0.7);
+        }
+
+        .grid-item p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .grid-item:hover p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .grid-item .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .grid-item:hover .scan-line {
+            opacity: 1;
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .cta-section {
+            padding: 50px 0;
+            text-align: center;
+            position: relative;
+            margin-bottom: 80px;
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-container::before {
+            content: '';
+            position: absolute;
+            top: -150%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 105, 180, 0.1), transparent);
+            transform: rotate(25deg);
+            animation: glare 7s linear infinite;
+        }
+
+        @keyframes glare {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(100%) rotate(25deg); }
+        }
+
+        .cta-section h2 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+            color: #fff;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: rgba(255, 105, 180, 0.7);
+        }
+
+        .form-group button {
+            padding: 15px 25px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            border-radius: 0 5px 5px 0;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+        }
+
+        .about-section {
+            padding: 50px 0;
+            position: relative;
+        }
+
+        .about-container {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            background: rgba(0, 0, 0, 1);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .about-image {
+            flex: 1;
+            position: relative;
+            height: 300px;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            opacity: 0.8;
+        }
+
+        .about-content {
+            flex: 2;
+        }
+
+        .about-content h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+        }
+
+        .about-content h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 70px;
+            height: 2px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+
+        .about-content p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .about-content ul {
+            list-style-type: none;
+            margin-bottom: 20px;
+        }
+
+        .about-content ul li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .about-content ul li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .floating-circle {
+            display: none;
+        }
+
+        #circle1 { top: 10%; left: 10%; animation: circle-float 10s ease-in-out infinite; }
+        #circle2 { top: 70%; left: 80%; animation: circle-float 15s ease-in-out infinite; animation-delay: 1s; }
+        #circle3 { top: 20%; left: 85%; animation: circle-float 12s ease-in-out infinite; animation-delay: 2s; }
+        #circle4 { top: 80%; left: 25%; animation: circle-float 9s ease-in-out infinite; animation-delay: 3s; }
+        #circle5 { top: 40%; left: 60%; animation: circle-float 14s ease-in-out infinite; animation-delay: 1.5s; }
+        #circle6 { top: 60%; left: 5%; animation: circle-float 11s ease-in-out infinite; animation-delay: 2.5s; }
+
+        @keyframes circle-float {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.2); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 50px;
+            border: 2px solid rgba(255, 105, 180, 0.5);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            animation: scroll-float 2s ease-in-out infinite;
+        }
+
+        @keyframes scroll-float {
+            0% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+            100% { transform: translateX(-50%) translateY(0); }
+        }
+
+        .scroll-indicator::before {
+            content: '';
+            width: 6px;
+            height: 10px;
+            background: #ff69b4;
+            border-radius: 3px;
+            margin-top: 8px;
+            animation: scroll-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes scroll-dot {
+            0% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(15px); opacity: 0.5; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .digital-numbers {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #random-numbers {
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 992px) {
+            .about-container {
+                flex-direction: column;
+            }
+            .about-image {
+                width: 100%;
+            }
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            .hero h1 {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .hero h1 {
+                font-size: 28px;
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 250px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            z-index: 1000;
+            border-left: 1px solid rgba(255, 105, 180, 0.3);
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+            transition: color 0.3s;
+        }
+
+        .mobile-nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 1);
+            z-index: 999;
+            display: none;
+        }
+
+        #overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="#about">Sobre</a>
+                <a href="#modules">Módulos</a>
+                <a href="#community">Comunidade</a>
+                <a href="contato.html">Contato</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1 data-text="Hacking Ético">Hacking Ético</h1>
+                <p>hacking ferramentas, técnicas e metodologias de segurança cibernética.</p>
+                <a href="#modules" class="hero-btn">EXPLORAR MÓDULOS</a>
+            </div>
+            <div class="scroll-indicator"></div>
+        </section>
+
+        <section id="modules" class="modules-section">
+            <h2 style="text-align: center; font-size: 32px; color: #ff69b4; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 3px;">Módulos de Estudo</h2>
+            
+            <div class="grid-container">
+                <a href="kali.html" class="grid-item">
+                    <div class="scan-line"></div>
+                    <i class="fab fa-linux"></i>
+                    <h3>Kali Linux</h3>
+                    <p>Aprenda a dominar o sistema operacional favorito dos especialistas em segurança. Ferramentas, técnicas e laboratórios práticos.</p>
+                </a>
+                
+                <a href="flipper.html" class="grid-item">
+                    <div class="scan-line"></div>
+                    <i class="fas fa-microchip"></i>
+                    <h3>Flipper Zero & M5Stack</h3>
+                    <p>Explore as possibilidades dos dispositivos de hardware hacking mais populares do momento.</p>
+                </a>
+                
+                <a href="jogos.html" class="grid-item">
+                    <div class="scan-line"></div>
+                    <i class="fas fa-gamepad"></i>
+                    <h3>Game Hacking</h3>
+                    <p>Descubra como funcionam os hacks de jogos analisando memória, criando trainers e modificando game engines.</p>
+                </a>
+                
+                <a href="wifi.html" class="grid-item">
+                    <div class="scan-line"></div>
+                    <i class="fas fa-wifi"></i>
+                    <h3>Wi-Fi Pentesting</h3>
+                    <p>Aprenda técnicas de auditoria e testes de penetração em redes sem fio, desde WEP até WPA3.</p>
+                </a>
+                
+                <a href="recursos.html" class="grid-item">
+                    <div class="scan-line"></div>
+                    <i class="fas fa-download"></i>
+                    <h3>Recursos & Downloads</h3>
+                    <p>Acesse cheatsheets, máquinas virtuais, ferramentas e materiais extras para aprimorar seus estudos.</p>
+                </a>
+                
+                <a href="blog.html" class="grid-item">
+                    <div class="scan-line"></div>
+                    <i class="fas fa-newspaper"></i>
+                    <h3>Blog & Pesquisas</h3>
+                    <p>Artigos sobre vulnerabilidades recentes, análises de hardware/software e entrevistas com profissionais.</p>
+                </a>
+                
+                <a href="comunidade.html" class="grid-item">
+                    <div class="scan-line"></div>
+                    <i class="fas fa-users"></i>
+                    <h3>Comunidade</h3>
+                    <p>Participe do nosso fórum, Discord e eventos online. Compartilhe conhecimento e conecte-se com outros hackers éticos.</p>
+                </a>
+                
+                <a href="contato.html" class="grid-item">
+                    <div class="scan-line"></div>
+                    <i class="fas fa-id-card"></i>
+                    <h3>Contato & Sobre</h3>
+                    <p>Conheça mais sobre o projeto, nosso código de ética e entre em contato com o autor.</p>
+                </a>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="cta-container">
+                <h2>Junte-se à Comunidade</h2>
+                <p>Receba atualizações, tutoriais exclusivos e acesso antecipado a novos conteúdos. Inscreva-se em nossa newsletter.</p>
+                <div class="form-group">
+                    <input type="email" placeholder="Seu melhor e-mail">
+                    <button type="submit">INSCREVER</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about-section">
+            <div class="about-container">
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1629654297299-c8506221ca97?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Hacking Ético">
+                </div>
+                <div class="about-content">
+                    <h2>Código de Ética</h2>
+                    <p>O CyberHack é dedicado à educação e promoção do hacking ético e responsável. Nosso conteúdo é desenvolvido para fins educacionais e deve ser praticado apenas em ambientes controlados e autorizados.</p>
+                    <ul>
+                        <li>Sempre obtenha permissão antes de testar qualquer sistema</li>
+                        <li>Nunca utilize estas técnicas para atividades ilegais</li>
+                        <li>Reporte vulnerabilidades de forma responsável</li>
+                        <li>Compartilhe conhecimento com a comunidade</li>
+                        <li>Mantenha-se atualizado sobre leis de segurança digital</li>
+                    </ul>
+                    <p>Acreditamos que o conhecimento de segurança deve ser acessível a todos que desejam aprender, mas sempre com responsabilidade e ética.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">FAQ</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="overlay"></div>
+    <div class="mobile-menu">
+        <button class="mobile-menu-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="#about">Sobre</a>
+            <a href="#modules">Módulos</a>
+            <a href="kali.html">Kali Linux</a>
+            <a href="flipper.html">Flipper Zero & M5Stack</a>
+            <a href="jogos.html">Game Hacking</a>
+            <a href="wifi.html">Wi-Fi Pentesting</a>
+            <a href="recursos.html">Recursos & Downloads</a>
+            <a href="blog.html">Blog & Pesquisas</a>
+            <a href="comunidade.html">Comunidade</a>
+            <a href="contato.html">Contato</a>
+        </div>
+    </div>
+    
+    <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
+    
+    <div id="accessDeniedModal" class="access-denied" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.95); border: 2px solid #ff1493; border-radius: 10px; padding: 30px; z-index: 9999; text-align: center; box-shadow: 0 0 30px rgba(255, 20, 147, 0.5); max-width: 90%; width: 400px;">
+        <h3 style="color: #ff1493; font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Acesso Negado</h3>
+        <p style="color: #fff; margin-bottom: 20px; font-size: 16px;">ID não cadastrado. Você não tem permissão para acessar esta área.</p>
+        <button id="closeAccessDenied" style="background: linear-gradient(45deg, #ff1493, #ff69b4); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Entendi</button>
+    </div>
+
+    <script>
+        document.getElementById('closeAccessDenied').addEventListener('click', function() {
+            document.getElementById('accessDeniedModal').style.display = 'none';
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const allLinks = document.querySelectorAll('a');
+            const allButtons = document.querySelectorAll('button:not(#closeAccessDenied)');
+            
+            function showAccessDenied(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('accessDeniedModal').style.display = 'block';
+            }
+            
+            allLinks.forEach(function(link) {
+                link.addEventListener('click', showAccessDenied);
+            });
+            
+            allButtons.forEach(function(button) {
+                button.addEventListener('click', showAccessDenied);
+            });
+            
+            document.querySelectorAll('.grid-item').forEach(function(item) {
+                item.addEventListener('click', showAccessDenied);
+            });
+            
+            document.querySelector('.hero-btn').addEventListener('click', showAccessDenied);
+            
+            const formButton = document.querySelector('.form-group button');
+            if (formButton) {
+                formButton.addEventListener('click', showAccessDenied);
+            }
+        });
+    </script>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const sizes = new Float32Array(particlesCount);
+        
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 20;
+            positions[i + 1] = (Math.random() - 0.5) * 20;
+            positions[i + 2] = (Math.random() - 0.5) * 20;
+            
+            colors[i] = Math.random() * 0.5 + 0.5;
+            colors[i + 1] = Math.random() * 0.2;
+            colors[i + 2] = Math.random() * 0.5 + 0.5;
+            
+            sizes[i/3] = Math.random() * 0.5 + 0.5;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true,
+            map: createCircleTexture()
+        });
+        
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2.5;
+            
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            
+            const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+            
+            context.fillStyle = gradient;
+            context.fill();
+            
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+        
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            targetX = mouseX * 0.2;
+            targetY = mouseY * 0.2;
+            
+            particles.rotation.x += 0.0005;
+            particles.rotation.y += 0.001;
+            
+            particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+            particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+            
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        setInterval(() => {
+            document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
+        }, 1000);
+
+        const gridItems = document.querySelectorAll('.grid-item');
+        gridItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.querySelector('.scan-line').style.opacity = '1';
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                item.querySelector('.scan-line').style.opacity = '0';
+            });
+        });
+
+        animate();
+    </script>
+</body>
+</html>
