@@ -100,6 +100,28 @@
             position: relative;
             transition: color 0.3s;
         }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .download-btn::after {
+            display: none;
+        }
 
         .nav-links a:hover {
             color: #ff69b4;
@@ -739,6 +761,23 @@
         .mobile-nav-links a:hover {
             color: #ff69b4;
         }
+        
+        .mobile-download-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 10px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            border-bottom: none !important;
+        }
+        
+        .mobile-download-btn:hover {
+            color: #fff !important;
+            transform: translateY(-2px);
+        }
 
         #overlay {
             position: fixed;
@@ -767,6 +806,7 @@
                 <a href="#modules">Módulos</a>
                 <a href="#community">Comunidade</a>
                 <a href="contato.html">Contato</a>
+                <a href="downloads.html" class="download-btn"><i class="fas fa-download"></i> Downloads</a>
             </nav>
             <button class="mobile-menu-btn">
                 <i class="fas fa-bars"></i>
@@ -945,6 +985,7 @@
             <a href="blog.html">Blog & Pesquisas</a>
             <a href="comunidade.html">Comunidade</a>
             <a href="contato.html">Contato</a>
+            <a href="downloads.html" class="mobile-download-btn"><i class="fas fa-download"></i> Downloads</a>
         </div>
     </div>
     
