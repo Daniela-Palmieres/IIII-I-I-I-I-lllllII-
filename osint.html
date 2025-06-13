@@ -1,0 +1,3439 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT Avançado - CyberHack</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .noise {
+            display: none;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .home-btn {
+            background: linear-gradient(45deg, #00c3ff, #00e7ff);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(0, 199, 255, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 199, 255, 0.6);
+            color: #fff !important;
+        }
+        
+        .home-btn::after {
+            display: none;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .download-btn::after {
+            display: none;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            margin-bottom: 50px;
+            perspective: 1000px;
+        }
+
+        .hero-content {
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(5deg); }
+            100% { transform: translateY(0px) rotateX(0deg); }
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+        }
+
+        .hero h1::before,
+        .hero h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #00ffea;
+            animation: glitch-before 3s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        .hero h1::after {
+            left: -2px;
+            text-shadow: 1px 0 #ff00c1;
+            animation: glitch-after 2s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        @keyframes glitch-before {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(30% 0 25% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes glitch-after {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(10% 0 40% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+        
+        .content-section {
+            padding: 30px 0;
+            margin-bottom: 40px;
+        }
+        
+        .content-card {
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            z-index: 1;
+        }
+        
+        .content-card h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .content-card h2 i {
+            margin-right: 15px;
+            font-size: 32px;
+            color: #ff69b4;
+        }
+        
+        .content-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #00c3ff;
+            margin: 25px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 195, 255, 0.3);
+        }
+        
+        .content-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff9500;
+            margin: 20px 0 10px;
+        }
+        
+        .content-card p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+        
+        .content-card ul, .content-card ol {
+            margin-bottom: 20px;
+            padding-left: 25px;
+        }
+        
+        .content-card li {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 3px solid #ff69b4;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            color: #ffffff;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .code-block::before {
+            content: 'COMANDO';
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: #ff69b4;
+            color: #000;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .output-block {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 3px solid #00c3ff;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .output-block pre {
+            margin: 0;
+            color: #ffffff;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .output-block::before {
+            content: 'SAÍDA';
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: #00c3ff;
+            color: #000;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .warning-block {
+            background: rgba(255, 149, 0, 0.1);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 3px solid #ff9500;
+            position: relative;
+        }
+        
+        .warning-block::before {
+            content: '⚠️ ATENÇÃO';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #ff9500;
+            color: #000;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .tip-block {
+            background: rgba(0, 195, 255, 0.1);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 3px solid #00c3ff;
+            position: relative;
+        }
+        
+        .tip-block::before {
+            content: '💡 DICA';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #00c3ff;
+            color: #000;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .tool-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 20, 147, 0.2);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+        
+        .tool-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+        }
+        
+        .tool-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            font-size: 20px;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.3);
+        }
+        
+        .tool-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff69b4;
+        }
+        
+        .tool-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .tool-link {
+            padding: 8px 15px;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 5px;
+            color: #ff69b4;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .tool-link i {
+            margin-right: 8px;
+            color: #ff69b4;
+        }
+        
+        .tool-link:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .sub-section {
+            margin: 30px 0;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: rgba(255, 20, 147, 0.2);
+            color: #ff69b4;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-top: 1px solid rgba(255, 105, 180, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: rgba(255, 105, 180, 0.05);
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 5px;
+            background: rgba(255, 105, 180, 0.1);
+            color: #ff69b4;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+        
+        .tag.web {
+            background: rgba(0, 195, 255, 0.1);
+            color: #00c3ff;
+            border: 1px solid rgba(0, 195, 255, 0.3);
+        }
+        
+        .tag.social {
+            background: rgba(255, 149, 0, 0.1);
+            color: #ff9500;
+            border: 1px solid rgba(255, 149, 0, 0.3);
+        }
+        
+        .tag.cli {
+            background: rgba(50, 205, 50, 0.1);
+            color: #32cd32;
+            border: 1px solid rgba(50, 205, 50, 0.3);
+        }
+        
+        .toc {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: sticky;
+            top: 20px;
+        }
+        
+        .toc-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .toc-title i {
+            margin-right: 10px;
+        }
+        
+        .toc-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc-list li {
+            margin-bottom: 10px;
+        }
+        
+        .toc-list a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 14px;
+            display: block;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.1);
+        }
+        
+        .toc-list a:hover {
+            color: #ff69b4;
+        }
+        
+        .toc-list ul {
+            list-style-type: none;
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+        
+        .toc-list ul li {
+            margin-bottom: 5px;
+        }
+        
+        .toc-list ul a {
+            font-size: 13px;
+            border-bottom: none;
+            padding: 3px 0;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .grid-item {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 20, 147, 0.2);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+        
+        .grid-item h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .grid-item h4 i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .grid-item p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.3);
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.5);
+        }
+        
+        .btn-blue {
+            background: linear-gradient(45deg, #0088ff, #00c3ff);
+            box-shadow: 0 5px 15px rgba(0, 140, 255, 0.3);
+        }
+        
+        .btn-blue:hover {
+            box-shadow: 0 8px 20px rgba(0, 140, 255, 0.5);
+        }
+        
+        .btn-orange {
+            background: linear-gradient(45deg, #ff6a00, #ff9500);
+            box-shadow: 0 5px 15px rgba(255, 106, 0, 0.3);
+        }
+        
+        .btn-orange:hover {
+            box-shadow: 0 8px 20px rgba(255, 106, 0, 0.5);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .accordion {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            overflow: hidden;
+        }
+        
+        .accordion-header {
+            padding: 15px;
+            background: rgba(255, 20, 147, 0.1);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .accordion-header:hover {
+            background: rgba(255, 20, 147, 0.2);
+        }
+        
+        .accordion-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ff69b4;
+        }
+        
+        .accordion-icon {
+            color: #ff69b4;
+            transition: transform 0.3s ease;
+        }
+        
+        .accordion-content {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .accordion.active .accordion-content {
+            padding: 15px;
+        }
+        
+        .accordion.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        .img-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .img-container img {
+            max-width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+        
+        .img-caption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+        }
+        
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            margin-top: 50px;
+        }
+        
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+            display: none;
+        }
+        
+        #overlay.active {
+            display: block;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 250px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            z-index: 1000;
+            border-left: 1px solid rgba(255, 105, 180, 0.3);
+            overflow-y: auto;
+            transition: right 0.3s ease;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 70px;
+            padding: 0 20px;
+        }
+        
+        .mobile-nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+            transition: color 0.3s;
+        }
+        
+        .mobile-nav-links a:hover {
+            color: #ff69b4;
+        }
+        
+        .mobile-home-btn {
+            background: linear-gradient(45deg, #00c3ff, #00e7ff);
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 10px;
+            box-shadow: 0 3px 10px rgba(0, 199, 255, 0.4);
+            border-bottom: none !important;
+        }
+        
+        .mobile-home-btn:hover {
+            color: #fff !important;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .content-card h2 {
+                font-size: 24px;
+            }
+            
+            .content-card h3 {
+                font-size: 20px;
+            }
+            
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 28px;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .toc {
+                position: static;
+            }
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+            cursor: pointer;
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+        }
+        
+        .digital-numbers {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #random-numbers {
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="index.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+                <a href="#introducao">Introdução</a>
+                <a href="#ferramentas">Ferramentas</a>
+                <a href="#tecnicas">Técnicas</a>
+                <a href="#frameworks">Frameworks</a>
+                <a href="#etica">Ética & Legal</a>
+                <a href="downloads.html" class="download-btn"><i class="fas fa-download"></i> Downloads</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+        
+        <section class="hero">
+            <div class="hero-content">
+                <h1 data-text="OSINT Avançado">OSINT Avançado</h1>
+                <p>Aprenda técnicas, ferramentas e metodologias de Open Source Intelligence para coleta e análise de informações públicas.</p>
+            </div>
+        </section>
+        
+        <div class="content-section">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="toc">
+                        <div class="toc-title"><i class="fas fa-list"></i> Índice</div>
+                        <ul class="toc-list">
+                            <li><a href="#introducao">Introdução ao OSINT</a></li>
+                            <li>
+                                <a href="#ferramentas">Principais Ferramentas</a>
+                                <ul>
+                                    <li><a href="#maltego">Maltego</a></li>
+                                    <li><a href="#shodan">Shodan</a></li>
+                                    <li><a href="#theHarvester">theHarvester</a></li>
+                                    <li><a href="#spiderfoot">SpiderFoot</a></li>
+                                    <li><a href="#osintframework">OSINT Framework</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#tecnicas">Técnicas Avançadas</a>
+                                <ul>
+                                    <li><a href="#googledorks">Google Dorks</a></li>
+                                    <li><a href="#socmint">SOCMINT (Redes Sociais)</a></li>
+                                    <li><a href="#imint">IMINT (Imagens)</a></li>
+                                    <li><a href="#geoint">GEOINT (Geolocalização)</a></li>
+                                    <li><a href="#darkweb">OSINT na Dark Web</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#reconhecimento">Reconhecimento de Domínios</a>
+                                <ul>
+                                    <li><a href="#subdominios">Enumeração de Subdomínios</a></li>
+                                    <li><a href="#whois">WHOIS e DNS</a></li>
+                                    <li><a href="#infraestrutura">Análise de Infraestrutura</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#pessoas">OSINT para Pessoas</a>
+                                <ul>
+                                    <li><a href="#identidade">Informações de Identidade</a></li>
+                                    <li><a href="#perfilsocial">Perfil Social</a></li>
+                                    <li><a href="#vazamentos">Vazamentos de Dados</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#frameworks">Frameworks de OSINT</a>
+                                <ul>
+                                    <li><a href="#recon-ng">Recon-ng</a></li>
+                                    <li><a href="#osrframework">OSRFramework</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#automatizacao">Automatização de OSINT</a></li>
+                            <li><a href="#etica">Considerações Éticas e Legais</a></li>
+                            <li><a href="#recursos">Recursos Adicionais</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-9">
+                    <section id="introducao" class="content-card">
+                        <h2><i class="fas fa-info-circle"></i> Introdução ao OSINT</h2>
+                        <p>OSINT (Open Source Intelligence) refere-se à coleta e análise de informações a partir de fontes públicas e abertas. Diferente de outras formas de inteligência, o OSINT não envolve métodos clandestinos ou ilegais para obter informações, mas sim a habilidade de encontrar, filtrar e correlacionar dados disponíveis publicamente.</p>
+                        
+                        <h3>O que é OSINT?</h3>
+                        <p>OSINT abrange a coleta de dados de diversas fontes, incluindo:</p>
+                        <ul>
+                            <li>Meios de comunicação (jornais, revistas, rádio, TV)</li>
+                            <li>Internet (websites, blogs, redes sociais)</li>
+                            <li>Dados públicos governamentais (relatórios, declarações)</li>
+                            <li>Publicações acadêmicas e comerciais</li>
+                            <li>Informações geoespaciais</li>
+                            <li>Fotografias e vídeos públicos</li>
+                            <li>Dados de código aberto e hacktivismo</li>
+                        </ul>
+                        
+                        <h3>Ciclo de OSINT</h3>
+                        <p>O processo de OSINT geralmente segue um ciclo composto por 5 etapas:</p>
+                        <ol>
+                            <li><strong>Planejamento e Direção:</strong> Definir objetivos, escopo e requisitos da investigação</li>
+                            <li><strong>Coleta:</strong> Reunir informações de fontes abertas relevantes para o objetivo</li>
+                            <li><strong>Processamento:</strong> Organizar, filtrar e preparar os dados coletados</li>
+                            <li><strong>Análise:</strong> Examinar e interpretar os dados para extrair insights valiosos</li>
+                            <li><strong>Disseminação:</strong> Compartilhar os resultados da análise com as partes interessadas</li>
+                        </ol>
+                        
+                        <div class="warning-block">
+                            <p>O OSINT deve ser praticado dentro dos limites éticos e legais. Embora as informações sejam públicas, a forma como são coletadas, armazenadas e utilizadas pode ter implicações legais. Este guia é fornecido apenas para fins educacionais e de segurança defensiva.</p>
+                        </div>
+                        
+                        <h3>Categorias de OSINT</h3>
+                        <div class="grid-container">
+                            <div class="grid-item">
+                                <h4><i class="fas fa-globe"></i> WEBINT</h4>
+                                <p>Inteligência baseada na web, incluindo sites, blogs, fóruns e outras plataformas online.</p>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-users"></i> SOCMINT</h4>
+                                <p>Inteligência de mídias sociais, focada em plataformas como Facebook, Twitter, Instagram e LinkedIn.</p>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-image"></i> IMINT</h4>
+                                <p>Inteligência de imagens, utilizando fotografias, vídeos e outras representações visuais.</p>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-map-marker-alt"></i> GEOINT</h4>
+                                <p>Inteligência geoespacial, relacionada a localizações, mapas e dados geográficos.</p>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-building"></i> FININT</h4>
+                                <p>Inteligência financeira, analisando dados econômicos e transações financeiras públicas.</p>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-file-alt"></i> DOCINT</h4>
+                                <p>Inteligência documental, baseada em relatórios, documentos e publicações oficiais.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section id="ferramentas" class="content-card">
+                        <h2><i class="fas fa-tools"></i> Principais Ferramentas de OSINT</h2>
+                        <p>O arsenal de um profissional de OSINT inclui diversas ferramentas especializadas para coleta e análise de dados. Abaixo estão algumas das mais poderosas e populares ferramentas usadas atualmente.</p>
+                        
+                        <div id="maltego" class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-icon"><i class="fas fa-project-diagram"></i></div>
+                                <div class="tool-title">Maltego</div>
+                            </div>
+                            <p>O Maltego é uma plataforma de inteligência e análise forense que permite mapear relacionamentos entre pessoas, empresas, domínios, IPs e outros elementos de informação em gráficos interativos.</p>
+                            
+                            <h4>Instalação</h4>
+                            <p>No Kali Linux, o Maltego já vem pré-instalado. Em outros sistemas:</p>
+                            <div class="code-block">
+                                <pre>sudo apt-get update
+sudo apt-get install maltego</pre>
+                            </div>
+                            <p>Ou baixe diretamente do site oficial: <a href="https://www.maltego.com/downloads/" style="color: #ff69b4;">https://www.maltego.com/downloads/</a></p>
+                            
+                            <h4>Uso Básico</h4>
+                            <ol>
+                                <li>Abra o Maltego e crie uma nova conta ou faça login</li>
+                                <li>Crie um novo gráfico: <code>File > New > Create a new graph</code></li>
+                                <li>Arraste uma entidade para o gráfico (ex: Domain, Person, Email)</li>
+                                <li>Clique com o botão direito na entidade e selecione "Run Transform" para executar uma transformação</li>
+                            </ol>
+                            
+                            <h4>Exemplo: Análise de Domínio</h4>
+                            <div class="code-block">
+                                <pre>1. Arraste uma entidade "Domain" para o gráfico
+2. Insira o domínio alvo (ex: exemplo.com.br)
+3. Clique com o botão direito > All Transforms
+4. Selecione "To DNS Name - MX (Mail Server)"
+5. Execute a transformação para descobrir servidores de email</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>Transformação concluída:
+- mail.exemplo.com.br [IP: 203.0.113.10]
+- backup-mx.exemplo.com.br [IP: 203.0.113.11]
+- Relações adicionadas ao gráfico</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>O Maltego Community Edition é gratuito, mas tem limitações. Para investigações mais completas, considere a versão comercial. A eficácia do Maltego depende muito das transformações utilizadas - aprenda a combinar transformações para obter os melhores resultados.</p>
+                            </div>
+                            
+                            <div class="tool-links">
+                                <a href="https://www.maltego.com/documentation/" class="tool-link"><i class="fas fa-book"></i> Documentação</a>
+                                <a href="https://www.maltego.com/categories/tutorials/" class="tool-link"><i class="fas fa-graduation-cap"></i> Tutoriais</a>
+                            </div>
+                        </div>
+                        
+                        <div id="shodan" class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-icon"><i class="fas fa-search"></i></div>
+                                <div class="tool-title">Shodan</div>
+                            </div>
+                            <p>Shodan é um motor de busca para dispositivos conectados à internet. Diferente de buscadores tradicionais, ele indexa banners e metadados de serviços em execução, permitindo encontrar dispositivos específicos, desde servidores e roteadores até câmeras IoT e sistemas industriais.</p>
+                            
+                            <h4>Acesso</h4>
+                            <p>Você pode usar o Shodan através da interface web ou da API/CLI:</p>
+                            <ul>
+                                <li>Interface Web: <a href="https://www.shodan.io/" style="color: #ff69b4;">https://www.shodan.io/</a></li>
+                                <li>API/CLI: Requer registro e chave API</li>
+                            </ul>
+                            
+                            <h4>Instalação da CLI</h4>
+                            <div class="code-block">
+                                <pre>pip install shodan</pre>
+                            </div>
+                            
+                            <h4>Configuração da CLI</h4>
+                            <div class="code-block">
+                                <pre>shodan init SUA_CHAVE_API_AQUI</pre>
+                            </div>
+                            
+                            <h4>Comandos Úteis</h4>
+                            <div class="code-block">
+                                <pre># Buscar por dispositivos específicos
+shodan search "apache country:BR"
+
+# Informações sobre um host específico
+shodan host 203.0.113.1
+
+# Estatísticas sobre resultados
+shodan stats "nginx country:BR"
+
+# Baixar resultados para análise offline
+shodan download resultados "webcam country:BR"
+
+# Converter para formato JSON
+shodan parse --fields ip_str,port,org --separator , resultados.json.gz</pre>
+                            </div>
+                            
+                            <h4>Filtros Avançados</h4>
+                            <div class="table-container">
+                                <table>
+                                    <tr>
+                                        <th>Filtro</th>
+                                        <th>Descrição</th>
+                                        <th>Exemplo</th>
+                                    </tr>
+                                    <tr>
+                                        <td>country</td>
+                                        <td>Código do país ISO</td>
+                                        <td>country:BR</td>
+                                    </tr>
+                                    <tr>
+                                        <td>city</td>
+                                        <td>Nome da cidade</td>
+                                        <td>city:"Sao Paulo"</td>
+                                    </tr>
+                                    <tr>
+                                        <td>org</td>
+                                        <td>Organização/ASN</td>
+                                        <td>org:"Amazon"</td>
+                                    </tr>
+                                    <tr>
+                                        <td>port</td>
+                                        <td>Número da porta</td>
+                                        <td>port:22</td>
+                                    </tr>
+                                    <tr>
+                                        <td>os</td>
+                                        <td>Sistema operacional</td>
+                                        <td>os:"Windows"</td>
+                                    </tr>
+                                    <tr>
+                                        <td>before/after</td>
+                                        <td>Timestamp</td>
+                                        <td>before:01/01/2023</td>
+                                    </tr>
+                                    <tr>
+                                        <td>vuln</td>
+                                        <td>Vulnerabilidade CVE</td>
+                                        <td>vuln:CVE-2021-44228</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <h4>Dorks do Shodan</h4>
+                            <div class="code-block">
+                                <pre># Cameras de segurança
+webcam country:BR
+
+# Servidores com acesso anônimo FTP
+"220" "230 Login successful." port:21 country:BR
+
+# Servidores MongoDB sem autenticação
+"MongoDB Server Information" port:27017 -authentication
+
+# Servidores Elasticsearch expostos
+port:9200 json country:BR
+
+# Servidores Jenkins
+"Dashboard [Jenkins]" country:BR</pre>
+                            </div>
+                            
+                            <div class="warning-block">
+                                <p>O uso do Shodan deve ser estritamente ético e legal. Não tente acessar sistemas sem autorização explícita. A conta gratuita tem limitações de busca - considere um plano pago para pesquisas mais avançadas.</p>
+                            </div>
+                            
+                            <div class="tool-links">
+                                <a href="https://cli.shodan.io/" class="tool-link"><i class="fas fa-terminal"></i> Documentação CLI</a>
+                                <a href="https://help.shodan.io/the-basics/search-query-fundamentals" class="tool-link"><i class="fas fa-search"></i> Guia de Busca</a>
+                            </div>
+                        </div>
+                        
+                        <div id="theHarvester" class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-icon"><i class="fas fa-envelope"></i></div>
+                                <div class="tool-title">theHarvester</div>
+                            </div>
+                            <p>theHarvester é uma ferramenta especializada em coletar emails, nomes, subdomínios, IPs e URLs de diversas fontes públicas, incluindo mecanismos de busca, APIs e sites.</p>
+                            
+                            <h4>Instalação</h4>
+                            <p>No Kali Linux:</p>
+                            <div class="code-block">
+                                <pre>sudo apt update
+sudo apt install theharvester</pre>
+                            </div>
+                            
+                            <p>Via GitHub:</p>
+                            <div class="code-block">
+                                <pre>git clone https://github.com/laramies/theHarvester.git
+cd theHarvester
+pip3 install -r requirements.txt</pre>
+                            </div>
+                            
+                            <h4>Uso Básico</h4>
+                            <div class="code-block">
+                                <pre># Sintaxe básica
+theharvester -d dominio.com.br -l 500 -b fonte
+
+# Exemplo com múltiplas fontes
+theharvester -d empresa.com.br -l 500 -b google,linkedin,twitter,yahoo,bing</pre>
+                            </div>
+                            
+                            <h4>Parâmetros Importantes</h4>
+                            <div class="table-container">
+                                <table>
+                                    <tr>
+                                        <th>Parâmetro</th>
+                                        <th>Descrição</th>
+                                    </tr>
+                                    <tr>
+                                        <td>-d</td>
+                                        <td>Domínio alvo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-b</td>
+                                        <td>Fontes de dados (google, bing, linkedin, twitter, etc.)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-l</td>
+                                        <td>Limite de resultados</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-f</td>
+                                        <td>Salvar resultados em arquivo HTML e XML</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-c</td>
+                                        <td>Realizar busca DNS para IPs encontrados</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-t</td>
+                                        <td>Realizar DNS TLD expansion</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-e</td>
+                                        <td>Usar mecanismo de busca específico</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-s</td>
+                                        <td>Iniciar posição para a busca</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <h4>Exemplo Prático</h4>
+                            <div class="code-block">
+                                <pre>theharvester -d uol.com.br -b google,bing,yahoo -l 500 -f resultado_uol</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>*******************************************************************
+*  _   _                                            _             *
+* | |_| |__   ___    /\  /\__ _ _ ____   _____  ___| |_ ___ _ __  *
+* | __| '_ \ / _ \  / /_/ / _` | '__\ \ / / _ \/ __| __/ _ \ '__| *
+* | |_| | | |  __/ / __  / (_| | |   \ V /  __/\__ \ ||  __/ |    *
+*  \__|_| |_|\___| \/ /_/ \__,_|_|    \_/ \___||___/\__\___|_|    *
+*                                                                 *
+* theHarvester 4.2.0                                              *
+* Coded by Christian Martorella                                   *
+* Edge-Security Research                                          *
+* cmartorella@edge-security.com                                   *
+*                                                                 *
+*******************************************************************
+
+[*] Target: uol.com.br
+
+[*] Searching Google...
+    Searching 0 results...
+    Searching 100 results...
+    Searching 200 results...
+    Searching 300 results...
+    Searching 400 results...
+    Searching 500 results...
+
+[*] Searching Bing...
+    Searching 0 results...
+    Searching 50 results...
+    Searching 100 results...
+    Searching 150 results...
+    Searching 200 results...
+
+[*] Searching Yahoo...
+    Searching 0 results...
+    Searching 100 results...
+    Searching 200 results...
+
+[*] Emails encontrados: 27
+------------------
+admin@uol.com.br
+contato@uol.com.br
+suporte@uol.com.br
+[...]
+
+[*] Hostnames encontrados: 42
+--------------------
+www.uol.com.br
+mail.uol.com.br
+blog.uol.com.br
+[...]
+
+[*] Resultados salvos em: resultado_uol.html e resultado_uol.xml</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>Para evitar bloqueios, é recomendável usar o parâmetro -s para definir um delay entre as requisições. Algumas fontes, como LinkedIn e Twitter, podem requerer chaves API - configure no arquivo de configuração.</p>
+                            </div>
+                            
+                            <div class="tool-links">
+                                <a href="https://github.com/laramies/theHarvester" class="tool-link"><i class="fab fa-github"></i> Código Fonte</a>
+                                <a href="https://github.com/laramies/theHarvester/wiki" class="tool-link"><i class="fas fa-book"></i> Documentação</a>
+                            </div>
+                        </div>
+                        
+                        <div id="spiderfoot" class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-icon"><i class="fas fa-spider"></i></div>
+                                <div class="tool-title">SpiderFoot</div>
+                            </div>
+                            <p>SpiderFoot é uma ferramenta de automação de OSINT que pode coletar e correlacionar dados de mais de 100 fontes públicas. É ideal para auditorias de footprinting e descoberta de superfície de ataque.</p>
+                            
+                            <h4>Instalação</h4>
+                            <div class="code-block">
+                                <pre>git clone https://github.com/smicallef/spiderfoot.git
+cd spiderfoot
+pip3 install -r requirements.txt</pre>
+                            </div>
+                            
+                            <h4>Iniciar SpiderFoot</h4>
+                            <div class="code-block">
+                                <pre>python3 ./sf.py -l 127.0.0.1:5001</pre>
+                            </div>
+                            
+                            <p>Acesse a interface web em: http://127.0.0.1:5001</p>
+                            
+                            <h4>Uso via CLI</h4>
+                            <div class="code-block">
+                                <pre># Ver módulos disponíveis
+python3 ./sf.py -M
+
+# Executar um scan
+python3 ./sf.py -m módulos,separados,por,vírgula -s dominio.com.br -q
+
+# Exemplo específico
+python3 ./sf.py -m sfp_dnsresolve,sfp_ripe,sfp_shodan -s uol.com.br -q</pre>
+                            </div>
+                            
+                            <h4>Módulos Úteis</h4>
+                            <div class="table-container">
+                                <table>
+                                    <tr>
+                                        <th>Módulo</th>
+                                        <th>Descrição</th>
+                                    </tr>
+                                    <tr>
+                                        <td>sfp_dnsresolve</td>
+                                        <td>Resolução DNS</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sfp_shodan</td>
+                                        <td>Busca por dados no Shodan</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sfp_hunter</td>
+                                        <td>Busca emails via Hunter.io</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sfp_social</td>
+                                        <td>Perfis em redes sociais</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sfp_whois</td>
+                                        <td>Consultas WHOIS</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sfp_threatcrowd</td>
+                                        <td>Busca por ameaças associadas</td>
+                                    </tr>
+                                    <tr>
+                                        <td>sfp_googleSearch</td>
+                                        <td>Busca no Google</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <h4>Exemplo de Scan Completo via Interface Web</h4>
+                            <ol>
+                                <li>Acesse http://127.0.0.1:5001</li>
+                                <li>Clique em "New Scan"</li>
+                                <li>Selecione um nome para o scan</li>
+                                <li>Insira o alvo (domínio, IP, email, etc)</li>
+                                <li>Selecione os módulos desejados (ou use "All")</li>
+                                <li>Clique em "Run Scan"</li>
+                            </ol>
+                            
+                            <div class="tip-block">
+                                <p>O SpiderFoot HX é a versão comercial com recursos adicionais. Para investigações mais completas, considere configurar chaves API para serviços como Shodan, VirusTotal e Hunter.io no arquivo de configuração.</p>
+                            </div>
+                            
+                            <div class="tool-links">
+                                <a href="https://github.com/smicallef/spiderfoot" class="tool-link"><i class="fab fa-github"></i> Código Fonte</a>
+                                <a href="https://www.spiderfoot.net/documentation/" class="tool-link"><i class="fas fa-book"></i> Documentação</a>
+                            </div>
+                        </div>
+                        
+                        <div id="osintframework" class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-icon"><i class="fas fa-sitemap"></i></div>
+                                <div class="tool-title">OSINT Framework</div>
+                            </div>
+                            <p>OSINT Framework não é uma ferramenta tradicional, mas sim uma coleção organizada de recursos e ferramentas de OSINT, estruturada por categorias. É um excelente ponto de partida para qualquer investigação.</p>
+                            
+                            <h4>Acesso</h4>
+                            <p>O OSINT Framework está disponível online:</p>
+                            <div class="code-block">
+                                <pre>https://osintframework.com/</pre>
+                            </div>
+                            
+                            <h4>Categorias Principais</h4>
+                            <ul>
+                                <li>Usernames</li>
+                                <li>Email Addresses</li>
+                                <li>Domain Names</li>
+                                <li>IP Addresses</li>
+                                <li>Social Networks</li>
+                                <li>Images</li>
+                                <li>Phone Numbers</li>
+                                <li>Business Research</li>
+                                <li>Public Records</li>
+                            </ul>
+                            
+                            <h4>Utilizando o Framework</h4>
+                            <ol>
+                                <li>Acesse o site osintframework.com</li>
+                                <li>Navegue pela estrutura de árvore expandindo os nós</li>
+                                <li>Clique nas ferramentas (links coloridos) para acessá-las</li>
+                                <li>Use a barra de pesquisa para encontrar ferramentas específicas</li>
+                            </ol>
+                            
+                            <div class="tip-block">
+                                <p>Você pode clonar o repositório do OSINT Framework do GitHub para ter uma cópia offline. Muitas das ferramentas listadas são gratuitas, mas algumas podem exigir registro ou pagamento.</p>
+                            </div>
+                            
+                            <div class="tool-links">
+                                <a href="https://osintframework.com/" class="tool-link"><i class="fas fa-globe"></i> Site Oficial</a>
+                                <a href="https://github.com/lockfale/OSINT-Framework" class="tool-link"><i class="fab fa-github"></i> Repositório GitHub</a>
+                            </div>
+                        </div>
+                        
+                        <div class="sub-section">
+                            <h3>Outras Ferramentas Notáveis</h3>
+                            <div class="grid-container">
+                                <div class="grid-item">
+                                    <h4><i class="fas fa-search-location"></i> Metagoofil</h4>
+                                    <p>Extrai metadados de documentos públicos de um domínio alvo.</p>
+                                    <div class="code-block">
+                                        <pre>metagoofil -d empresa.com.br -t pdf,docx -o resultados -f resultado.html</pre>
+                                    </div>
+                                </div>
+                                <div class="grid-item">
+                                    <h4><i class="fas fa-fingerprint"></i> Recon-ng</h4>
+                                    <p>Framework modular para reconhecimento baseado na web.</p>
+                                    <div class="code-block">
+                                        <pre>recon-ng
+marketplace search domain
+marketplace install recon/domains-hosts/google_site_web</pre>
+                                    </div>
+                                </div>
+                                <div class="grid-item">
+                                    <h4><i class="fas fa-user-secret"></i> Sherlock</h4>
+                                    <p>Busca por nomes de usuário em centenas de redes sociais.</p>
+                                    <div class="code-block">
+                                        <pre>python3 sherlock.py usuariosuspecto</pre>
+                                    </div>
+                                </div>
+                                <div class="grid-item">
+                                    <h4><i class="fas fa-address-card"></i> PhoneInfoga</h4>
+                                    <p>Ferramenta avançada para OSINT de números telefônicos.</p>
+                                    <div class="code-block">
+                                        <pre>phoneinfoga scan -n +5511987654321</pre>
+                                    </div>
+                                </div>
+                                <div class="grid-item">
+                                    <h4><i class="fas fa-globe-americas"></i> Amass</h4>
+                                    <p>Mapeamento de superfície de ataque e descoberta de ativos.</p>
+                                    <div class="code-block">
+                                        <pre>amass enum -d dominio.com.br</pre>
+                                    </div>
+                                </div>
+                                <div class="grid-item">
+                                    <h4><i class="fas fa-images"></i> ExifTool</h4>
+                                    <p>Leitor e editor de metadados de imagens e arquivos.</p>
+                                    <div class="code-block">
+                                        <pre>exiftool imagem.jpg</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section id="tecnicas" class="content-card">
+                        <h2><i class="fas fa-graduation-cap"></i> Técnicas Avançadas de OSINT</h2>
+                        <p>Conhecer as ferramentas é apenas o início. O verdadeiro poder do OSINT está nas técnicas e metodologias que permitem correlacionar dados de diferentes fontes para obter insights valiosos.</p>
+                        
+                        <div id="googledorks" class="sub-section">
+                            <h3>Google Dorks (Google Hacking)</h3>
+                            <p>Google Dorks são operadores de busca avançados que permitem encontrar informações específicas e muitas vezes sensíveis indexadas pelo Google.</p>
+                            
+                            <h4>Operadores Básicos</h4>
+                            <div class="table-container">
+                                <table>
+                                    <tr>
+                                        <th>Operador</th>
+                                        <th>Descrição</th>
+                                        <th>Exemplo</th>
+                                    </tr>
+                                    <tr>
+                                        <td>site:</td>
+                                        <td>Limita resultados a um domínio específico</td>
+                                        <td>site:uol.com.br</td>
+                                    </tr>
+                                    <tr>
+                                        <td>filetype:</td>
+                                        <td>Busca por tipos específicos de arquivo</td>
+                                        <td>filetype:pdf site:gov.br</td>
+                                    </tr>
+                                    <tr>
+                                        <td>inurl:</td>
+                                        <td>Busca por texto específico na URL</td>
+                                        <td>inurl:admin site:com.br</td>
+                                    </tr>
+                                    <tr>
+                                        <td>intitle:</td>
+                                        <td>Busca por texto específico no título</td>
+                                        <td>intitle:"index of" site:org.br</td>
+                                    </tr>
+                                    <tr>
+                                        <td>intext:</td>
+                                        <td>Busca por texto específico no conteúdo</td>
+                                        <td>intext:"senha" site:gov.br</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ext:</td>
+                                        <td>Busca por extensão de arquivo específica</td>
+                                        <td>ext:sql site:gov.br</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-</td>
+                                        <td>Exclui termos da busca</td>
+                                        <td>confidencial site:org.br -público</td>
+                                    </tr>
+                                    <tr>
+                                        <td>|</td>
+                                        <td>Operador OR</td>
+                                        <td>senha | password site:com.br</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <h4>Google Dorks Eficazes para OSINT</h4>
+                            <div class="code-block">
+                                <pre># Documentos confidenciais
+filetype:pdf intext:"confidencial" site:gov.br
+
+# Diretórios expostos
+intitle:"Index of" intext:"parent directory" site:com.br
+
+# Arquivos de configuração
+filetype:env OR filetype:ini OR filetype:config site:com.br
+
+# Painéis de administração
+inurl:admin OR inurl:login OR inurl:painel site:com.br
+
+# Informações de funcionários
+site:linkedin.com "at empresa" "location São Paulo"
+
+# Arquivos de backup
+filetype:bak OR filetype:old OR filetype:backup site:gov.br
+
+# Planilhas com dados sensíveis
+filetype:xls OR filetype:xlsx intext:"cpf" OR intext:"senha" site:org.br
+
+# Páginas com erros de SQL
+intext:"sql syntax near" OR intext:"syntax error has occurred" site:com.br
+
+# Documentos com metadados valiosos
+filetype:pdf OR filetype:docx OR filetype:pptx site:empresa.com.br</pre>
+                            </div>
+                            
+                            <div class="warning-block">
+                                <p>Os Google Dorks são extremamente poderosos e podem revelar informações sensíveis. Use essas técnicas apenas para fins legítimos e éticos. Muitos sites monitoram buscas que utilizam esses operadores.</p>
+                            </div>
+                            
+                            <h4>Ferramentas para Automatizar Google Dorks</h4>
+                            <ul>
+                                <li><strong>GHDB (Google Hacking Database):</strong> Coleção de dorks em https://www.exploit-db.com/google-hacking-database</li>
+                                <li><strong>Pagodo:</strong> Ferramenta para automatizar buscas com Google Dorks</li>
+                                <li><strong>GooDork:</strong> Script Python para automatizar Google Dorks</li>
+                            </ul>
+                            
+                            <div class="code-block">
+                                <pre># Instalando e usando o Pagodo
+git clone https://github.com/opsdisk/pagodo.git
+cd pagodo
+pip3 install -r requirements.txt
+python3 pagodo.py -d empresa.com.br -g dorks.txt</pre>
+                            </div>
+                        </div>
+                        
+                        <div id="socmint" class="sub-section">
+                            <h3>SOCMINT (Social Media Intelligence)</h3>
+                            <p>SOCMINT envolve a coleta e análise de dados de plataformas de mídia social para obter insights sobre indivíduos, organizações ou tendências.</p>
+                            
+                            <h4>Técnicas para Facebook</h4>
+                            <div class="code-block">
+                                <pre># Busca avançada usando URLs
+https://www.facebook.com/search/people/?q=nome+sobrenome&epa=FILTERS
+
+# Buscar pessoas que trabalham em uma empresa específica
+https://www.facebook.com/search/people/?q=&filters=eyJjaXR5IjoiMCIsImNvbXBhbnkiOiJ7XCJuYW1lXCI6XCJFbXByZXNhIFgsXCIsXCJpZFwiOlwiMTIzNDU2Nzg5XCJ9In0%3D
+
+# Encontrar posts de um local específico
+https://www.facebook.com/search/posts/?q=&filters=eyJycF9sb2NhdGlvbjowIjoie1wibmFtZVwiOlwiU8OjbyBQYXVsb1wiLFwiaWRcIjpcIjEwNjA3ODAzMjY0MTEyOVwifSJ9</pre>
+                            </div>
+                            
+                            <h4>Técnicas para Twitter/X</h4>
+                            <div class="code-block">
+                                <pre># Operadores de busca avançada
+from:usuário termo  # Posts de um usuário específico com o termo
+to:usuário          # Mensagens direcionadas a um usuário
+url:dominio.com     # Tweets com links para o domínio
+geocode:-23.5505,-46.6333,10km  # Tweets em um raio de 10km de São Paulo
+since:2023-01-01 until:2023-12-31  # Tweets em um período específico
+
+# Exemplo combinado
+from:jornalnacional covid geocode:-23.5505,-46.6333,20km since:2023-01-01</pre>
+                            </div>
+                            
+                            <h4>Técnicas para Instagram</h4>
+                            <div class="code-block">
+                                <pre># Análise de hashtags relacionadas
+URL: https://www.instagram.com/explore/tags/nomeDaTag/
+
+# Análise de localização
+URL: https://www.instagram.com/explore/locations/123456789/
+
+# Ferramenta: Instaloader
+pip install instaloader
+instaloader profile usuário --no-videos --no-metadata-json
+
+# Ferramenta: Osintgram (requer login)
+git clone https://github.com/Datalux/Osintgram
+cd Osintgram
+pip3 install -r requirements.txt
+python3 main.py usuário_alvo</pre>
+                            </div>
+                            
+                            <h4>LinkedIn OSINT</h4>
+                            <div class="code-block">
+                                <pre># Operadores de busca avançada no LinkedIn
+site:linkedin.com/in/ "gerente de segurança" "Empresa X"
+
+# Ferramenta: LinkedInt
+git clone https://github.com/vysecurity/LinkedInt
+cd LinkedInt
+pip3 install -r requirements.txt
+python3 LinkedInt.py -c cookies.txt -e @empresa.com.br</pre>
+                            </div>
+                            
+                            <h4>Ferramenta: Social Analyzer</h4>
+                            <div class="code-block">
+                                <pre>git clone https://github.com/qeeqbox/social-analyzer.git
+cd social-analyzer
+pip3 install -r requirements.txt
+python3 app.py --username "alvo" --metadata --extract --trim</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>Encontrados 14 perfis para "alvo":
+[+] Twitter: https://twitter.com/alvo (Nome: João Silva, Bio: Especialista em segurança)
+[+] Instagram: https://instagram.com/alvo (Seguindo: 453, Seguidores: 1.2K)
+[+] GitHub: https://github.com/alvo (Repositórios: 23)
+[+] LinkedIn: https://linkedin.com/in/alvo (Cargo: Gerente de Segurança na Empresa X)
+...</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>As redes sociais constantemente mudam suas APIs e políticas. Mantenha suas ferramentas atualizadas e esteja ciente de que algumas podem parar de funcionar após atualizações das plataformas.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="imint" class="sub-section">
+                            <h3>IMINT (Imagery Intelligence)</h3>
+                            <p>IMINT envolve a análise de imagens para extrair informações valiosas, incluindo metadados, localização geográfica e detalhes visuais.</p>
+                            
+                            <h4>Análise de Metadados EXIF</h4>
+                            <div class="code-block">
+                                <pre># Usando ExifTool
+exiftool imagem.jpg
+
+# Usando exiv2
+exiv2 print imagem.jpg
+
+# Usando a ferramenta online
+https://exif.tools/</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>ExifTool Version Number         : 12.40
+File Name                       : imagem.jpg
+Directory                       : .
+File Size                       : 2.5 MiB
+File Modification Date/Time     : 2023:05:15 14:32:30-03:00
+File Access Date/Time           : 2023:05:15 14:32:30-03:00
+File Creation Date/Time         : 2023:05:15 14:32:30-03:00
+File Permissions                : -rw-r--r--
+File Type                       : JPEG
+File Type Extension             : jpg
+MIME Type                       : image/jpeg
+JFIF Version                    : 1.01
+Exif Byte Order                 : Little-endian (Intel, II)
+Make                            : Apple
+Camera Model Name               : iPhone 13 Pro
+Orientation                     : Horizontal (normal)
+X Resolution                    : 72
+Y Resolution                    : 72
+Resolution Unit                 : inches
+Software                        : iOS 16.3.1
+Modify Date                     : 2023:05:14 11:22:18
+Y Cb Cr Positioning             : Centered
+Exposure Time                   : 1/1250
+F Number                        : 1.8
+Exposure Program                : Program AE
+ISO                             : 32
+GPS Version ID                  : 2.3.0.0
+GPS Latitude Ref                : South
+GPS Latitude                    : 23 deg 32' 44.86"
+GPS Longitude Ref               : West
+GPS Longitude                   : 46 deg 38' 19.25"
+GPS Altitude Ref                : Above Sea Level
+GPS Altitude                    : 826.3 m
+GPS Time Stamp                  : 14:22:18
+GPS Img Direction Ref           : True North
+GPS Img Direction               : 185.71
+GPS Dest Bearing Ref            : True North
+GPS Dest Bearing                : 185.71
+Image Width                     : 4032
+Image Height                    : 3024
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:2:0 (2 2)
+Aperture                        : 1.8
+Image Size                      : 4032x3024
+Megapixels                      : 12.2
+Scale Factor To 35 mm Equivalent: 6.0
+Shutter Speed                   : 1/1250
+GPS Altitude                    : 826.3 m Above Sea Level
+GPS Latitude                    : 23 deg 32' 44.86" S
+GPS Longitude                   : 46 deg 38' 19.25" W
+GPS Position                    : 23 deg 32' 44.86" S, 46 deg 38' 19.25" W
+Circle Of Confusion             : 0.005 mm
+Field Of View                   : 63.7 deg
+Focal Length                    : 5.7 mm (35 mm equivalent: 34.0 mm)
+Hyperfocal Distance             : 3.00 m
+Light Value                     : 14.6</pre>
+                            </div>
+                            
+                            <h4>Busca Reversa de Imagens</h4>
+                            <div class="code-block">
+                                <pre># Ferramentas online
+Google Images: https://images.google.com
+TinEye: https://tineye.com
+Yandex Images: https://yandex.com/images/
+Bing Visual Search: https://www.bing.com/visualsearch
+
+# Usando Search By Image (extensão para navegador)
+https://chrome.google.com/webstore/detail/search-by-image/cnojnbdhbhnkbcieeekonklommdnndci</pre>
+                            </div>
+                            
+                            <h4>Análise Forense de Imagens</h4>
+                            <div class="code-block">
+                                <pre># Usando Ghiro
+git clone https://github.com/ghirensics/ghiro.git
+cd ghiro
+sudo ./install.sh
+
+# Usando Sherloq
+git clone https://github.com/GuidoBartoli/sherloq.git
+cd sherloq
+pip3 install -r requirements.txt
+python3 sherloq.py</pre>
+                            </div>
+                            
+                            <h4>Geolocalização de Imagens</h4>
+                            <p>Técnicas para determinar a localização a partir de elementos visuais:</p>
+                            <ul>
+                                <li>Identificar marcos e pontos de referência</li>
+                                <li>Analisar sinalização, placas de rua e nomes de estabelecimentos</li>
+                                <li>Observar características arquitetônicas regionais</li>
+                                <li>Examinar vegetação e paisagem natural</li>
+                                <li>Identificar padrões de calçadas, postes, semáforos</li>
+                                <li>Analisar condições climáticas e posição do sol</li>
+                                <li>Observar placas de veículos e modelos específicos de regiões</li>
+                            </ul>
+                            
+                            <div class="code-block">
+                                <pre># Ferramenta: GeoEstimation
+https://github.com/TIBHannover/GeoEstimation
+
+# Jogo para praticar geolocalização
+https://geoguessr.com/</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>Combine várias técnicas de IMINT para resultados mais precisos. Muitas redes sociais e plataformas removem metadados EXIF automaticamente, mas podem preservar outras informações úteis nas imagens.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="geoint" class="sub-section">
+                            <h3>GEOINT (Geospatial Intelligence)</h3>
+                            <p>GEOINT usa dados geoespaciais para identificar, analisar e interpretar locais físicos e atividades relacionadas a eles.</p>
+                            
+                            <h4>Ferramentas de Mapeamento</h4>
+                            <div class="code-block">
+                                <pre># Google Earth Pro (download)
+https://www.google.com/earth/versions/#earth-pro
+
+# Comandos Google Earth (filtros temporais)
+Usar o controle deslizante de tempo para ver imagens históricas de uma localização
+
+# Sentinel Hub
+https://www.sentinel-hub.com/
+
+# NASA Worldview
+https://worldview.earthdata.nasa.gov/</pre>
+                            </div>
+                            
+                            <h4>Monitoramento de Áreas</h4>
+                            <div class="code-block">
+                                <pre># Acessar imagens atualizadas de satélite
+https://zoom.earth/
+https://www.sentinel-hub.com/explore/eobrowser/
+
+# Capturar mudanças ao longo do tempo
+https://earthengine.google.com/timelapse/</pre>
+                            </div>
+                            
+                            <h4>Análise de Infraestrutura</h4>
+                            <p>Identifique e analise:</p>
+                            <ul>
+                                <li>Instalações industriais e militares</li>
+                                <li>Redes de transportes (estradas, ferrovias, portos)</li>
+                                <li>Usinas de energia e linhas de transmissão</li>
+                                <li>Instalações de telecomunicações</li>
+                                <li>Barragens e sistemas de água</li>
+                            </ul>
+                            
+                            <h4>Ferramentas de Visualização 3D</h4>
+                            <div class="code-block">
+                                <pre># Google Earth Studio
+https://earth.google.com/studio/
+
+# Cesium
+https://cesium.com/platform/cesiumjs/
+
+# OpenStreetMap 3D
+https://demo.f4map.com/</pre>
+                            </div>
+                            
+                            <h4>Análise de Tráfego e Movimento</h4>
+                            <div class="code-block">
+                                <pre># Visualização de tráfego em tempo real
+https://www.waze.com/live-map/
+
+# Monitoramento de navios
+https://www.marinetraffic.com
+
+# Monitoramento de aeronaves
+https://www.flightradar24.com
+
+# Análise de congestionamento
+https://www.tomtom.com/traffic-index/</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>Combine imagens de satélite com dados de redes sociais geolocalizadas para uma análise mais completa. Por exemplo, compare relatos de um evento no Twitter com imagens de satélite da mesma data e local.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="darkweb" class="sub-section">
+                            <h3>OSINT na Dark Web</h3>
+                            <p>A Dark Web também contém informações valiosas para OSINT, mas requer ferramentas e técnicas especiais para acesso seguro e anônimo.</p>
+                            
+                            <div class="warning-block">
+                                <p>A navegação na Dark Web deve ser feita com extrema cautela e apenas para fins legítimos. Utilize sempre medidas de segurança adequadas, como VPNs, Tor e sistemas operacionais dedicados.</p>
+                            </div>
+                            
+                            <h4>Configuração Segura</h4>
+                            <div class="code-block">
+                                <pre># Instalar Tor Browser
+sudo apt install tor torbrowser-launcher
+torbrowser-launcher
+
+# Configurar navegador Tor com nível de segurança máximo
+Abrir Tor Browser > Clicar no escudo > Selecionar "Safest"
+
+# Usar Tails OS (sistema operacional para anonimato)
+https://tails.boum.org/install/index.en.html</pre>
+                            </div>
+                            
+                            <h4>Motores de Busca da Dark Web</h4>
+                            <div class="code-block">
+                                <pre># Torch
+http://torchqsxgmuloqfj23.onion/
+
+# Ahmia
+http://msydqstlz2kzerdg.onion/
+
+# DarkSearch
+http://darksearch.io/
+
+# NotEvil
+http://hss3uro2hsxfogfq.onion/</pre>
+                            </div>
+                            
+                            <h4>Monitoramento de Vazamentos</h4>
+                            <div class="code-block">
+                                <pre># Monitorar fóruns e marketplaces específicos
+Substitua URLs específicos por orientações gerais para fóruns relevantes
+
+# Ferramenta: OnionScan (analise sites .onion)
+git clone https://github.com/s-rah/onionscan.git
+cd onionscan
+go build
+
+# Ferramenta: Hunchly (captura sites visitados)
+https://www.hunch.ly/
+
+# Have I Been Pwned (verificar emails comprometidos)
+https://haveibeenpwned.com/</pre>
+                            </div>
+                            
+                            <h4>Técnicas de Investigação na Dark Web</h4>
+                            <ol>
+                                <li>Use identidades separadas para diferentes investigações</li>
+                                <li>Nunca use informações pessoais reais</li>
+                                <li>Mantenha um registro detalhado (use Hunchly ou ferramentas similares)</li>
+                                <li>Utilize máquina virtual dedicada</li>
+                                <li>Desative JavaScript quando possível</li>
+                                <li>Verifique regularmente se seu IP real não está vazando</li>
+                                <li>Evite fazer download de arquivos; se necessário, analise-os em ambiente isolado</li>
+                            </ol>
+                            
+                            <div class="code-block">
+                                <pre># Verificar anonimato no Tor
+https://check.torproject.org/
+
+# Whonix (sistema operacional para uso do Tor)
+https://www.whonix.org/wiki/Download</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>A Dark Web muda constantemente. Endereços .onion frequentemente ficam offline ou mudam. Mantenha uma lista atualizada de sites confiáveis e verifique a autenticidade dos links com múltiplas fontes.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section id="reconhecimento" class="content-card">
+                        <h2><i class="fas fa-binoculars"></i> Reconhecimento de Domínios</h2>
+                        <p>O reconhecimento de domínios é uma etapa crítica do OSINT, permitindo mapear a superfície de ataque de uma organização e descobrir ativos digitais potencialmente vulneráveis.</p>
+                        
+                        <div id="subdominios" class="sub-section">
+                            <h3>Enumeração de Subdomínios</h3>
+                            <p>Descobrir subdomínios é essencial para mapear a presença online de uma organização. Existem diversas técnicas e ferramentas para isso:</p>
+                            
+                            <h4>DNS Bruteforce</h4>
+                            <div class="code-block">
+                                <pre># Usando DNSMap
+dnsmap empresa.com.br -w /usr/share/wordlists/dnsmap.txt -r resultado.txt
+
+# Usando Fierce
+fierce -domain empresa.com.br -wordlist /usr/share/wordlists/fierce/fierce-hostlist.txt
+
+# Usando Sublist3r
+sublist3r -d empresa.com.br -o subdomains.txt
+
+# Usando Amass
+amass enum -d empresa.com.br -o subdominios.txt</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>[*] Iniciando enumeração de subdomínios para empresa.com.br
+[+] Encontrado: mail.empresa.com.br [203.0.113.10]
+[+] Encontrado: www.empresa.com.br [203.0.113.11]
+[+] Encontrado: blog.empresa.com.br [203.0.113.12]
+[+] Encontrado: admin.empresa.com.br [203.0.113.13]
+[+] Encontrado: intranet.empresa.com.br [203.0.113.14]
+[+] Encontrado: dev.empresa.com.br [203.0.113.15]
+[+] Encontrado: api.empresa.com.br [203.0.113.16]
+[+] Encontrado: stage.empresa.com.br [203.0.113.17]
+[+] Encontrado: test.empresa.com.br [203.0.113.18]
+[+] Encontrados 9 subdomínios únicos
+[*] Resultados salvos em subdominios.txt</pre>
+                            </div>
+                            
+                            <h4>Certificados SSL/TLS</h4>
+                            <div class="code-block">
+                                <pre># Usando crt.sh
+curl -s "https://crt.sh/?q=%25.empresa.com.br&output=json" | jq -r '.[].name_value' | sort -u
+
+# Usando Censys
+censys search "empresa.com.br" --fields "parsed.names" | jq
+
+# Usando Certspotter
+curl -s "https://api.certspotter.com/v1/issuances?domain=empresa.com.br&include_subdomains=true&expand=dns_names" | jq</pre>
+                            </div>
+                            
+                            <h4>Scraping de Motores de Busca</h4>
+                            <div class="code-block">
+                                <pre># Google dork para subdomínios
+site:*.empresa.com.br -www
+
+# Usando theHarvester
+theHarvester -d empresa.com.br -b google,bing,yahoo -f resultado.xml</pre>
+                            </div>
+                            
+                            <h4>Técnicas Passivas</h4>
+                            <div class="code-block">
+                                <pre># Usando SecLists para wordlists de subdomínios
+git clone https://github.com/danielmiessler/SecLists.git
+cd SecLists/Discovery/DNS/
+
+# Ferramenta: Subfinder
+subfinder -d empresa.com.br -o resultado.txt
+
+# Combinando resultados de várias ferramentas
+cat resultado1.txt resultado2.txt resultado3.txt | sort -u > subdominios_combinados.txt</pre>
+                            </div>
+                            
+                            <h4>Verificação de Subdomínios Vivos</h4>
+                            <div class="code-block">
+                                <pre># Usando httprobe
+cat subdominios.txt | httprobe -c 50 > subdominios_ativos.txt
+
+# Usando httpx
+cat subdominios.txt | httpx -silent -follow-redirects -status-code > subdominios_status.txt
+
+# Usando Aquatone para screenshot dos subdomínios
+cat subdominios_ativos.txt | aquatone -out ./aquatone_resultados</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>Combine múltiplas técnicas e ferramentas para obter resultados mais completos. Alguns subdomínios podem estar acessíveis apenas em determinadas redes ou usar redirecionamentos, então verifique os resultados manualmente quando possível.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="whois" class="sub-section">
+                            <h3>WHOIS e DNS</h3>
+                            <p>WHOIS e registros DNS fornecem informações valiosas sobre propriedade, contatos e infraestrutura técnica de domínios.</p>
+                            
+                            <h4>Consultas WHOIS</h4>
+                            <div class="code-block">
+                                <pre># Consulta WHOIS básica
+whois empresa.com.br
+
+# Consulta WHOIS com jq para parsear JSON
+whois -j empresa.com.br | jq
+
+# WHOIS para endereço IP
+whois 203.0.113.10
+
+# Consulta WHOIS detalhada com whois-json
+pip install whois-json
+python -c "import whois_json; print(whois_json.whois_domain('empresa.com.br'))"</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>domain:      empresa.com.br
+owner:       Empresa Exemplo S.A.
+ownerid:     12.345.678/0001-90
+responsible: João da Silva
+country:     BR
+owner-c:     JOASI123
+admin-c:     JOASI123
+tech-c:      TECAD123
+billing-c:   JOASI123
+nserver:     ns1.empresa.com.br
+nsstat:      20240613 AA
+nslastaa:    20240613
+nserver:     ns2.empresa.com.br
+nsstat:      20240613 AA
+nslastaa:    20240613
+created:     19970131
+changed:     20230410
+expires:     20250131
+status:      published
+
+nic-hdl-br:  JOASI123
+person:      João da Silva
+e-mail:      contato@empresa.com.br
+country:     BR
+created:     20100112
+changed:     20210723
+
+nic-hdl-br:  TECAD123
+person:      Equipe Técnica
+e-mail:      tech@empresa.com.br
+country:     BR
+created:     20100112
+changed:     20210723</pre>
+                            </div>
+                            
+                            <h4>Consultas DNS</h4>
+                            <div class="code-block">
+                                <pre># Busca de registros A
+dig empresa.com.br A
+
+# Busca de registros MX
+dig empresa.com.br MX
+
+# Busca de registros NS
+dig empresa.com.br NS
+
+# Busca de registros TXT
+dig empresa.com.br TXT
+
+# Busca de todos os registros
+dig empresa.com.br ANY
+
+# Transferência de zona (se permitida)
+dig @ns1.empresa.com.br empresa.com.br AXFR
+
+# DNS recursivo
+dig +trace empresa.com.br</pre>
+                            </div>
+                            
+                            <h4>Histórico de Registros</h4>
+                            <div class="code-block">
+                                <pre># Usando a API do ViewDNS.info
+curl -s "https://api.viewdns.info/iphistory/?domain=empresa.com.br&apikey=SUA_API_KEY&output=json" | jq
+
+# Verificando histórico WHOIS com DomainTools (comercial)
+https://whois.domaintools.com/empresa.com.br
+
+# Internet Archive Wayback Machine
+https://web.archive.org/web/*/empresa.com.br</pre>
+                            </div>
+                            
+                            <h4>Verificação de Registros SPF, DKIM e DMARC</h4>
+                            <div class="code-block">
+                                <pre># Verificar SPF
+dig empresa.com.br TXT | grep "v=spf"
+
+# Verificar DKIM
+dig selector._domainkey.empresa.com.br TXT
+
+# Verificar DMARC
+dig _dmarc.empresa.com.br TXT
+
+# Ferramenta automatizada: DMARCly
+python dmarcly.py -d empresa.com.br -a</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>Os registros WHOIS estão cada vez mais privados devido ao GDPR e outras regulamentações de privacidade. Combine os resultados atuais com dados históricos e outras fontes para uma visão mais completa.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="infraestrutura" class="sub-section">
+                            <h3>Análise de Infraestrutura</h3>
+                            <p>A análise da infraestrutura de rede fornece insights valiosos sobre a arquitetura de sistemas e potenciais vetores de ataque.</p>
+                            
+                            <h4>Mapeamento de Rede</h4>
+                            <div class="code-block">
+                                <pre># Descoberta de hosts com Nmap (sem intrusão)
+sudo nmap -sn 203.0.113.0/24
+
+# Descoberta de serviços (sem intrusão)
+sudo nmap -sS -A -T4 --open --osscan-limit 203.0.113.10-20
+
+# Descoberta de versões de serviços
+nmap -sV -p 80,443,21,22,25 203.0.113.10
+
+# Verificação de WAF/IDS
+wafw00f https://empresa.com.br</pre>
+                            </div>
+                            
+                            <div class="warning-block">
+                                <p>Scanning ativo como Nmap pode ser considerado invasivo e possivelmente ilegal sem autorização expressa. Use apenas técnicas passivas ou levemente ativas em alvos sem autorização formal.</p>
+                            </div>
+                            
+                            <h4>Footprinting Passivo</h4>
+                            <div class="code-block">
+                                <pre># Usando Shodan
+shodan host 203.0.113.10
+
+# Usando Censys
+censys search "empresa.com.br"
+
+# Verificação de BGP e ASN
+whois -h whois.radb.net -- '-i origin AS13335' | grep -Eo "([0-9.]+){4}/[0-9]+"
+
+# Usando Hurricane Electric BGP Toolkit
+https://bgp.he.net/AS13335</pre>
+                            </div>
+                            
+                            <h4>Análise de Cabeçalhos</h4>
+                            <div class="code-block">
+                                <pre># Verificação de cabeçalhos HTTP
+curl -I https://empresa.com.br
+
+# Verificação detalhada com httpx
+echo "https://empresa.com.br" | httpx -silent -tech-detect -status-code -title -web-server -cname
+
+# Análise completa com EyeWitness
+./EyeWitness.py --web -f urls.txt --no-prompt</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>HTTP/2 200 
+date: Thu, 13 Jun 2025 15:47:22 GMT
+content-type: text/html; charset=UTF-8
+cf-ray: 855af75a6a2e4a2b-GRU
+cache-control: max-age=600
+expires: Thu, 13 Jun 2025 15:57:22 GMT
+last-modified: Thu, 13 Jun 2025 15:42:02 GMT
+vary: Accept-Encoding
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+referrer-policy: strict-origin-when-cross-origin
+permissions-policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+report-to: {"group":"default","max_age":31536000,"endpoints":[{"url":"https://empresa.report-uri.com/a/d/g"}],"include_subdomains":true}
+nel: {"success_fraction":0.01,"report_to":"default","max_age":604800}
+server: cloudflare
+alt-svc: h3=":443"; ma=86400</pre>
+                            </div>
+                            
+                            <h4>Tecnologias e Frameworks</h4>
+                            <div class="code-block">
+                                <pre># Usando Wappalyzer (extensão do navegador)
+https://www.wappalyzer.com/
+
+# Usando Webanalyze
+webanalyze -host https://empresa.com.br -output json
+
+# Usando whatweb
+whatweb -a 3 https://empresa.com.br</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>Ao analisar a infraestrutura, procure por padrões e inconsistências. Servidores desatualizados, configurações incomuns ou serviços em portas não-padrão podem indicar sistemas esquecidos ou mal configurados.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section id="pessoas" class="content-card">
+                        <h2><i class="fas fa-user-secret"></i> OSINT para Pessoas</h2>
+                        <p>A investigação de pessoas envolve a coleta e análise de informações públicas sobre indivíduos para criar perfis detalhados.</p>
+                        
+                        <div class="warning-block">
+                            <p>O OSINT direcionado a pessoas deve respeitar a privacidade e legislação aplicável. Esta seção é fornecida apenas para fins educacionais e de segurança defensiva. Nunca use estas técnicas para assédio, stalking, doxing ou outras atividades maliciosas.</p>
+                        </div>
+                        
+                        <div id="identidade" class="sub-section">
+                            <h3>Informações de Identidade</h3>
+                            <p>A coleta de informações básicas de identidade é o ponto de partida para investigações mais profundas.</p>
+                            
+                            <h4>Busca por Nome Completo</h4>
+                            <div class="code-block">
+                                <pre># Operadores de busca avançada
+"João Silva" (São Paulo OR SP) (empresa OR LinkedIn)
+
+# Ferramentas de pessoas search
+https://www.searchpeoplefree.com/
+https://www.truepeoplesearch.com/
+https://webmii.com/</pre>
+                            </div>
+                            
+                            <h4>Registros Públicos</h4>
+                            <div class="code-block">
+                                <pre># Consulta Pública CPF (Brasil)
+https://www.situacao-cadastral.com/
+
+# Consulta CNPJ (Brasil)
+https://www.gov.br/empresas-e-negocios/pt-br/redesim/servicos/consulta-cnpj
+
+# Consulta processos judiciais
+https://portalbnmp.cnj.jus.br/
+https://consultaprocedimento.trf4.jus.br/
+https://esaj.tjsp.jus.br/cpopg/</pre>
+                            </div>
+                            
+                            <h4>Verificação de Email</h4>
+                            <div class="code-block">
+                                <pre># Verificar existência do email
+curl "https://api.hunter.io/v2/email-verifier?email=exemplo@empresa.com.br&api_key=SUA_API_KEY"
+
+# Ferramenta: Holehe (verifica contas associadas a um email)
+holehe email@exemplo.com.br
+
+# Email Permutador (gera possíveis emails)
+git clone https://github.com/Datalux/Osintgram.git
+cd Osintgram
+python email-permutator.py joao silva empresa.com.br</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>Possíveis formatos de email:
+joao@empresa.com.br
+joao.silva@empresa.com.br
+joaosilva@empresa.com.br
+j.silva@empresa.com.br
+jsilva@empresa.com.br
+silva.joao@empresa.com.br
+silvajoao@empresa.com.br
+silva.j@empresa.com.br
+silva@empresa.com.br
+joao_silva@empresa.com.br
+joao-silva@empresa.com.br
+jsilva2023@empresa.com.br</pre>
+                            </div>
+                            
+                            <h4>Números de Telefone</h4>
+                            <div class="code-block">
+                                <pre># Ferramenta: PhoneInfoga
+phoneinfoga scan -n +5511987654321
+
+# Busca reversa de telefone
+https://www.truecaller.com/
+
+# Formatador para múltiplas possibilidades
+https://www.phonenumberformatter.com/</pre>
+                            </div>
+                        </div>
+                        
+                        <div id="perfilsocial" class="sub-section">
+                            <h3>Perfil Social</h3>
+                            <p>As redes sociais são uma fonte rica de informações sobre indivíduos, revelando conexões, interesses, localizações e padrões de comportamento.</p>
+                            
+                            <h4>Usernames e Handles</h4>
+                            <div class="code-block">
+                                <pre># Sherlock (verifica username em +300 sites)
+git clone https://github.com/sherlock-project/sherlock.git
+cd sherlock
+python3 sherlock username
+
+# WhatsMyName
+git clone https://github.com/WebBreacher/WhatsMyName.git
+cd WhatsMyName
+python3 whatsmyname.py -u username
+
+# Ferramenta online: Namechk
+https://namechk.com/</pre>
+                            </div>
+                            
+                            <h4>Análise de Perfis</h4>
+                            <div class="code-block">
+                                <pre># Social Analyzer
+git clone https://github.com/qeeqbox/social-analyzer.git
+cd social-analyzer
+pip3 install -r requirements.txt
+python3 app.py --username "alvo" --metadata --extract --trim
+
+# Profil3r
+git clone https://github.com/Rog3rSm1th/Profil3r.git
+cd Profil3r
+pip3 install -r requirements.txt
+python3 profil3r.py -p username</pre>
+                            </div>
+                            
+                            <h4>Análise de Conteúdo</h4>
+                            <div class="code-block">
+                                <pre># Tinfoleak (análise do Twitter)
+python tinfoleak.py -u username -c -p
+
+# Twint (scraping do Twitter)
+twint -u username -o resultado.txt --year 2023 --filter-retweets
+
+# Instaloader (Instagram)
+instaloader profile username --no-videos
+
+# Operadores de busca no LinkedIn
+site:linkedin.com "trabalha na Empresa X" "São Paulo"</pre>
+                            </div>
+                            
+                            <h4>Conexões e Relações</h4>
+                            <div class="code-block">
+                                <pre># Maltego Transform: Person to Social Networks
+1. Criar entidade Person
+2. Preencher com nome completo
+3. Executar transform "To Social Networks"
+
+# Análise de seguidores com Cree.py
+git clone https://github.com/ilektrojohn/creepy.git
+cd creepy
+python creepy.py</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>Pessoas frequentemente usam os mesmos usernames ou variações similares em diferentes plataformas. Procure por padrões e interconexões entre perfis para construir um mapa mais completo da presença online.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="vazamentos" class="sub-section">
+                            <h3>Vazamentos de Dados</h3>
+                            <p>Vazamentos de dados podem revelar informações sensíveis que as pessoas não compartilhariam voluntariamente em canais públicos.</p>
+                            
+                            <h4>Verificação de Emails Comprometidos</h4>
+                            <div class="code-block">
+                                <pre># Have I Been Pwned
+https://haveibeenpwned.com/
+
+# DeHashed (requer assinatura)
+https://dehashed.com/
+
+# Scylla.sh
+https://scylla.sh/
+
+# IntelX (requer assinatura)
+https://intelx.io/</pre>
+                            </div>
+                            
+                            <h4>Busca em Bases Vazadas</h4>
+                            <div class="code-block">
+                                <pre># Ferramenta: h8mail
+h8mail -t email@alvo.com.br -c haveibeenpwned
+
+# Ferramenta: Breach-Parse
+./breach-parse.sh email@alvo.com.br</pre>
+                            </div>
+                            
+                            <h4>Monitoramento de Credenciais</h4>
+                            <div class="code-block">
+                                <pre># Monitoramento contínuo
+firefox monitor: https://monitor.firefox.com/
+
+# Google Alertas para emails específicos
+https://www.google.com/alerts</pre>
+                            </div>
+                            
+                            <div class="warning-block">
+                                <p>A busca e uso de informações de vazamentos de dados está em uma área legal cinzenta. Nunca use credenciais vazadas para tentativas de acesso não autorizado, mesmo que para testes de segurança sem autorização formal.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section id="frameworks" class="content-card">
+                        <h2><i class="fas fa-cubes"></i> Frameworks de OSINT</h2>
+                        <p>Frameworks de OSINT fornecem uma abordagem estruturada e automatizada para coleta e análise de informações, integrando diversas ferramentas em uma única plataforma.</p>
+                        
+                        <div id="recon-ng" class="sub-section">
+                            <h3>Recon-ng</h3>
+                            <p>Recon-ng é um framework modular escrito em Python para reconhecimento baseado na web, oferecendo uma interface similar ao Metasploit.</p>
+                            
+                            <h4>Instalação</h4>
+                            <div class="code-block">
+                                <pre>git clone https://github.com/lanmaster53/recon-ng.git
+cd recon-ng
+pip install -r REQUIREMENTS
+./recon-ng</pre>
+                            </div>
+                            
+                            <h4>Uso Básico</h4>
+                            <div class="code-block">
+                                <pre># Iniciar Recon-ng
+./recon-ng
+
+# Listar todos os módulos disponíveis
+marketplace search
+
+# Instalar um módulo
+marketplace install recon/domains-hosts/google_site_web
+
+# Carregar um módulo
+modules load recon/domains-hosts/google_site_web
+
+# Configurar opções do módulo
+options set SOURCE empresa.com.br
+
+# Executar o módulo
+run
+
+# Exibir resultados
+show hosts</pre>
+                            </div>
+                            
+                            <h4>Fluxo de Trabalho Completo</h4>
+                            <div class="code-block">
+                                <pre># Criar um workspace
+workspaces create empresa_xyz
+
+# Adicionar domínio como seed
+db insert domains
+
+# Instalar e executar múltiplos módulos
+marketplace install recon/domains-contacts/whois_pocs
+modules load recon/domains-contacts/whois_pocs
+run
+
+marketplace install recon/domains-hosts/certificate_transparency
+modules load recon/domains-hosts/certificate_transparency
+run
+
+marketplace install recon/domains-hosts/hackertarget
+modules load recon/domains-hosts/hackertarget
+run
+
+# Verificar hosts descobertos
+show hosts
+
+# Gerar relatório
+marketplace install reporting/html
+modules load reporting/html
+options set CREATOR "Seu Nome"
+options set CUSTOMER "Empresa XYZ"
+options set FILENAME /home/user/relatorio_recon_empresa.html
+run</pre>
+                            </div>
+                            
+                            <h4>Módulos Recomendados</h4>
+                            <div class="table-container">
+                                <table>
+                                    <tr>
+                                        <th>Categoria</th>
+                                        <th>Módulo</th>
+                                        <th>Descrição</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Domínios -> Hosts</td>
+                                        <td>bing_domain_web</td>
+                                        <td>Encontra hosts via busca Bing</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Domínios -> Hosts</td>
+                                        <td>certificate_transparency</td>
+                                        <td>Encontra hosts via certificados SSL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Domínios -> Contatos</td>
+                                        <td>pgp_search</td>
+                                        <td>Encontra emails via busca PGP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hosts -> IPs</td>
+                                        <td>resolve</td>
+                                        <td>Resolve hostnames para IPs</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Contatos -> Credenciais</td>
+                                        <td>hibp_breach</td>
+                                        <td>Verifica vazamentos via HIBP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reporting</td>
+                                        <td>xlsx</td>
+                                        <td>Gera relatório em Excel</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>O Recon-ng mantém um banco de dados local de todas as descobertas, permitindo construir investigações complexas ao longo do tempo. Use o comando "db schema" para ver a estrutura do banco de dados.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="osrframework" class="sub-section">
+                            <h3>OSRFramework</h3>
+                            <p>OSRFramework é uma coleção de ferramentas Python para OSINT, especializada na descoberta de identidades e perfis em diferentes plataformas.</p>
+                            
+                            <h4>Instalação</h4>
+                            <div class="code-block">
+                                <pre>pip3 install osrframework</pre>
+                            </div>
+                            
+                            <h4>Ferramentas Incluídas</h4>
+                            <ol>
+                                <li><strong>usufy.py</strong>: Verifica a existência de usernames em diferentes plataformas</li>
+                                <li><strong>searchfy.py</strong>: Busca perfis por nome e sobrenome</li>
+                                <li><strong>domainfy.py</strong>: Verifica a disponibilidade de domínios</li>
+                                <li><strong>mailfy.py</strong>: Verifica a existência de emails</li>
+                                <li><strong>phonefy.py</strong>: Busca informações sobre números de telefone</li>
+                                <li><strong>entify.py</strong>: Extrai entidades de textos (emails, usuários, etc.)</li>
+                            </ol>
+                            
+                            <h4>Exemplos de Uso</h4>
+                            <div class="code-block">
+                                <pre># Verificar username em múltiplas plataformas
+usufy.py -n username -p twitter facebook instagram linkedin
+
+# Buscar por perfis pelo nome e sobrenome
+searchfy.py -n "João Silva"
+
+# Verificar domínios disponíveis
+domainfy.py -n empresa -t com br org net
+
+# Verificar emails
+mailfy.py -n email@empresa.com.br
+
+# Procurar números de telefone
+phonefy.py -n +5511987654321</pre>
+                            </div>
+                            
+                            <div class="output-block">
+                                <pre>[ Usufy | INFO ] Starting the search...
+[ Usufy | INFO ] Looking for profiles in 32 platforms...
+[ Usufy | INFO ] Checking for username 'username' in Twitter...
+[ Usufy | INFO ] Checking for username 'username' in Instagram...
+[ Usufy | INFO ] Checking for username 'username' in LinkedIn...
+[ Usufy | INFO ] Checking for username 'username' in Facebook...
+...
+[ Usufy | INFO ] Found 7 profiles:
+        Twitter: twitter.com/username
+        Instagram: instagram.com/username
+        GitHub: github.com/username
+        Reddit: reddit.com/user/username
+        Telegram: t.me/username
+        Mastodon: mastodon.social/@username
+        TikTok: tiktok.com/@username</pre>
+                            </div>
+                            
+                            <h4>Recursos Avançados</h4>
+                            <div class="code-block">
+                                <pre># Usar proxy para anonimato
+usufy.py -n username --proxy http://127.0.0.1:8080
+
+# Exportar resultados para JSON
+usufy.py -n username -o result.json --json
+
+# Usar lista de usernames de um arquivo
+usufy.py -L usernames.txt
+
+# Executar análise silenciosa
+usufy.py -n username -q</pre>
+                            </div>
+                            
+                            <div class="tip-block">
+                                <p>O OSRFramework é altamente modular e extensível. Você pode adicionar novas plataformas para verificação criando arquivos de configuração em JSON. Consulte a documentação para mais detalhes.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section id="automatizacao" class="content-card">
+                        <h2><i class="fas fa-robot"></i> Automatização de OSINT</h2>
+                        <p>A automatização pode significativamente aumentar a eficiência e escalabilidade de suas investigações OSINT, permitindo coletar e analisar grandes volumes de dados.</p>
+                        
+                        <h3>Scripts Personalizados</h3>
+                        <div class="code-block">
+                            <pre># Script Python para automação básica de OSINT
+import requests
+import json
+import subprocess
+import sys
+
+def check_domain(domain):
+    print(f"[+] Iniciando reconhecimento para {domain}")
+    
+    # Verificar subdomínios com Subfinder
+    print("[+] Enumerando subdomínios...")
+    subprocess.run(["subfinder", "-d", domain, "-o", f"{domain}_subdomains.txt"], capture_output=True)
+    
+    # Verificar hosts ativos
+    print("[+] Verificando hosts ativos...")
+    with open(f"{domain}_subdomains.txt", "r") as f:
+        subdomains = f.read().splitlines()
+    
+    with open(f"{domain}_subdomains.txt", "w") as f:
+        for subdomain in subdomains:
+            try:
+                response = requests.get(f"https://{subdomain}", timeout=5)
+                f.write(f"{subdomain} - {response.status_code}\n")
+                print(f"    [+] {subdomain} - {response.status_code}")
+            except:
+                f.write(f"{subdomain} - Erro\n")
+                print(f"    [-] {subdomain} - Erro")
+    
+    # Verificar tecnologias com Wappalyzer CLI
+    print("[+] Detectando tecnologias...")
+    subprocess.run(["wappalyzer", f"https://{domain}", "-o", f"{domain}_tech.json"], capture_output=True)
+    
+    print(f"[+] Reconhecimento concluído para {domain}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Uso: python osint_automation.py dominio.com.br")
+    else:
+        check_domain(sys.argv[1])</pre>
+                        </div>
+                        
+                        <h3>Ferramentas de Automação</h3>
+                        <div class="table-container">
+                            <table>
+                                <tr>
+                                    <th>Ferramenta</th>
+                                    <th>Descrição</th>
+                                    <th>Instalação</th>
+                                </tr>
+                                <tr>
+                                    <td>OSINT.sh</td>
+                                    <td>Framework completo para automação de OSINT</td>
+                                    <td>https://github.com/Osint-Shield/osint.sh</td>
+                                </tr>
+                                <tr>
+                                    <td>Raccoon</td>
+                                    <td>Ferramenta de reconhecimento de alta performance</td>
+                                    <td><pre>pip install raccoon-scanner</pre></td>
+                                </tr>
+                                <tr>
+                                    <td>AutoRecon</td>
+                                    <td>Ferramenta multi-threaded para reconhecimento</td>
+                                    <td><pre>git clone https://github.com/Tib3rius/AutoRecon.git</pre></td>
+                                </tr>
+                                <tr>
+                                    <td>Sn1per</td>
+                                    <td>Framework para pentest e OSINT</td>
+                                    <td><pre>git clone https://github.com/1N3/Sn1per</pre></td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <h3>Integração com APIs</h3>
+                        <div class="code-block">
+                            <pre># Exemplo de integração com API do Shodan
+import shodan
+import sys
+
+# Configurar a chave API
+SHODAN_API_KEY = "sua_chave_api_aqui"
+api = shodan.Shodan(SHODAN_API_KEY)
+
+def shodan_search(query):
+    try:
+        # Busca no Shodan
+        results = api.search(query)
+        
+        # Imprimir o número de resultados encontrados
+        print(f'Resultados encontrados: {results["total"]}')
+        
+        # Iterar através dos resultados e imprimir as informações relevantes
+        for result in results['matches']:
+            print(f'IP: {result["ip_str"]}')
+            print(f'Porta: {result["port"]}')
+            print(f'Organização: {result.get("org", "N/A")}')
+            print(f'Localização: {result.get("location", {}).get("country_name", "N/A")}')
+            print(f'Hostnames: {result.get("hostnames", [])}')
+            print(f'Banner: {result.get("data", "").split("\n")[0]}')
+            print('-' * 60)
+            
+    except shodan.APIError as e:
+        print(f'Erro: {e}')
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print('Uso: python shodan_api.py "apache country:BR"')
+    else:
+        shodan_search(sys.argv[1])</pre>
+                        </div>
+                        
+                        <h3>Fluxos de Trabalho Automatizados</h3>
+                        <div class="code-block">
+                            <pre># Script Bash para fluxo de trabalho de reconhecimento de domínio
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+    echo "Uso: ./recon.sh dominio.com.br"
+    exit 1
+fi
+
+domain=$1
+output_dir="recon_${domain}"
+
+# Criar diretório de saída
+mkdir -p $output_dir
+cd $output_dir
+
+echo "[+] Iniciando reconhecimento para $domain"
+echo "[+] Resultados serão salvos em $output_dir"
+
+# 1. Enumeração de subdomínios
+echo "[+] Enumerando subdomínios..."
+subfinder -d $domain -o subdomains.txt
+assetfinder --subs-only $domain | sort -u >> subdomains.txt
+amass enum -passive -d $domain >> subdomains.txt
+cat subdomains.txt | sort -u > subdomains_unique.txt
+echo "[+] Encontrados $(wc -l < subdomains_unique.txt) subdomínios únicos"
+
+# 2. Verificar hosts ativos
+echo "[+] Verificando hosts ativos..."
+cat subdomains_unique.txt | httprobe -c 50 > hosts_alive.txt
+echo "[+] Encontrados $(wc -l < hosts_alive.txt) hosts ativos"
+
+# 3. Capturar screenshots
+echo "[+] Capturando screenshots..."
+cat hosts_alive.txt | aquatone -out aquatone_results
+echo "[+] Screenshots salvos em aquatone_results"
+
+# 4. Buscar por arquivos interessantes
+echo "[+] Buscando arquivos interessantes..."
+ffuf -w hosts_alive.txt:DOMAIN -w wordlists/files.txt:FILE -u DOMAIN/FILE -mc 200 -o ffuf_files.json
+echo "[+] Resultados de ffuf salvos em ffuf_files.json"
+
+# 5. Buscar por painéis de administração
+echo "[+] Buscando painéis de administração..."
+ffuf -w hosts_alive.txt:DOMAIN -w wordlists/admin.txt:ADMIN -u DOMAIN/ADMIN -mc 200,301,302 -o ffuf_admin.json
+echo "[+] Resultados de painéis de admin salvos em ffuf_admin.json"
+
+# 6. Verificar tecnologias
+echo "[+] Detectando tecnologias..."
+python3 ~/tools/webtech.py -i hosts_alive.txt -o tech_results.json
+echo "[+] Tecnologias detectadas salvas em tech_results.json"
+
+# 7. Análise Whois e DNS
+echo "[+] Realizando análise Whois e DNS..."
+whois $domain > whois.txt
+dig $domain ANY > dns.txt
+echo "[+] Informações de Whois e DNS salvas"
+
+echo "[+] Reconhecimento concluído para $domain"
+echo "[+] Todos os resultados estão em $output_dir"</pre>
+                        </div>
+                        
+                        <div class="tip-block">
+                            <p>A automatização deve ser usada com cautela. Embora aumente a eficiência, também pode aumentar o risco de detecção e sobrecarga dos sistemas alvo. Implemente controles como delays entre requisições e limitação de taxas de acesso.</p>
+                        </div>
+                    </section>
+                    
+                    <section id="etica" class="content-card">
+                        <h2><i class="fas fa-balance-scale"></i> Considerações Éticas e Legais</h2>
+                        <p>O OSINT é uma prática poderosa que deve ser conduzida dentro de limites éticos e legais claros. Esta seção aborda as principais considerações que todo praticante de OSINT deve ter em mente.</p>
+                        
+                        <h3>Aspectos Legais</h3>
+                        <div class="warning-block">
+                            <p>As leis sobre privacidade, proteção de dados e crimes cibernéticos variam significativamente entre países e jurisdições. Esteja ciente da legislação aplicável ao seu caso específico. No Brasil, considere especialmente:</p>
+                        </div>
+                        
+                        <ul>
+                            <li><strong>Lei Geral de Proteção de Dados (LGPD) - Lei nº 13.709/2018:</strong> Regula o tratamento de dados pessoais, inclusive em meios digitais</li>
+                            <li><strong>Marco Civil da Internet - Lei nº 12.965/2014:</strong> Estabelece princípios, garantias, direitos e deveres para o uso da Internet no Brasil</li>
+                            <li><strong>Código Penal:</strong> Artigos relacionados à invasão de dispositivo informático (Art. 154-A), intercepção de comunicações (Art. 10 da Lei nº 9.296/1996)</li>
+                            <li><strong>Lei Carolina Dieckmann - Lei nº 12.737/2012:</strong> Tipifica delitos informáticos</li>
+                            <li><strong>Constituição Federal:</strong> Direito à privacidade (Art. 5º, X)</li>
+                        </ul>
+                        
+                        <h3>Princípios Éticos</h3>
+                        <ol>
+                            <li><strong>Propósito Legítimo:</strong> Conduza investigações de OSINT apenas para fins legítimos como segurança, investigações autorizadas ou pesquisa acadêmica</li>
+                            <li><strong>Mínima Intrusão:</strong> Utilize apenas dados disponíveis publicamente e evite técnicas intrusivas</li>
+                            <li><strong>Consentimento Quando Possível:</strong> Quando prático, busque consentimento das partes envolvidas</li>
+                            <li><strong>Segurança dos Dados:</strong> Proteja adequadamente as informações coletadas</li>
+                            <li><strong>Transparência:</strong> Seja claro sobre suas intenções e métodos quando apropriado</li>
+                            <li><strong>Precisão:</strong> Verifique as informações obtidas e evite conclusões baseadas em dados parciais</li>
+                            <li><strong>Responsabilidade:</strong> Assuma responsabilidade pelo impacto de suas ações</li>
+                        </ol>
+                        
+                        <h3>Linha Entre Legal e Ilegal</h3>
+                        <div class="table-container">
+                            <table>
+                                <tr>
+                                    <th>Legal (Geralmente)</th>
+                                    <th>Ilegal (Geralmente)</th>
+                                </tr>
+                                <tr>
+                                    <td>Acessar informações publicamente disponíveis</td>
+                                    <td>Invadir sistemas ou burlar mecanismos de segurança</td>
+                                </tr>
+                                <tr>
+                                    <td>Buscar em motores de busca e arquivos públicos</td>
+                                    <td>Utilizar credenciais vazadas para acessar contas</td>
+                                </tr>
+                                <tr>
+                                    <td>Analisar metadados de arquivos compartilhados publicamente</td>
+                                    <td>Interferir ou interromper serviços e sistemas</td>
+                                </tr>
+                                <tr>
+                                    <td>Usar ferramentas de busca passiva</td>
+                                    <td>Realizar engenharia social para obter acesso não autorizado</td>
+                                </tr>
+                                <tr>
+                                    <td>Verificar registros DNS, WHOIS e certificados SSL</td>
+                                    <td>Monitorar comunicações privadas sem autorização</td>
+                                </tr>
+                                <tr>
+                                    <td>Revisar históricos de redes sociais públicas</td>
+                                    <td>Doxing (publicar informações privadas com intuito malicioso)</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <h3>Melhores Práticas</h3>
+                        <ul>
+                            <li>Documente seu processo e fontes</li>
+                            <li>Estabeleça limites claros antes de iniciar uma investigação</li>
+                            <li>Obtenha autorização formal para investigações profissionais</li>
+                            <li>Considere o impacto de suas ações nas pessoas envolvidas</li>
+                            <li>Consulte um advogado em caso de dúvidas legais</li>
+                            <li>Respeite a privacidade e segurança das informações coletadas</li>
+                            <li>Reporte responsavelmente vulnerabilidades ou ameaças descobertas</li>
+                        </ul>
+                        
+                        <div class="warning-block">
+                            <p>Este guia não constitui aconselhamento legal. Quando em dúvida sobre a legalidade de uma técnica específica de OSINT, consulte um advogado especializado em direito digital.</p>
+                        </div>
+                    </section>
+                    
+                    <section id="recursos" class="content-card">
+                        <h2><i class="fas fa-book"></i> Recursos Adicionais</h2>
+                        <p>Continue seu aprendizado em OSINT com estes recursos adicionais, organizados por categoria.</p>
+                        
+                        <h3>Livros Recomendados</h3>
+                        <ul>
+                            <li><strong>OSINT: Uma Abordagem Investigativa</strong> - Michael Bazzell</li>
+                            <li><strong>Manual de Inteligência de Fontes Abertas</strong> - i-intelligence</li>
+                            <li><strong>Técnicas e Ferramentas para OSINT</strong> - Benjamin Strick</li>
+                            <li><strong>Google Hacking para Pentesters</strong> - Johnny Long</li>
+                            <li><strong>Inteligência Digital em Investigações</strong> - Dawid Farbaniec</li>
+                        </ul>
+                        
+                        <h3>Blogs e Sites</h3>
+                        <div class="grid-container">
+                            <div class="grid-item">
+                                <h4><i class="fas fa-globe"></i> IntelTechniques</h4>
+                                <p>Blog de Michael Bazzell com recursos e tutoriais atualizados sobre OSINT.</p>
+                                <a href="https://inteltechniques.com" class="btn" style="color: #fff;"><i class="fas fa-external-link-alt"></i> Visitar</a>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-globe"></i> Bellingcat</h4>
+                                <p>Grupo de investigação que utiliza OSINT para verificar fatos em zonas de conflito.</p>
+                                <a href="https://www.bellingcat.com" class="btn" style="color: #fff;"><i class="fas fa-external-link-alt"></i> Visitar</a>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-globe"></i> OSINT Curious</h4>
+                                <p>Projeto voltado para compartilhar técnicas e metodologias de OSINT.</p>
+                                <a href="https://osintcurio.us" class="btn" style="color: #fff;"><i class="fas fa-external-link-alt"></i> Visitar</a>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-globe"></i> OSINT Framework</h4>
+                                <p>Coleção organizada de ferramentas e recursos de OSINT.</p>
+                                <a href="https://osintframework.com" class="btn" style="color: #fff;"><i class="fas fa-external-link-alt"></i> Visitar</a>
+                            </div>
+                        </div>
+                        
+                        <h3>Comunidades e Fóruns</h3>
+                        <ul>
+                            <li><strong>r/OSINT</strong> - Subreddit dedicado a OSINT: <a href="https://www.reddit.com/r/OSINT/" style="color: #ff69b4;">https://www.reddit.com/r/OSINT/</a></li>
+                            <li><strong>OSINT Técnicas</strong> - Grupo do Telegram em português: <a href="https://t.me/osinttecnicas" style="color: #ff69b4;">https://t.me/osinttecnicas</a></li>
+                            <li><strong>OSINT Brazil</strong> - Comunidade brasileira de OSINT: <a href="https://osintbrazil.org" style="color: #ff69b4;">https://osintbrazil.org</a></li>
+                            <li><strong>Discord OSINT</strong> - Servidor de Discord: <a href="https://discord.gg/osint" style="color: #ff69b4;">https://discord.gg/osint</a></li>
+                        </ul>
+                        
+                        <h3>Cursos Online</h3>
+                        <div class="table-container">
+                            <table>
+                                <tr>
+                                    <th>Curso</th>
+                                    <th>Plataforma</th>
+                                    <th>Nível</th>
+                                </tr>
+                                <tr>
+                                    <td>OSINT: Técnicas Fundamentais</td>
+                                    <td>Udemy</td>
+                                    <td>Iniciante</td>
+                                </tr>
+                                <tr>
+                                    <td>Investigação Digital e OSINT</td>
+                                    <td>Coursera</td>
+                                    <td>Intermediário</td>
+                                </tr>
+                                <tr>
+                                    <td>OSINT para Segurança Corporativa</td>
+                                    <td>LinkedIn Learning</td>
+                                    <td>Avançado</td>
+                                </tr>
+                                <tr>
+                                    <td>Certificação OSINT Profissional</td>
+                                    <td>SANS</td>
+                                    <td>Profissional</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <h3>Exercícios Práticos</h3>
+                        <div class="grid-container">
+                            <div class="grid-item">
+                                <h4><i class="fas fa-gamepad"></i> Trace Labs CTF</h4>
+                                <p>Competições de OSINT com foco em pessoas desaparecidas reais.</p>
+                                <a href="https://www.tracelabs.org" class="btn" style="color: #fff;"><i class="fas fa-external-link-alt"></i> Participar</a>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-gamepad"></i> Quiztime</h4>
+                                <p>Desafios diários de geolocalização e OSINT no Twitter.</p>
+                                <a href="https://twitter.com/quiztime" class="btn" style="color: #fff;"><i class="fas fa-external-link-alt"></i> Participar</a>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-gamepad"></i> OSINT Challenges</h4>
+                                <p>Plataforma com desafios progressivos de OSINT.</p>
+                                <a href="https://osintchallenge.com" class="btn" style="color: #fff;"><i class="fas fa-external-link-alt"></i> Participar</a>
+                            </div>
+                            <div class="grid-item">
+                                <h4><i class="fas fa-gamepad"></i> GeoGuessr</h4>
+                                <p>Jogo para praticar geolocalização com imagens do Street View.</p>
+                                <a href="https://www.geoguessr.com" class="btn" style="color: #fff;"><i class="fas fa-external-link-alt"></i> Jogar</a>
+                            </div>
+                        </div>
+                        
+                        <h3>Listas de Ferramentas</h3>
+                        <p>Repositórios GitHub com compilações de ferramentas OSINT:</p>
+                        <ul>
+                            <li><a href="https://github.com/jivoi/awesome-osint" style="color: #ff69b4;">awesome-osint</a> - Coleção curada de recursos OSINT</li>
+                            <li><a href="https://github.com/cipher387/osint_stuff_tool_collection" style="color: #ff69b4;">osint_stuff_tool_collection</a> - Coleção extensa de ferramentas</li>
+                            <li><a href="https://github.com/sinwindie/OSINT" style="color: #ff69b4;">OSINT Collections</a> - Coleções organizadas por categoria</li>
+                            <li><a href="https://github.com/Ph055a/OSINT_Collection" style="color: #ff69b4;">OSINT_Collection</a> - Coleção com mais de 2000 links</li>
+                        </ul>
+                        
+                        <div class="tip-block">
+                            <p>A prática constante é essencial para desenvolver habilidades em OSINT. Participe de CTFs, desafios online e projetos comunitários para aprimorar suas técnicas em um ambiente seguro e ético.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">FAQ</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    
+    <div id="overlay"></div>
+    <div class="mobile-menu">
+        <button class="mobile-menu-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mobile-nav-links">
+            <a href="index.html" class="mobile-home-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="#introducao">Introdução</a>
+            <a href="#ferramentas">Ferramentas</a>
+            <a href="#tecnicas">Técnicas</a>
+            <a href="#reconhecimento">Reconhecimento</a>
+            <a href="#pessoas">OSINT para Pessoas</a>
+            <a href="#frameworks">Frameworks</a>
+            <a href="#automatizacao">Automatização</a>
+            <a href="#etica">Ética & Legal</a>
+            <a href="#recursos">Recursos</a>
+            <a href="downloads.html">Downloads</a>
+            <a href="contato.html">Contato</a>
+        </div>
+    </div>
+    
+    <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
+    
+    <script>
+        
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const sizes = new Float32Array(particlesCount);
+        
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 20;
+            positions[i + 1] = (Math.random() - 0.5) * 20;
+            positions[i + 2] = (Math.random() - 0.5) * 20;
+            
+            colors[i] = Math.random() * 0.5 + 0.5;
+            colors[i + 1] = Math.random() * 0.2;
+            colors[i + 2] = Math.random() * 0.5 + 0.5;
+            
+            sizes[i/3] = Math.random() * 0.5 + 0.5;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true,
+            map: createCircleTexture()
+        });
+        
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2.5;
+            
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            
+            const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+            
+            context.fillStyle = gradient;
+            context.fill();
+            
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+        
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            targetX = mouseX * 0.2;
+            targetY = mouseY * 0.2;
+            
+            particles.rotation.x += 0.0005;
+            particles.rotation.y += 0.001;
+            
+            particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+            particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+            
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        animate();
+        
+        
+        const backToTop = document.querySelector('.back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+        
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const mobileMenuClose = document.querySelector('.mobile-menu-close');
+        const overlay = document.getElementById('overlay');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        overlay.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-links a');
+        
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+        
+        
+        const accordions = document.querySelectorAll('.accordion');
+        
+        accordions.forEach(accordion => {
+            const header = accordion.querySelector('.accordion-header');
+            const content = accordion.querySelector('.accordion-content');
+            
+            header.addEventListener('click', () => {
+                accordion.classList.toggle('active');
+                
+                if (accordion.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                } else {
+                    content.style.maxHeight = 0;
+                }
+            });
+        });
+        
+        
+        setInterval(() => {
+            document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
+        }, 1000);
+    </script>
+</body>
+</html>
