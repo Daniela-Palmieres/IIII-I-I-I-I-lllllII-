@@ -1,0 +1,2931 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hack de Senhas - CyberHack</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .home-btn {
+            background: linear-gradient(45deg, #00c3ff, #00e7ff);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(0, 199, 255, 0.4);
+            transition: all 0.3s ease !important;
+            margin-right: 10px;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 199, 255, 0.6);
+            color: #fff !important;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .page-title {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .page-title h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .page-title h1::before,
+        .page-title h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .page-title h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #00ffea;
+            animation: glitch-before 3s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        .page-title h1::after {
+            left: -2px;
+            text-shadow: 1px 0 #ff00c1;
+            animation: glitch-after 2s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+
+        @keyframes glitch-before {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(30% 0 25% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes glitch-after {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(10% 0 40% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .intro-section {
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intro-section::before {
+            content: '';
+            position: absolute;
+            top: -150%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 105, 180, 0.1), transparent);
+            transform: rotate(25deg);
+            animation: glare 7s linear infinite;
+        }
+
+        @keyframes glare {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(100%) rotate(25deg); }
+        }
+
+        .intro-section h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .intro-section h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 70px;
+            height: 2px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+
+        .intro-section p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .intro-section .warning-box {
+            background: rgba(255, 50, 50, 0.1);
+            border-left: 4px solid #ff3232;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .intro-section .warning-box p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .toc-section {
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .toc-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding-left: 10px;
+        }
+
+        .toc-list li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .toc-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+        }
+
+        .toc-list a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc-list a:hover {
+            color: #ff69b4;
+        }
+
+        .content-section {
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .content-section h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .content-section h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin: 25px 0 15px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .content-section h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, #ff1493, #ff69b4);
+            border-radius: 2px;
+        }
+
+        .content-section h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 20px 0 10px;
+        }
+
+        .content-section p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .content-section ul, .content-section ol {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .content-section li {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+        }
+
+        .command-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #00c3ff;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-box code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #00c3ff;
+            white-space: pre;
+        }
+
+        .command-title {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(0, 195, 255, 0.2);
+            padding: 3px 10px;
+            font-size: 12px;
+            border-radius: 0 0 0 5px;
+            color: #00c3ff;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 195, 255, 0.2);
+            color: #00c3ff;
+        }
+
+        .info-box {
+            background: rgba(0, 195, 255, 0.1);
+            border-left: 4px solid #00c3ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .warning-box {
+            background: rgba(255, 50, 50, 0.1);
+            border-left: 4px solid #ff3232;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .warning-box p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .tip-box {
+            background: rgba(50, 205, 50, 0.1);
+            border-left: 4px solid #32cd32;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .tip-box p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .tool-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tool-icon {
+            font-size: 30px;
+            margin-right: 15px;
+            color: #ff69b4;
+        }
+
+        .tool-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ff69b4;
+        }
+
+        .tool-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .tool-features {
+            margin-top: 15px;
+        }
+
+        .tool-features h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 8px;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #00c3ff;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .algorithm-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .algorithm-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 10px;
+        }
+
+        .algorithm-description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .step-by-step {
+            margin: 20px 0;
+        }
+
+        .step {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 10px;
+            padding-left: 20px;
+        }
+
+        .step-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .step-image {
+            margin-top: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .step-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 105, 180, 0.2);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 16px;
+            color: #ff69b4;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(255, 105, 180, 0.1);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 105, 180, 0.05);
+        }
+
+        .faq-section {
+            margin: 40px 0;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+        }
+
+        .faq-question {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 10px;
+            cursor: pointer;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .faq-question::before {
+            content: '+';
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 18px;
+            color: #ff69b4;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-question.active::before {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            padding-left: 25px;
+            display: none;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        .terminal-window {
+            background: #000;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            background: rgba(255, 105, 180, 0.2);
+            border-radius: 5px 5px 0 0;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-button-red {
+            background: #ff5f56;
+        }
+
+        .terminal-button-yellow {
+            background: #ffbd2e;
+        }
+
+        .terminal-button-green {
+            background: #27c93f;
+        }
+
+        .terminal-title {
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .terminal-body {
+            margin-top: 25px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #00ff00;
+            white-space: pre-wrap;
+        }
+
+        .terminal-prompt {
+            color: #ff69b4;
+        }
+
+        .terminal-output {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .resource-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .resource-icon {
+            font-size: 30px;
+            margin-right: 20px;
+            color: #ff69b4;
+        }
+
+        .resource-content {
+            flex: 1;
+        }
+
+        .resource-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 5px;
+        }
+
+        .resource-description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 20px;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.7);
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            margin-top: 80px;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .digital-numbers {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #random-numbers {
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 992px) {
+            .algorithm-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .page-title h1 {
+                font-size: 36px;
+            }
+            .comparison-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-title h1 {
+                font-size: 28px;
+            }
+            .tool-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .tool-icon {
+                margin-bottom: 10px;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 250px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            z-index: 1000;
+            border-left: 1px solid rgba(255, 105, 180, 0.3);
+            overflow-y: auto;
+            transition: right 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 60px;
+            padding: 0 20px;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+            transition: color 0.3s;
+        }
+
+        .mobile-nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+            display: none;
+        }
+
+        #overlay.active {
+            display: block;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            z-index: 1000;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <canvas id="canvas"></canvas>
+    <div id="overlay"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="index.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+                <a href="#intro">Introdução</a>
+                <a href="#ferramentas">Ferramentas</a>
+                <a href="#tecnicas">Técnicas</a>
+                <a href="#protecao">Proteção</a>
+                <a href="#laboratorio">Laboratório</a>
+                <a href="downloads.html" class="download-btn"><i class="fas fa-download"></i> Downloads</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+
+        <div class="mobile-menu">
+            <button class="mobile-menu-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="mobile-nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="#intro">Introdução</a>
+                <a href="#ferramentas">Ferramentas</a>
+                <a href="#tecnicas">Técnicas</a>
+                <a href="#ataques">Tipos de Ataques</a>
+                <a href="#hashcat">Hashcat</a>
+                <a href="#johnripper">John the Ripper</a>
+                <a href="#hydra">Hydra</a>
+                <a href="#protecao">Proteção</a>
+                <a href="#laboratorio">Laboratório Prático</a>
+                <a href="#recursos">Recursos Adicionais</a>
+            </div>
+        </div>
+
+        <div class="page-title">
+            <h1 data-text="Hack de Senhas">Hack de Senhas</h1>
+            <p>Técnicas avançadas, ferramentas e métodos para teste de segurança de senhas</p>
+        </div>
+
+        <section id="intro" class="intro-section">
+            <h2>Introdução ao Hack de Senhas</h2>
+            <p>A quebra de senhas é uma das técnicas fundamentais no arsenal de um profissional de segurança da informação. Compreender como os atacantes podem comprometer credenciais é essencial para criar sistemas seguros e proteger dados sensíveis.</p>
+            <p>Neste guia completo, você aprenderá sobre as principais ferramentas, técnicas e metodologias utilizadas para testes de segurança de senhas, desde ataques de força bruta até engenharia social, passando por técnicas avançadas como rainbow tables e ataques de dicionário.</p>
+            
+            <div class="warning-box">
+                <p><strong>AVISO IMPORTANTE:</strong> Todas as técnicas e ferramentas descritas neste guia são para fins educacionais e devem ser usadas apenas em ambientes controlados e com autorização explícita. A utilização destas técnicas sem permissão constitui crime e pode resultar em sérias consequências legais.</p>
+            </div>
+        </section>
+
+        <section class="toc-section">
+            <h2>Conteúdo do Guia</h2>
+            <ul class="toc-list">
+                <li><a href="#conceitos">Conceitos Fundamentais</a></li>
+                <li><a href="#ataques">Tipos de Ataques</a></li>
+                <li><a href="#ferramentas">Ferramentas Principais</a></li>
+                <li><a href="#hashcat">Hashcat - Tutorial Completo</a></li>
+                <li><a href="#johnripper">John the Ripper - Guia Detalhado</a></li>
+                <li><a href="#hydra">Hydra - Ataques Online</a></li>
+                <li><a href="#wordlists">Wordlists e Dicionários</a></li>
+                <li><a href="#rainbow">Rainbow Tables</a></li>
+                <li><a href="#social">Engenharia Social</a></li>
+                <li><a href="#protecao">Proteção e Mitigação</a></li>
+                <li><a href="#laboratorio">Laboratório Prático</a></li>
+                <li><a href="#recursos">Recursos Adicionais</a></li>
+            </ul>
+        </section>
+
+        <section id="conceitos" class="content-section">
+            <h2>Conceitos Fundamentais</h2>
+            
+            <h3>O que é um Hash?</h3>
+            <p>Um hash é uma função matemática que converte dados de tamanho arbitrário em uma string de bits de tamanho fixo. Os hashes são fundamentais para o armazenamento seguro de senhas, pois:</p>
+            <ul>
+                <li>São unidirecionais (não podem ser revertidos para a senha original)</li>
+                <li>A mesma entrada sempre produz o mesmo hash de saída</li>
+                <li>Pequenas alterações na entrada resultam em hashes completamente diferentes</li>
+                <li>É computacionalmente inviável encontrar duas entradas diferentes que produzam o mesmo hash (resistência a colisões)</li>
+            </ul>
+            
+            <div class="info-box">
+                <p><strong>Exemplos de Algoritmos de Hash:</strong> MD5, SHA-1, SHA-256, SHA-512, NTLM, bcrypt, Argon2</p>
+            </div>
+            
+            <h3>Salting (Uso de Sais)</h3>
+            <p>Um "salt" é um valor aleatório que é combinado com a senha antes de aplicar a função hash. Os sais são cruciais para a segurança porque:</p>
+            <ul>
+                <li>Previnem ataques com rainbow tables (tabelas pré-computadas)</li>
+                <li>Fazem com que senhas idênticas produzam hashes diferentes</li>
+                <li>Aumentam significativamente o custo computacional de ataques de força bruta</li>
+            </ul>
+            
+            <h3>Armazenamento de Senhas</h3>
+            <p>Os sistemas modernos armazenam senhas de maneiras específicas para garantir segurança:</p>
+            <ul>
+                <li><strong>Linux:</strong> Em /etc/shadow usando algoritmos como SHA-512 com salt</li>
+                <li><strong>Windows:</strong> Na SAM (Security Accounts Manager) usando NTLM ou NTLMv2</li>
+                <li><strong>Aplicações Web:</strong> Frequentemente usando bcrypt, Argon2 ou PBKDF2</li>
+                <li><strong>Bancos de Dados:</strong> Colunas criptografadas com hashes e salts</li>
+            </ul>
+        </section>
+
+        <section id="ataques" class="content-section">
+            <h2>Tipos de Ataques de Senha</h2>
+            
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <div class="algorithm-title">Força Bruta</div>
+                    <div class="algorithm-description">Testa todas as combinações possíveis de caracteres até encontrar a senha correta. Altamente eficaz, mas muito demorado para senhas complexas.</div>
+                </div>
+                
+                <div class="algorithm-card">
+                    <div class="algorithm-title">Dicionário</div>
+                    <div class="algorithm-description">Utiliza uma lista de palavras comuns para tentar adivinhar a senha. Mais eficiente que força bruta, mas depende da qualidade do dicionário.</div>
+                </div>
+                
+                <div class="algorithm-card">
+                    <div class="algorithm-title">Híbrido</div>
+                    <div class="algorithm-description">Combina ataques de dicionário com força bruta, adicionando caracteres especiais e números a palavras comuns.</div>
+                </div>
+                
+                <div class="algorithm-card">
+                    <div class="algorithm-title">Rainbow Tables</div>
+                    <div class="algorithm-description">Utiliza tabelas pré-computadas para encontrar senhas a partir de seus hashes, trocando espaço de armazenamento por velocidade.</div>
+                </div>
+                
+                <div class="algorithm-card">
+                    <div class="algorithm-title">Spray de Senha</div>
+                    <div class="algorithm-description">Tenta algumas senhas comuns em muitas contas diferentes, evitando bloqueios por excesso de tentativas.</div>
+                </div>
+                
+                <div class="algorithm-card">
+                    <div class="algorithm-title">Regras e Máscaras</div>
+                    <div class="algorithm-description">Utiliza padrões e regras específicas para tentar variações de palavras-base, aumentando a eficiência do ataque.</div>
+                </div>
+            </div>
+            
+            <h3>Eficácia dos Ataques</h3>
+            <p>A eficácia de um ataque de senha depende de vários fatores:</p>
+            <ul>
+                <li><strong>Complexidade da senha:</strong> Comprimento, uso de caracteres variados</li>
+                <li><strong>Algoritmo de hash:</strong> Algoritmos antigos como MD5 são muito mais rápidos de quebrar</li>
+                <li><strong>Uso de salts e iterações:</strong> Aumentam significativamente a dificuldade</li>
+                <li><strong>Poder computacional:</strong> GPUs modernas são muito mais eficientes que CPUs para quebra de senhas</li>
+                <li><strong>Tempo disponível:</strong> Alguns ataques podem levar dias, semanas ou mesmo anos</li>
+            </ul>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Tipo de Ataque</th>
+                        <th>Eficácia</th>
+                        <th>Velocidade</th>
+                        <th>Recurso Necessário</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Força Bruta</td>
+                        <td>Alta (se houver tempo suficiente)</td>
+                        <td>Muito lenta</td>
+                        <td>Alto poder computacional</td>
+                    </tr>
+                    <tr>
+                        <td>Dicionário</td>
+                        <td>Média (dependendo da wordlist)</td>
+                        <td>Rápida</td>
+                        <td>Boas wordlists</td>
+                    </tr>
+                    <tr>
+                        <td>Rainbow Tables</td>
+                        <td>Alta (para hashes sem salt)</td>
+                        <td>Muito rápida</td>
+                        <td>Muito espaço de armazenamento</td>
+                    </tr>
+                    <tr>
+                        <td>Híbrido</td>
+                        <td>Alta</td>
+                        <td>Média</td>
+                        <td>Boas regras e wordlists</td>
+                    </tr>
+                    <tr>
+                        <td>Mask Attack</td>
+                        <td>Alta (com boas máscaras)</td>
+                        <td>Média</td>
+                        <td>Conhecimento do padrão de senha</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="ferramentas" class="content-section">
+            <h2>Ferramentas Principais</h2>
+            
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon"><i class="fas fa-bolt"></i></div>
+                    <div class="tool-title">Hashcat</div>
+                </div>
+                <div class="tool-description">
+                    <p>Hashcat é a ferramenta de quebra de senha mais rápida do mundo, utilizando a potência de GPUs para acelerar o processo. Suporta mais de 300 tipos de hash e múltiplos modos de ataque.</p>
+                </div>
+                <div class="tool-features">
+                    <h4>Recursos Principais:</h4>
+                    <ul class="feature-list">
+                        <li>Suporte a GPU via OpenCL</li>
+                        <li>Múltiplos modos de ataque (brute-force, mask, dictionary, rule-based, etc.)</li>
+                        <li>Suporte a mais de 300 algoritmos de hash</li>
+                        <li>Otimizado para alta performance</li>
+                        <li>Modo distribuído para múltiplas máquinas</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon"><i class="fas fa-key"></i></div>
+                    <div class="tool-title">John the Ripper</div>
+                </div>
+                <div class="tool-description">
+                    <p>John the Ripper é uma ferramenta de quebra de senha gratuita e de código aberto, inicialmente desenvolvida para sistemas Unix. É altamente configurável e suporta diversos formatos de hash.</p>
+                </div>
+                <div class="tool-features">
+                    <h4>Recursos Principais:</h4>
+                    <ul class="feature-list">
+                        <li>Detecta automaticamente o tipo de hash</li>
+                        <li>Diversos modos de ataque integrados</li>
+                        <li>Sistema de regras flexível</li>
+                        <li>Versão Community com suporte a mais formatos</li>
+                        <li>Capacidade de retomar ataques interrompidos</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon"><i class="fas fa-dragon"></i></div>
+                    <div class="tool-title">Hydra</div>
+                </div>
+                <div class="tool-description">
+                    <p>Hydra é uma ferramenta de cracking de login online, capaz de realizar ataques contra numerosos protocolos, incluindo SSH, FTP, SMTP, HTTP(S) e muitos outros.</p>
+                </div>
+                <div class="tool-features">
+                    <h4>Recursos Principais:</h4>
+                    <ul class="feature-list">
+                        <li>Suporte a mais de 50 protocolos</li>
+                        <li>Paralelização para acelerar ataques</li>
+                        <li>Módulos extensíveis</li>
+                        <li>Suporte a proxies e SOCKS</li>
+                        <li>Possibilidade de restaurar sessões interrompidas</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon"><i class="fas fa-table"></i></div>
+                    <div class="tool-title">Ophcrack</div>
+                </div>
+                <div class="tool-description">
+                    <p>Ophcrack é uma ferramenta especializada em quebrar senhas do Windows usando ataques de rainbow tables, particularmente eficaz contra hashes NTLM e LM.</p>
+                </div>
+                <div class="tool-features">
+                    <h4>Recursos Principais:</h4>
+                    <ul class="feature-list">
+                        <li>Interface gráfica intuitiva</li>
+                        <li>Rainbow tables gratuitas e premium</li>
+                        <li>Live CD para recuperação de senhas</li>
+                        <li>Extração automática de hashes</li>
+                        <li>Suporte a Windows XP até Windows 10</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon"><i class="fas fa-file-word"></i></div>
+                    <div class="tool-title">CeWL</div>
+                </div>
+                <div class="tool-description">
+                    <p>CeWL (Custom Word List generator) é uma ferramenta Ruby que rastreia um URL específico para criar listas de palavras personalizadas baseadas no conteúdo do site, útil para ataques direcionados.</p>
+                </div>
+                <div class="tool-features">
+                    <h4>Recursos Principais:</h4>
+                    <ul class="feature-list">
+                        <li>Geração de wordlists personalizadas</li>
+                        <li>Profundidade de rastreamento configurável</li>
+                        <li>Filtros de tamanho mínimo de palavra</li>
+                        <li>Inclui e-mails encontrados</li>
+                        <li>Inclui meta tags para palavras-chave relevantes</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="hashcat" class="content-section">
+            <h2>Hashcat - Tutorial Completo</h2>
+            
+            <h3>Instalação e Configuração</h3>
+            <p>Hashcat é pré-instalado no Kali Linux, mas também pode ser instalado em outros sistemas:</p>
+            
+            <div class="command-box">
+                <div class="command-title">Debian/Ubuntu</div>
+                <code>sudo apt update
+sudo apt install hashcat</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Arch Linux</div>
+                <code>sudo pacman -S hashcat</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Windows (PowerShell como Admin)</div>
+                <code>winget install hashcat</code>
+            </div>
+            
+            <p>Para obter melhor performance, é altamente recomendável instalar os drivers mais recentes da sua GPU.</p>
+            
+            <h3>Verificando Suporte a Hardware</h3>
+            
+            <div class="command-box">
+                <div class="command-title">Verificar dispositivos disponíveis</div>
+                <code>hashcat --opencl-info</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Verificar performance em benchmark</div>
+                <code>hashcat -b</code>
+            </div>
+            
+            <h3>Modos de Ataque</h3>
+            <p>Hashcat oferece vários modos de ataque que podem ser especificados com a opção <code>-a</code>:</p>
+            <ul>
+                <li><strong>Modo 0:</strong> Ataque de Dicionário</li>
+                <li><strong>Modo 1:</strong> Ataque de Combinação</li>
+                <li><strong>Modo 3:</strong> Ataque de Máscara (Brute Force)</li>
+                <li><strong>Modo 6:</strong> Ataque de Dicionário com Máscara</li>
+                <li><strong>Modo 7:</strong> Ataque de Máscara com Dicionário</li>
+            </ul>
+            
+            <h3>Tipos de Hash</h3>
+            <p>Hashcat suporta centenas de tipos de hash. Para especificar o tipo, use a opção <code>-m</code>:</p>
+            
+            <div class="command-box">
+                <div class="command-title">Tipos de hash comuns</div>
+                <code># MD5: -m 0
+# SHA1: -m 100
+# SHA2-256: -m 1400
+# SHA2-512: -m 1700
+# MySQL: -m 300
+# NTLM: -m 1000
+# WPA/WPA2: -m 22000
+# bcrypt: -m 3200
+# Argon2: -m 16900</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Listar todos os hashes suportados</div>
+                <code>hashcat --help | grep -i "Hash modes"</code>
+            </div>
+            
+            <h3>Exemplos Práticos de Uso do Hashcat</h3>
+            
+            <h4>Ataque de Dicionário Básico (MD5)</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Usando rockyou.txt</div>
+                <code>hashcat -m 0 -a 0 hash.txt /usr/share/wordlists/rockyou.txt</code>
+            </div>
+            
+            <div class="info-box">
+                <p>No Kali Linux, a wordlist rockyou.txt está compactada em /usr/share/wordlists/. Para descompactá-la, use: <code>gzip -d /usr/share/wordlists/rockyou.txt.gz</code></p>
+            </div>
+            
+            <h4>Ataque de Força Bruta com Máscara</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Senhas de 8 caracteres (a-z, 0-9)</div>
+                <code>hashcat -m 1000 -a 3 hash.txt ?a?a?a?a?a?a?a?a</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Padrão específico (3 letras + 5 números)</div>
+                <code>hashcat -m 1000 -a 3 hash.txt ?l?l?l?d?d?d?d?d</code>
+            </div>
+            
+            <div class="info-box">
+                <p><strong>Tipos de caracteres em máscaras:</strong></p>
+                <p>?l = letras minúsculas (a-z)<br>
+                ?u = letras maiúsculas (A-Z)<br>
+                ?d = dígitos (0-9)<br>
+                ?s = caracteres especiais (!@#$)<br>
+                ?a = todos os caracteres acima</p>
+            </div>
+            
+            <h4>Ataque com Regras</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Usando regras best64</div>
+                <code>hashcat -m 0 -a 0 hash.txt wordlist.txt -r /usr/share/hashcat/rules/best64.rule</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Usando regras OneRuleToRuleThemAll</div>
+                <code>hashcat -m 0 -a 0 hash.txt wordlist.txt -r /usr/share/hashcat/rules/OneRuleToRuleThemAll.rule</code>
+            </div>
+            
+            <h4>Quebra de Senhas do Windows (NTLM)</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Extraindo hashes com mimikatz (no Windows)</div>
+                <code>mimikatz # privilege::debug
+mimikatz # sekurlsa::logonpasswords</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Quebrando hash NTLM</div>
+                <code>hashcat -m 1000 -a 0 hash.txt /usr/share/wordlists/rockyou.txt</code>
+            </div>
+            
+            <h4>Quebra de Senhas WPA/WPA2</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Convertendo cap para hccapx</div>
+                <code>cap2hccapx captura.cap saida.hccapx</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Quebrando WPA/WPA2</div>
+                <code>hashcat -m 22000 -a 0 saida.hccapx /usr/share/wordlists/rockyou.txt</code>
+            </div>
+            
+            <h4>Quebra de Hash de Senha do Linux (/etc/shadow)</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Extraindo hashes</div>
+                <code>unshadow /etc/passwd /etc/shadow > hashes.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Quebrando hashes SHA-512 (comum em sistemas modernos)</div>
+                <code>hashcat -m 1800 -a 0 hashes.txt /usr/share/wordlists/rockyou.txt</code>
+            </div>
+            
+            <h3>Otimizando o Desempenho</h3>
+            <ul>
+                <li>Use GPUs em vez de CPUs quando possível</li>
+                <li>Atualize para os drivers mais recentes</li>
+                <li>Ajuste as configurações de workload com <code>-w</code> (1-4)</li>
+                <li>Utilize a opção <code>--opencl-device-types=1,2,3</code> para usar todos os dispositivos disponíveis</li>
+                <li>Ative o modo optimizado com <code>-O</code> (pode usar mais memória)</li>
+            </ul>
+            
+            <div class="command-box">
+                <div class="command-title">Configuração otimizada</div>
+                <code>hashcat -m 1000 -a 0 hash.txt wordlist.txt -w 3 -O --opencl-device-types=1,2,3</code>
+            </div>
+        </section>
+
+        <section id="johnripper" class="content-section">
+            <h2>John the Ripper - Guia Detalhado</h2>
+            
+            <h3>Instalação e Configuração</h3>
+            <p>John the Ripper está disponível no Kali Linux por padrão, mas você pode querer a versão "jumbo" com mais recursos:</p>
+            
+            <div class="command-box">
+                <div class="command-title">Debian/Ubuntu</div>
+                <code>sudo apt update
+sudo apt install john john-data</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Versão Jumbo (Github)</div>
+                <code>git clone https://github.com/openwall/john.git
+cd john/src
+./configure && make -s clean && make -sj4</code>
+            </div>
+            
+            <h3>Características do John the Ripper</h3>
+            <ul>
+                <li>Detecção automática de tipos de hash</li>
+                <li>Ataques de dicionário, brute force e baseados em regras</li>
+                <li>Suporte a múltiplos formatos de hash</li>
+                <li>Capacidade de retomar sessões interrompidas</li>
+                <li>Modo incremental para ataques de força bruta altamente configuráveis</li>
+            </ul>
+            
+            <h3>Formato dos Arquivos de Hash</h3>
+            <p>John the Ripper aceita diversos formatos de hash:</p>
+            <ul>
+                <li><strong>Formato simples:</strong> usuário:hash</li>
+                <li><strong>Formato shadow:</strong> usuário:hash:últimaModificação:mínimo:máximo:aviso:inativo:expiração</li>
+                <li><strong>Raw hashes:</strong> apenas o hash</li>
+            </ul>
+            
+            <h3>Exemplos Práticos</h3>
+            
+            <h4>Quebra de Senhas do Linux</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Combinando arquivos passwd e shadow</div>
+                <code>sudo unshadow /etc/passwd /etc/shadow > hashes.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Quebrando com John</div>
+                <code>john hashes.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Usando wordlist específica</div>
+                <code>john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt</code>
+            </div>
+            
+            <h4>Quebra de Hashes MD5</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Formato do arquivo (hash.txt)</div>
+                <code>user1:5f4dcc3b5aa765d61d8327deb882cf99
+user2:e99a18c428cb38d5f260853678922e03</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Quebra com regras</div>
+                <code>john --format=raw-md5 --wordlist=/usr/share/wordlists/rockyou.txt --rules hash.txt</code>
+            </div>
+            
+            <h4>Quebra de Hashes do Windows (NTLM)</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Formato do arquivo (ntlm.txt)</div>
+                <code>Administrator:500:LMHASH:NTHASH:::
+Guest:501:LMHASH:NTHASH:::</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Quebra de hashes NTLM</div>
+                <code>john --format=nt --wordlist=/usr/share/wordlists/rockyou.txt ntlm.txt</code>
+            </div>
+            
+            <h4>Ataque de Força Bruta Incremental</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Usando modo incremental</div>
+                <code>john --incremental hash.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Força bruta com configuração específica</div>
+                <code>john --incremental=Digits --format=raw-md5 hash.txt</code>
+            </div>
+            
+            <h4>Usando Regras Personalizadas</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Aplicando regras</div>
+                <code>john --wordlist=wordlist.txt --rules=Jumbo hash.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Arquivo de regras personalizado</div>
+                <code>john --wordlist=wordlist.txt --rules:meuarquivo hash.txt</code>
+            </div>
+            
+            <h4>Exibindo Senhas Quebradas</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Ver senhas já quebradas</div>
+                <code>john --show hash.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Ver estatísticas da sessão</div>
+                <code>john --status</code>
+            </div>
+            
+            <h3>Utilizando John com ZIP, RAR e outros formatos</h3>
+            
+            <div class="command-box">
+                <div class="command-title">Extraindo hash de arquivo ZIP</div>
+                <code>zip2john arquivo.zip > zip.hash</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Extraindo hash de arquivo RAR</div>
+                <code>rar2john arquivo.rar > rar.hash</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Extraindo hash de arquivo PDF</div>
+                <code>pdf2john documento.pdf > pdf.hash</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Quebrando o hash extraído</div>
+                <code>john zip.hash</code>
+            </div>
+            
+            <h3>Dicas para Otimização</h3>
+            <ul>
+                <li>Use a opção <code>--fork=N</code> para paralelizar o processamento em N threads</li>
+                <li>Use <code>--session=nome</code> para salvar o progresso e poder retomar depois</li>
+                <li>Use <code>--pot=arquivo.pot</code> para especificar um arquivo de potfile personalizado</li>
+                <li>Combine wordlists com regras para maior eficiência</li>
+            </ul>
+        </section>
+
+        <section id="hydra" class="content-section">
+            <h2>Hydra - Ataques Online</h2>
+            
+            <h3>Introdução ao Hydra</h3>
+            <p>THC-Hydra é uma ferramenta de cracking de autenticação online, usada para realizar ataques de força bruta contra diversos serviços e protocolos. Ao contrário do Hashcat e John the Ripper que trabalham com hashes offline, o Hydra tenta autenticação direta em serviços online.</p>
+            
+            <div class="warning-box">
+                <p><strong>ATENÇÃO:</strong> Ataques online são facilmente detectáveis e podem bloquear contas, gerar logs e disparar alertas. Use apenas em ambientes autorizados para teste.</p>
+            </div>
+            
+            <h3>Instalação</h3>
+            
+            <div class="command-box">
+                <div class="command-title">Debian/Ubuntu/Kali</div>
+                <code>sudo apt update
+sudo apt install hydra</code>
+            </div>
+            
+            <h3>Protocolos Suportados</h3>
+            <p>Hydra suporta dezenas de protocolos, incluindo:</p>
+            <ul>
+                <li>HTTP(S), HTTP-FORM-POST, HTTP-PROXY</li>
+                <li>FTP, SSH, Telnet</li>
+                <li>SMTP, IMAP, POP3</li>
+                <li>SMB, RDP, VNC</li>
+                <li>MySQL, PostgreSQL, Oracle</li>
+                <li>E muitos outros</li>
+            </ul>
+            
+            <div class="command-box">
+                <div class="command-title">Listar todos os protocolos suportados</div>
+                <code>hydra -h | grep "Supported services"</code>
+            </div>
+            
+            <h3>Sintaxe Básica</h3>
+            
+            <div class="command-box">
+                <div class="command-title">Formato geral</div>
+                <code>hydra -l usuario -P wordlist.txt servico://servidor opcoes</code>
+            </div>
+            
+            <h3>Exemplos Práticos</h3>
+            
+            <h4>Ataque SSH</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Usuário único, múltiplas senhas</div>
+                <code>hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.100</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Múltiplos usuários, senha única</div>
+                <code>hydra -L usuarios.txt -p "senha123" ssh://192.168.1.100</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Múltiplos usuários, múltiplas senhas</div>
+                <code>hydra -L usuarios.txt -P senhas.txt ssh://192.168.1.100</code>
+            </div>
+            
+            <h4>Ataque FTP</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Ataque básico</div>
+                <code>hydra -l ftpuser -P /usr/share/wordlists/rockyou.txt ftp://192.168.1.100</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Com porta específica</div>
+                <code>hydra -l ftpuser -P /usr/share/wordlists/rockyou.txt ftp://192.168.1.100:2121</code>
+            </div>
+            
+            <h4>Ataque a Formulário Web</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Atacando login HTTP POST</div>
+                <code>hydra -l admin -P /usr/share/wordlists/rockyou.txt 192.168.1.100 http-post-form "/login.php:usuario=^USER^&senha=^PASS^:Falha no login"</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Login HTTPS com parâmetros adicionais</div>
+                <code>hydra -l admin -P /usr/share/wordlists/rockyou.txt 192.168.1.100 -s 443 https-post-form "/login:username=^USER^&password=^PASS^&submit=Login:F=Login incorreto"</code>
+            </div>
+            
+            <h4>Ataque a WordPress</h4>
+            
+            <div class="command-box">
+                <div class="command-title">WordPress Admin</div>
+                <code>hydra -l admin -P /usr/share/wordlists/rockyou.txt 192.168.1.100 http-post-form "/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In:F=incorreto"</code>
+            </div>
+            
+            <h4>Atacando Serviços de Email</h4>
+            
+            <div class="command-box">
+                <div class="command-title">SMTP</div>
+                <code>hydra -l usuario@dominio.com -P /usr/share/wordlists/rockyou.txt smtp://mail.servidor.com</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">IMAP</div>
+                <code>hydra -l usuario@dominio.com -P /usr/share/wordlists/rockyou.txt imap://mail.servidor.com</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">POP3</div>
+                <code>hydra -l usuario@dominio.com -P /usr/share/wordlists/rockyou.txt pop3://mail.servidor.com</code>
+            </div>
+            
+            <h3>Opções Avançadas</h3>
+            
+            <h4>Limitando Tentativas</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Threads paralelas</div>
+                <code>hydra -l admin -P wordlist.txt -t 4 ssh://192.168.1.100</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Tempo entre tentativas</div>
+                <code>hydra -l admin -P wordlist.txt -t 1 -W 3 ssh://192.168.1.100</code>
+            </div>
+            
+            <h4>Saída e Logging</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Salvar resultados</div>
+                <code>hydra -l admin -P wordlist.txt ftp://192.168.1.100 -o resultados.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Saída em formato JSON</div>
+                <code>hydra -l admin -P wordlist.txt ftp://192.168.1.100 -o resultados.json -b json</code>
+            </div>
+            
+            <h4>Usando Proxies</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Proxy SOCKS</div>
+                <code>hydra -l admin -P wordlist.txt ssh://192.168.1.100 -s 22 -x 4:127.0.0.1:9050</code>
+            </div>
+            
+            <h3>Dicas para Evitar Detecção e Bloqueio</h3>
+            <ul>
+                <li>Use valores baixos para threads (<code>-t 1</code> ou <code>-t 2</code>)</li>
+                <li>Adicione tempo entre tentativas (<code>-W 5</code> para 5 segundos)</li>
+                <li>Use listas menores e mais direcionadas</li>
+                <li>Utilize a opção <code>-f</code> para parar após encontrar a primeira credencial válida</li>
+                <li>Monitorar alertas e bloqueios para ajustar sua estratégia</li>
+            </ul>
+        </section>
+
+        <section id="wordlists" class="content-section">
+            <h2>Wordlists e Dicionários</h2>
+            
+            <h3>Importância das Wordlists</h3>
+            <p>Wordlists são coleções de palavras usadas em ataques de dicionário. A qualidade e relevância da wordlist é frequentemente o fator mais importante no sucesso de um ataque de senha.</p>
+            
+            <h3>Principais Wordlists</h3>
+            <ul>
+                <li><strong>RockYou:</strong> Uma das mais famosas, contendo 14 milhões de senhas reais vazadas</li>
+                <li><strong>SecLists:</strong> Coleção de múltiplas listas para diversos propósitos</li>
+                <li><strong>CrackStation:</strong> Uma das maiores wordlists disponíveis publicamente</li>
+                <li><strong>Weakpass:</strong> Contém senhas fracas comumente usadas</li>
+                <li><strong>Wordlists específicas por idioma:</strong> Adaptadas para diferentes línguas e regiões</li>
+            </ul>
+            
+            <div class="command-box">
+                <div class="command-title">Localização no Kali Linux</div>
+                <code>/usr/share/wordlists/</code>
+            </div>
+            
+            <h3>Criando Wordlists Personalizadas</h3>
+            
+            <h4>Usando CeWL para Web Scraping</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Extrair palavras de um site</div>
+                <code>cewl -d 2 -m 6 -w wordlist.txt https://alvo.com.br</code>
+            </div>
+            
+            <div class="info-box">
+                <p><strong>Parâmetros CeWL:</strong></p>
+                <p>-d: profundidade de rastreamento (níveis)<br>
+                -m: tamanho mínimo das palavras<br>
+                -w: arquivo de saída</p>
+            </div>
+            
+            <h4>Usando CUPP (Common User Passwords Profiler)</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Gerar wordlist baseada em informações pessoais</div>
+                <code>python3 cupp.py -i</code>
+            </div>
+            
+            <p>O CUPP fará perguntas sobre a pessoa (nome, aniversário, informações de familiares, etc.) e gerará uma wordlist personalizada.</p>
+            
+            <h4>Manipulação de Wordlists</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Remover duplicatas</div>
+                <code>sort wordlist.txt | uniq > wordlist_clean.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Filtrar por tamanho</div>
+                <code>cat wordlist.txt | grep -E '^.{8,12}$' > wordlist_8-12chars.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Combinar múltiplas wordlists</div>
+                <code>cat wordlist1.txt wordlist2.txt wordlist3.txt | sort | uniq > wordlist_combined.txt</code>
+            </div>
+            
+            <h4>Gerando Wordlists com Regras</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Usando hashcat para aplicar regras</div>
+                <code>hashcat --force wordlist.txt -r /usr/share/hashcat/rules/best64.rule --stdout > wordlist_com_regras.txt</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Usando John para aplicar regras</div>
+                <code>john --wordlist=wordlist.txt --rules=Jumbo --stdout > wordlist_john_rules.txt</code>
+            </div>
+            
+            <h3>Recursos Online de Wordlists</h3>
+            <ul>
+                <li><strong>GitHub SecLists:</strong> github.com/danielmiessler/SecLists</li>
+                <li><strong>CrackStation:</strong> crackstation.net/crackstation-wordlist-password-cracking-dictionary.htm</li>
+                <li><strong>WeakPass:</strong> weakpass.com</li>
+                <li><strong>Packetstorm:</strong> packetstormsecurity.com/Crackers/wordlists/</li>
+            </ul>
+        </section>
+
+        <section id="rainbow" class="content-section">
+            <h2>Rainbow Tables</h2>
+            
+            <h3>O que são Rainbow Tables?</h3>
+            <p>Rainbow Tables são estruturas de dados pré-computadas que oferecem um compromisso entre tempo e espaço para recuperar senhas a partir de hashes. Elas permitem realizar uma busca rápida em uma vasta quantidade de hashes pré-calculados.</p>
+            
+            <h3>Como Funcionam</h3>
+            <p>Rainbow Tables usam um conceito chamado "time-memory trade-off" (compromisso tempo-memória):</p>
+            <ol>
+                <li>Pré-computam cadeias de hash e redução em vez de todos os hashes possíveis</li>
+                <li>Armazenam apenas os pontos finais dessas cadeias</li>
+                <li>Durante a busca, re-computam cadeias parciais para encontrar correspondências</li>
+            </ol>
+            <p>Isso reduz significativamente o espaço de armazenamento necessário, embora aumente um pouco o tempo de busca.</p>
+            
+            <h3>Ferramentas para Rainbow Tables</h3>
+            
+            <h4>RainbowCrack</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Instalação</div>
+                <code>sudo apt install rainbowcrack</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Gerando tabelas (exemplo MD5)</div>
+                <code>rtgen md5 loweralpha-numeric 1 8 0 1000 1000000 0</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Usando tabelas existentes</div>
+                <code>rcrack caminho/para/tabelas/ -h hash_para_quebrar</code>
+            </div>
+            
+            <h4>Ophcrack</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Instalação</div>
+                <code>sudo apt install ophcrack ophcrack-tables</code>
+            </div>
+            
+            <div class="info-box">
+                <p>Ophcrack possui uma interface gráfica e é especializado em hashes do Windows. Também está disponível como Live CD para recuperação de senhas diretamente do sistema.</p>
+            </div>
+            
+            <h3>Limitações das Rainbow Tables</h3>
+            <ul>
+                <li><strong>Saltings:</strong> As Rainbow Tables são ineficazes contra hashes que usam salt</li>
+                <li><strong>Espaço de armazenamento:</strong> Tabelas completas podem ocupar terabytes</li>
+                <li><strong>Algoritmos lentos:</strong> Não são eficientes contra algoritmos como bcrypt, Argon2</li>
+                <li><strong>Conjunto limitado:</strong> Cada tabela cobre apenas um conjunto específico de caracteres e comprimentos</li>
+            </ul>
+            
+            <div class="warning-box">
+                <p>Devido ao uso generalizado de salt e algoritmos lentos em sistemas modernos, as Rainbow Tables têm uso limitado hoje em dia, exceto para alguns casos específicos como hashes antigos sem salt.</p>
+            </div>
+            
+            <h3>Quando Usar Rainbow Tables</h3>
+            <p>As Rainbow Tables ainda são úteis em alguns cenários:</p>
+            <ul>
+                <li>Hashes sem salt (alguns hashes MD5, SHA1 antigos)</li>
+                <li>Hashes NTLM do Windows (quando extraídos diretamente)</li>
+                <li>Análise forense de sistemas legados</li>
+                <li>Recuperação de senhas em dispositivos antigos</li>
+            </ul>
+        </section>
+
+        <section id="social" class="content-section">
+            <h2>Engenharia Social e Ataques Psicológicos</h2>
+            
+            <h3>Engenharia Social na Quebra de Senhas</h3>
+            <p>A engenharia social é muitas vezes o método mais eficaz para obtenção de senhas, pois explora o "elo mais fraco" da segurança: o fator humano.</p>
+            
+            <h3>Técnicas Comuns</h3>
+            
+            <h4>1. Phishing</h4>
+            <p>Criação de páginas falsas de login idênticas às legítimas para capturar credenciais.</p>
+            
+            <div class="tip-box">
+                <p>Ferramentas como o <strong>SET (Social Engineering Toolkit)</strong> e <strong>Gophish</strong> são usadas para criar campanhas de phishing controladas em testes de segurança.</p>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Iniciando o SET no Kali</div>
+                <code>sudo setoolkit</code>
+            </div>
+            
+            <h4>2. Pretexting</h4>
+            <p>Criar uma narrativa falsa para obter informações ou acesso.</p>
+            <ul>
+                <li>Fingir ser suporte técnico</li>
+                <li>Impersonar funcionários de autoridade</li>
+                <li>Criar situações de "emergência" que exigem quebra de protocolo</li>
+            </ul>
+            
+            <h4>3. Baiting</h4>
+            <p>Deixar dispositivos infectados (como pen drives) em locais estratégicos, esperando que alguém os conecte.</p>
+            
+            <div class="command-box">
+                <div class="command-title">Criando USB malicioso com LaZagne</div>
+                <code>sudo apt install auto-run-on-insert
+# Crie um script que execute LaZagne e envie resultados via email/FTP</code>
+            </div>
+            
+            <h4>4. Shoulder Surfing</h4>
+            <p>Observar diretamente quando alguém digita sua senha ou usa dispositivos.</p>
+            
+            <h3>Ferramentas de Coleta de Informações</h3>
+            
+            <h4>Maltego</h4>
+            <p>Ferramenta de inteligência e forensics que permite mapear relações entre pessoas, empresas e informações online.</p>
+            
+            <div class="command-box">
+                <div class="command-title">Instalação do Maltego</div>
+                <code>sudo apt install maltego</code>
+            </div>
+            
+            <h4>theHarvester</h4>
+            <p>Coleta emails, nomes, subdomínios, IPs e URLs de diversas fontes públicas.</p>
+            
+            <div class="command-box">
+                <div class="command-title">Exemplo básico</div>
+                <code>theHarvester -d empresa.com.br -b google,linkedin</code>
+            </div>
+            
+            <h4>Sherlock</h4>
+            <p>Encontra contas de usuários em redes sociais usando o nome de usuário.</p>
+            
+            <div class="command-box">
+                <div class="command-title">Instalação e uso</div>
+                <code>git clone https://github.com/sherlock-project/sherlock.git
+cd sherlock
+python3 -m pip install -r requirements.txt
+python3 sherlock nomeusuario</code>
+            </div>
+            
+            <h3>Aplicação na Criação de Wordlists Personalizadas</h3>
+            <p>As informações coletadas por engenharia social podem ser usadas para criar wordlists altamente eficazes:</p>
+            
+            <div class="command-box">
+                <div class="command-title">Usando CUPP com informações coletadas</div>
+                <code>python3 cupp.py -i
+# Inserir informações coletadas: nome, data de nascimento, nomes de filhos, animal de estimação, etc.</code>
+            </div>
+            
+            <h3>Mitigação e Defesas</h3>
+            <ul>
+                <li>Treinamento regular de conscientização de segurança</li>
+                <li>Implementação de autenticação de múltiplos fatores (MFA)</li>
+                <li>Políticas claras sobre compartilhamento de informações</li>
+                <li>Verificação de identidade através de canais secundários</li>
+                <li>Sistemas de detecção de phishing</li>
+            </ul>
+        </section>
+
+        <section id="protecao" class="content-section">
+            <h2>Proteção e Mitigação</h2>
+            
+            <h3>Melhores Práticas para Armazenamento de Senhas</h3>
+            
+            <h4>Algoritmos Recomendados</h4>
+            <ul>
+                <li><strong>Argon2:</strong> Vencedor da competição Password Hashing Competition (2015), resistente a ataques de GPU</li>
+                <li><strong>bcrypt:</strong> Desenho à prova de ataques por GPU, com fator de custo ajustável</li>
+                <li><strong>PBKDF2:</strong> Padrão aprovado pelo NIST, com iterações configuráveis</li>
+                <li><strong>scrypt:</strong> Algoritmo memory-hard, resistente a hardware especializado</li>
+            </ul>
+            
+            <div class="warning-box">
+                <p>Algoritmos obsoletos que NÃO devem ser usados: MD5, SHA-1, SHA-256 (sem salt ou iterações), DES, 3DES.</p>
+            </div>
+            
+            <h4>Parâmetros Importantes</h4>
+            <ul>
+                <li><strong>Salt:</strong> Único para cada usuário, pelo menos 16 bytes aleatórios</li>
+                <li><strong>Iterações/Fator de Trabalho:</strong> Configurado para levar aproximadamente 100-500ms por operação</li>
+                <li><strong>Uso de Memória (para Argon2/scrypt):</strong> O máximo possível dentro das restrições do servidor</li>
+                <li><strong>Paralelismo:</strong> Ajustado conforme os núcleos disponíveis no servidor</li>
+            </ul>
+            
+            <h4>Implementação em Diferentes Linguagens</h4>
+            
+            <div class="command-box">
+                <div class="command-title">PHP (usando password_hash)</div>
+                <code>// Para bcrypt
+$hash = password_hash($senha, PASSWORD_BCRYPT, ['cost' => 12]);
+
+// Para Argon2
+$hash = password_hash($senha, PASSWORD_ARGON2ID, [
+    'memory_cost' => 65536, // 64MB
+    'time_cost' => 4,       // 4 iterações
+    'threads' => 2          // 2 threads paralelas
+]);</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Python (usando passlib)</div>
+                <code>from passlib.hash import argon2, bcrypt
+
+# Usando bcrypt
+hashed = bcrypt.hash(senha, rounds=12)
+
+# Usando Argon2
+hashed = argon2.hash(senha, 
+    time_cost=3,      # iterações
+    memory_cost=65536, # 64MB
+    parallelism=4)    # threads</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Java (Spring Security)</div>
+                <code>import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+
+// Usando BCrypt
+BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+String hashed = encoder.encode(senha);
+
+// Usando Argon2
+Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(
+    32,     // salt length
+    64,     // hash length
+    1,      // parallelism
+    65536,  // memory in KB
+    3);     // iterations
+String hashed = encoder.encode(senha);</code>
+            </div>
+            
+            <h3>Proteção de Infraestrutura</h3>
+            
+            <h4>Limitação de Tentativas (Rate Limiting)</h4>
+            <p>Implementar bloqueio temporário de conta após múltiplas tentativas fracassadas.</p>
+            
+            <div class="command-box">
+                <div class="command-title">Configuração fail2ban para SSH</div>
+                <code>sudo apt install fail2ban
+sudo nano /etc/fail2ban/jail.local
+
+# Adicionar configuração
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 3600</code>
+            </div>
+            
+            <h4>Autenticação de Múltiplos Fatores (MFA)</h4>
+            <p>Adicionar uma segunda camada de autenticação além da senha.</p>
+            
+            <div class="command-box">
+                <div class="command-title">Configurando Google Authenticator para SSH</div>
+                <code>sudo apt install libpam-google-authenticator
+google-authenticator</code>
+            </div>
+            
+            <div class="command-box">
+                <div class="command-title">Editar PAM para SSH</div>
+                <code>sudo nano /etc/pam.d/sshd
+
+# Adicionar a linha:
+auth required pam_google_authenticator.so</code>
+            </div>
+            
+            <h4>Implementação de Políticas de Senha Fortes</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Configurando PAM para requisitos de senha</div>
+                <code>sudo apt install libpam-pwquality
+sudo nano /etc/security/pwquality.conf
+
+# Configurações recomendadas
+minlen = 12
+minclass = 3
+maxrepeat = 2
+maxsequence = 3
+gecoscheck = 1
+difok = 4
+enforce_for_root</code>
+            </div>
+            
+            <h3>Checagem de Senhas Vazadas</h3>
+            
+            <h4>API HIBP (Have I Been Pwned)</h4>
+            <p>Verificar se senhas estão presentes em vazamentos conhecidos.</p>
+            
+            <div class="command-box">
+                <div class="command-title">Usando a API k-Anonimity</div>
+                <code>import hashlib
+import requests
+
+def check_password(password):
+    # Calcula o hash SHA-1 da senha
+    sha1 = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    prefix, suffix = sha1[:5], sha1[5:]
+    
+    # Consulta a API HIBP com o prefixo do hash
+    url = f"https://api.pwnedpasswords.com/range/{prefix}"
+    response = requests.get(url)
+    
+    # Verifica se o sufixo está na resposta
+    for line in response.text.splitlines():
+        if line.split(':')[0] == suffix:
+            return True  # Senha vazada
+    
+    return False  # Senha não encontrada em vazamentos</code>
+            </div>
+            
+            <h4>Ferramentas para Auditoria de Senhas</h4>
+            
+            <div class="command-box">
+                <div class="command-title">Usando zxcvbn para avaliar força de senha</div>
+                <code># JavaScript
+import zxcvbn from 'zxcvbn';
+
+const resultado = zxcvbn('MinhaS3nha!');
+console.log(`Pontuação (0-4): ${resultado.score}`);
+console.log(`Tempo estimado para quebra: ${resultado.crack_times_display.offline_slow_hashing_1e4_per_second}`);
+console.log(`Sugestões: ${resultado.feedback.suggestions.join(', ')}`);</code>
+            </div>
+        </section>
+
+        <section id="laboratorio" class="content-section">
+            <h2>Laboratório Prático</h2>
+            
+            <p>Nesta seção, vamos configurar um ambiente seguro para praticar as técnicas de quebra de senhas. Todos os exercícios devem ser realizados em ambiente controlado e não em sistemas de produção.</p>
+            
+            <h3>Preparando o Ambiente</h3>
+            
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Configurar uma Máquina Virtual Kali Linux</div>
+                    <div class="step-content">
+                        <p>Baixe a imagem ISO do Kali Linux no site oficial e crie uma VM usando VirtualBox ou VMware.</p>
+                        <div class="command-box">
+                            <div class="command-title">Verificar as ferramentas instaladas</div>
+                            <code>which hashcat john hydra
+hashcat --version
+john --version
+hydra -h | head -n 3</code>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Configurar Máquina Vulnerável para Testes</div>
+                    <div class="step-content">
+                        <p>Configure uma segunda VM com um sistema operacional para testes, como Metasploitable ou DVWA (Damn Vulnerable Web Application).</p>
+                        <div class="command-box">
+                            <div class="command-title">Instalação do DVWA no Ubuntu</div>
+                            <code>sudo apt update
+sudo apt install apache2 php php-mysqli mariadb-server git
+sudo systemctl start apache2
+sudo systemctl start mariadb
+
+git clone https://github.com/digininja/DVWA.git
+sudo mv DVWA /var/www/html/dvwa
+sudo chmod -R 755 /var/www/html/dvwa
+
+sudo mysql -u root -p
+CREATE DATABASE dvwa;
+CREATE USER 'dvwa'@'localhost' IDENTIFIED BY 'p@ssw0rd';
+GRANT ALL ON dvwa.* TO 'dvwa'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+sudo cp /var/www/html/dvwa/config/config.inc.php.dist /var/www/html/dvwa/config/config.inc.php
+sudo nano /var/www/html/dvwa/config/config.inc.php
+# Editar as configurações de banco de dados
+
+sudo chmod 777 /var/www/html/dvwa/hackable/uploads/
+sudo chmod 777 /var/www/html/dvwa/external/phpids/0.6/lib/IDS/tmp/phpids_log.txt</code>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Criar Hashes para Prática</div>
+                    <div class="step-content">
+                        <p>Gere diferentes tipos de hash para praticar a quebra.</p>
+                        <div class="command-box">
+                            <div class="command-title">Criando hashes MD5</div>
+                            <code>echo -n "senha123" | md5sum | awk '{print $1}' > hash_md5.txt</code>
+                        </div>
+                        <div class="command-box">
+                            <div class="command-title">Criando hashes SHA-1</div>
+                            <code>echo -n "senha123" | sha1sum | awk '{print $1}' > hash_sha1.txt</code>
+                        </div>
+                        <div class="command-box">
+                            <div class="command-title">Criando hashes SHA-256</div>
+                            <code>echo -n "senha123" | sha256sum | awk '{print $1}' > hash_sha256.txt</code>
+                        </div>
+                        <div class="command-box">
+                            <div class="command-title">Criando hashes NTLM (Windows)</div>
+                            <code>echo -n "senha123" | iconv -t utf16le | openssl md4 | awk '{print $2}' > hash_ntlm.txt</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Exercícios Práticos</h3>
+            
+            <h4>Exercício 1: Quebra Básica de Hash MD5</h4>
+            
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <div class="terminal-button terminal-button-red"></div>
+                        <div class="terminal-button terminal-button-yellow"></div>
+                        <div class="terminal-button terminal-button-green"></div>
+                    </div>
+                    <div class="terminal-title">Terminal - Exercício 1</div>
+                </div>
+                <div class="terminal-body">
+<span class="terminal-prompt">kali@kali:~$</span> hashcat -m 0 -a 0 hash_md5.txt /usr/share/wordlists/rockyou.txt
+hashcat (v6.2.5) starting...
+
+OpenCL API (OpenCL 2.0 CUDA 11.4) - Platform #1 [NVIDIA Corporation]
+* Device #1: NVIDIA GeForce RTX 3060, 11957/12052 MB, 28MCU
+
+Dictionary cache built:
+* Filename..: /usr/share/wordlists/rockyou.txt
+* Passwords.: 14344384
+* Bytes.....: 139921497
+* Keyspace..: 14344384
+
+47bce5c74f589f4867dbd57e9ca9f808:senha123
+                                                 
+Session..........: hashcat
+Status...........: Cracked
+Hash.Name........: MD5
+Hash.Target......: 47bce5c74f589f4867dbd57e9ca9f808
+Time.Started.....: Sat Jun 14 16:48:12 2025 (0 secs)
+Time.Estimated...: Sat Jun 14 16:48:12 2025 (0 secs)
+Guess.Base.......: File (/usr/share/wordlists/rockyou.txt)
+Guess.Queue......: 1/1 (100.00%)
+Speed.#1.........:  8642.8 kH/s (0.16ms) @ Accel:1024 Loops:1 Thr:64 Vec:1
+Recovered........: 1/1 (100.00%) Digests
+Progress.........: 49152/14344384 (0.34%)
+Rejected.........: 0/49152 (0.00%)
+Restore.Point....: 0/14344384 (0.00%)
+Restore.Sub.#1...: Salt:0 Amplifier:0-1 Iteration:0-1
+Candidates.#1....: 123456 -> freedom
+
+<span class="terminal-prompt">kali@kali:~$</span> 
+                </div>
+            </div>
+            
+            <h4>Exercício 2: Quebra de Senha do Linux</h4>
+            
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <div class="terminal-button terminal-button-red"></div>
+                        <div class="terminal-button terminal-button-yellow"></div>
+                        <div class="terminal-button terminal-button-green"></div>
+                    </div>
+                    <div class="terminal-title">Terminal - Exercício 2</div>
+                </div>
+                <div class="terminal-body">
+<span class="terminal-prompt">kali@kali:~$</span> # Primeiro, criamos um hash de senha do Linux para teste
+<span class="terminal-prompt">kali@kali:~$</span> mkpasswd -m sha-512 "teste123" > linux_hash.txt
+<span class="terminal-prompt">kali@kali:~$</span> cat linux_hash.txt
+$6$k3fDuhop$QXkiefmq2Z9/ZJJy9HlTE4PVFYUL6XbQEWpS8kW9oG8Y7Xqr5xB5gLY.r1GqTAoHK1G1lqJ.JZKLLYHky5PNO1
+
+<span class="terminal-prompt">kali@kali:~$</span> # Agora, vamos quebrá-lo com John the Ripper
+<span class="terminal-prompt">kali@kali:~$</span> john --format=sha512crypt --wordlist=/usr/share/wordlists/rockyou.txt linux_hash.txt
+Using default input encoding: UTF-8
+Loaded 1 password hash (sha512crypt, crypt(3) $6$ [SHA512 256/256 AVX2 4x])
+Cost 1 (iteration count) is 5000 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+teste123         (?)     
+1g 0:00:00:02 DONE (2025-06-14 16:51) 0.4347g/s 2115p/s 2115c/s 2115C/s 123456..heaven
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+
+<span class="terminal-prompt">kali@kali:~$</span> john --show linux_hash.txt
+?:teste123
+
+1 password hash cracked, 0 left
+                </div>
+            </div>
+            
+            <h4>Exercício 3: Ataque a Formulário Web com Hydra</h4>
+            
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <div class="terminal-button terminal-button-red"></div>
+                        <div class="terminal-button terminal-button-yellow"></div>
+                        <div class="terminal-button terminal-button-green"></div>
+                    </div>
+                    <div class="terminal-title">Terminal - Exercício 3</div>
+                </div>
+                <div class="terminal-body">
+<span class="terminal-prompt">kali@kali:~$</span> # Primeiro, vamos identificar a estrutura do formulário e a mensagem de erro
+<span class="terminal-prompt">kali@kali:~$</span> # Usando o DVWA configurado anteriormente
+
+<span class="terminal-prompt">kali@kali:~$</span> # Agora, vamos usar o Hydra para atacar o formulário
+<span class="terminal-prompt">kali@kali:~$</span> hydra -l admin -P /usr/share/wordlists/fasttrack.txt 192.168.1.100 http-post-form "/dvwa/login.php:username=^USER^&password=^PASS^&Login=Login:F=Login failed" -V
+
+Hydra v9.3 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-06-14 16:53:22
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 222 login tries (l:1/p:222), ~14 tries per task
+[DATA] attacking http-post-form://192.168.1.100:80/dvwa/login.php:username=^USER^&password=^PASS^&Login=Login:F=Login failed
+[ATTEMPT] target 192.168.1.100 - login "admin" - pass "123456" - 1 of 222 [child 0] (0/0)
+[ATTEMPT] target 192.168.1.100 - login "admin" - pass "12345" - 2 of 222 [child 1] (0/0)
+[...]
+[80][http-post-form] host: 192.168.1.100   login: admin   password: password
+[STATUS] attack finished for 192.168.1.100 (waiting for children to complete tests)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-06-14 16:54:03
+                </div>
+            </div>
+            
+            <h4>Exercício 4: Criação de Wordlist Personalizada com CeWL</h4>
+            
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <div class="terminal-button terminal-button-red"></div>
+                        <div class="terminal-button terminal-button-yellow"></div>
+                        <div class="terminal-button terminal-button-green"></div>
+                    </div>
+                    <div class="terminal-title">Terminal - Exercício 4</div>
+                </div>
+                <div class="terminal-body">
+<span class="terminal-prompt">kali@kali:~$</span> # Primeiro, vamos instalar o CeWL se não estiver instalado
+<span class="terminal-prompt">kali@kali:~$</span> sudo apt install cewl
+
+<span class="terminal-prompt">kali@kali:~$</span> # Agora, vamos criar uma wordlist baseada em um site alvo
+<span class="terminal-prompt">kali@kali:~$</span> cewl -d 2 -m 6 -w wordlist_personalizada.txt http://192.168.1.100/dvwa
+
+<span class="terminal-prompt">kali@kali:~$</span> # Verificar as palavras encontradas
+<span class="terminal-prompt">kali@kali:~$</span> wc -l wordlist_personalizada.txt
+112 wordlist_personalizada.txt
+
+<span class="terminal-prompt">kali@kali:~$</span> head -n 10 wordlist_personalizada.txt
+security
+Vulnerability
+vulnerable
+vulnerabilities
+application
+password
+database
+injection
+authentication
+brute
+                </div>
+            </div>
+            
+            <h4>Exercício 5: Ataque com Regras no Hashcat</h4>
+            
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <div class="terminal-button terminal-button-red"></div>
+                        <div class="terminal-button terminal-button-yellow"></div>
+                        <div class="terminal-button terminal-button-green"></div>
+                    </div>
+                    <div class="terminal-title">Terminal - Exercício 5</div>
+                </div>
+                <div class="terminal-body">
+<span class="terminal-prompt">kali@kali:~$</span> # Primeiro, criamos um hash um pouco mais complexo
+<span class="terminal-prompt">kali@kali:~$</span> echo -n "SecurityPass" | md5sum | awk '{print $1}' > hash_complex.txt
+
+<span class="terminal-prompt">kali@kali:~$</span> # Agora, usamos o hashcat com regras para aumentar as chances
+<span class="terminal-prompt">kali@kali:~$</span> hashcat -m 0 -a 0 hash_complex.txt wordlist_personalizada.txt -r /usr/share/hashcat/rules/best64.rule
+
+hashcat (v6.2.5) starting...
+
+Applying rule "best64"...
+
+Dictionary cache built:
+* Filename..: wordlist_personalizada.txt
+* Passwords.: 112
+* Bytes.....: 1273
+* Keyspace..: 7168 (112 x 64)
+
+69e19614e84c35ec78974c287abb4520:SecurityPass
+                                                 
+Session..........: hashcat
+Status...........: Cracked
+Hash.Name........: MD5
+Hash.Target......: 69e19614e84c35ec78974c287abb4520
+Time.Started.....: Sat Jun 14 16:57:01 2025 (0 secs)
+Time.Estimated...: Sat Jun 14 16:57:01 2025 (0 secs)
+Guess.Base.......: File (wordlist_personalizada.txt)
+Guess.Mod........: Rules (/usr/share/hashcat/rules/best64.rule)
+Guess.Queue......: 1/1 (100.00%)
+Speed.#1.........:   234.3 kH/s (0.14ms) @ Accel:1024 Loops:64 Thr:1 Vec:8
+Recovered........: 1/1 (100.00%) Digests
+Progress.........: 3072/7168 (42.86%)
+Rejected.........: 0/3072 (0.00%)
+Restore.Point....: 48/112 (42.86%)
+Restore.Sub.#1...: Salt:0 Amplifier:0-64 Iteration:0-64
+Candidates.#1....: bruteforce -> passwordSecurity
+
+<span class="terminal-prompt">kali@kali:~$</span> 
+                </div>
+            </div>
+        </section>
+
+        <section id="recursos" class="content-section">
+            <h2>Recursos Adicionais</h2>
+            
+            <div class="resource-card">
+                <div class="resource-icon"><i class="fas fa-book"></i></div>
+                <div class="resource-content">
+                    <div class="resource-title">Documentação Oficial das Ferramentas</div>
+                    <div class="resource-description">
+                        <ul>
+                            <li><a href="https://hashcat.net/wiki/" target="_blank">Wiki do Hashcat</a></li>
+                            <li><a href="https://www.openwall.com/john/doc/" target="_blank">Documentação do John the Ripper</a></li>
+                            <li><a href="https://github.com/vanhauser-thc/thc-hydra/blob/master/README.md" target="_blank">README do Hydra</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon"><i class="fas fa-file-pdf"></i></div>
+                <div class="resource-content">
+                    <div class="resource-title">E-books e Livros Recomendados</div>
+                    <div class="resource-description">
+                        <ul>
+                            <li>"Password Attacks: In-depth Techniques and Best Practices" - Heath Adams</li>
+                            <li>"Hash Crack: Password Cracking Manual" - Joshua Picolet</li>
+                            <li>"Social Engineering: The Science of Human Hacking" - Christopher Hadnagy</li>
+                            <li>"The Password Book: A Guide for System Administrators" - Susan Maddox</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon"><i class="fas fa-laptop-code"></i></div>
+                <div class="resource-content">
+                    <div class="resource-title">Laboratórios Práticos Online</div>
+                    <div class="resource-description">
+                        <ul>
+                            <li><a href="https://tryhackme.com/room/passwordattacks" target="_blank">TryHackMe - Password Attacks</a></li>
+                            <li><a href="https://www.hackthebox.eu/" target="_blank">HackTheBox - Diversas máquinas envolvendo quebra de senhas</a></li>
+                            <li><a href="https://www.vulnhub.com/" target="_blank">VulnHub - Máquinas virtuais vulneráveis para prática</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon"><i class="fas fa-download"></i></div>
+                <div class="resource-content">
+                    <div class="resource-title">Wordlists e Regras Adicionais</div>
+                    <div class="resource-description">
+                        <ul>
+                            <li><a href="https://github.com/danielmiessler/SecLists" target="_blank">SecLists - Coleção de múltiplas wordlists</a></li>
+                            <li><a href="https://github.com/praetorian-inc/Hob0Rules" target="_blank">Hob0Rules - Regras avançadas para Hashcat</a></li>
+                            <li><a href="https://github.com/NotSoSecure/password_cracking_rules" target="_blank">NotSoSecure Password Cracking Rules</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon"><i class="fas fa-users"></i></div>
+                <div class="resource-content">
+                    <div class="resource-title">Comunidades e Fóruns</div>
+                    <div class="resource-description">
+                        <ul>
+                            <li><a href="https://hashcat.net/forum/" target="_blank">Fórum do Hashcat</a></li>
+                            <li><a href="https://www.reddit.com/r/AskNetsec/" target="_blank">Reddit - r/AskNetsec</a></li>
+                            <li><a href="https://security.stackexchange.com/" target="_blank">Information Security Stack Exchange</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>FAQ - Perguntas Frequentes</h2>
+            
+            <div class="faq-section">
+                <div class="faq-item">
+                    <div class="faq-question">O que é mais eficiente: CPU ou GPU para quebra de senhas?</div>
+                    <div class="faq-answer">
+                        <p>GPUs são significativamente mais eficientes para quebra de senhas devido à sua capacidade de processamento paralelo massivo. Uma GPU moderna pode ser 50-100x mais rápida que uma CPU de alta performance para algoritmos como MD5 ou SHA1. No entanto, alguns algoritmos como bcrypt e Argon2 são projetados para serem resistentes a ataques de GPU, reduzindo essa vantagem.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Quanto tempo leva para quebrar uma senha de 8 caracteres?</div>
+                    <div class="faq-answer">
+                        <p>O tempo varia drasticamente dependendo da complexidade da senha e do hardware utilizado. Com uma GPU moderna:</p>
+                        <ul>
+                            <li>8 caracteres numéricos (MD5): segundos a minutos</li>
+                            <li>8 caracteres alfanuméricos (MD5): horas a dias</li>
+                            <li>8 caracteres com maiúsculas, minúsculas, números e símbolos (MD5): dias a semanas</li>
+                            <li>8 caracteres com maiúsculas, minúsculas, números e símbolos (bcrypt): anos</li>
+                        </ul>
+                        <p>Isso demonstra a importância de escolher algoritmos lentos como bcrypt ou Argon2 para armazenamento de senhas.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">É possível reverter um hash para obter a senha original?</div>
+                    <div class="faq-answer">
+                        <p>Não, funções de hash são unidirecionais por design. Não é possível "reverter" o hash para obter a senha original. Os ataques de quebra de senha funcionam tentando diferentes senhas, gerando o hash de cada uma e comparando com o hash alvo. Quando há uma correspondência, a senha foi encontrada.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Quais são os sinais de que minha senha foi comprometida?</div>
+                    <div class="faq-answer">
+                        <p>Alguns sinais incluem:</p>
+                        <ul>
+                            <li>Atividade não reconhecida em suas contas</li>
+                            <li>Emails de confirmação de login de locais desconhecidos</li>
+                            <li>Alterações em configurações que você não fez</li>
+                            <li>Recebimento de notificações sobre redefinição de senha que você não solicitou</li>
+                            <li>Sua conta de email sendo usada para enviar spam</li>
+                        </ul>
+                        <p>Você pode verificar se seus dados foram expostos em vazamentos conhecidos usando serviços como <a href="https://haveibeenpwned.com/" target="_blank">Have I Been Pwned</a>.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Qual é a senha mais segura que posso criar?</div>
+                    <div class="faq-answer">
+                        <p>As senhas mais seguras são:</p>
+                        <ul>
+                            <li><strong>Longas:</strong> pelo menos 16 caracteres</li>
+                            <li><strong>Complexas:</strong> combinação de letras maiúsculas, minúsculas, números e símbolos</li>
+                            <li><strong>Únicas:</strong> diferentes para cada serviço</li>
+                            <li><strong>Aleatórias:</strong> sem padrões reconhecíveis ou palavras de dicionário</li>
+                            <li><strong>Gerenciáveis:</strong> use um gerenciador de senhas para não precisar memorizá-las</li>
+                        </ul>
+                        <p>Uma técnica eficaz é usar frases-senha: sequências de palavras aleatórias com símbolos intercalados, como "cavalo-bateria-grampo-nuvem!42".</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="back-to-top" id="backToTop">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">FAQ</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
+
+    <script>
+        // Canvas Background
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const sizes = new Float32Array(particlesCount);
+        
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 20;
+            positions[i + 1] = (Math.random() - 0.5) * 20;
+            positions[i + 2] = (Math.random() - 0.5) * 20;
+            
+            colors[i] = Math.random() * 0.5 + 0.5;
+            colors[i + 1] = Math.random() * 0.2;
+            colors[i + 2] = Math.random() * 0.5 + 0.5;
+            
+            sizes[i/3] = Math.random() * 0.5 + 0.5;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true,
+            map: createCircleTexture()
+        });
+        
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2.5;
+            
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            
+            const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+            
+            context.fillStyle = gradient;
+            context.fill();
+            
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+        
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            targetX = mouseX * 0.2;
+            targetY = mouseY * 0.2;
+            
+            particles.rotation.x += 0.0005;
+            particles.rotation.y += 0.001;
+            
+            particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+            particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+            
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        // Mobile Menu
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const mobileMenuClose = document.querySelector('.mobile-menu-close');
+        const overlay = document.getElementById('overlay');
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('active');
+                overlay.classList.add('active');
+            });
+        }
+
+        if (mobileMenuClose) {
+            mobileMenuClose.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+
+        // FAQ Toggle
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                
+                // Toggle active class for the question
+                question.classList.toggle('active');
+                
+                // Toggle active class for the answer
+                answer.classList.toggle('active');
+                
+                // If the answer is now active, show it, otherwise hide it
+                if (answer.classList.contains('active')) {
+                    answer.style.display = 'block';
+                } else {
+                    answer.style.display = 'none';
+                }
+            });
+        });
+
+        // Copy Command Button Functionality
+        const commandBoxes = document.querySelectorAll('.command-box');
+        
+        commandBoxes.forEach(box => {
+            // Create the copy button
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyBtn.title = 'Copiar para área de transferência';
+            
+            // Append the button to the command box
+            box.appendChild(copyBtn);
+            
+            // Add click event to copy the command
+            copyBtn.addEventListener('click', () => {
+                const commandText = box.querySelector('code').innerText;
+                
+                // Create a temporary textarea to copy from
+                const textarea = document.createElement('textarea');
+                textarea.value = commandText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                // Visual feedback
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.style.background = 'rgba(50, 205, 50, 0.2)';
+                copyBtn.style.color = '#32cd32';
+                
+                // Reset after a delay
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                    copyBtn.style.background = '';
+                    copyBtn.style.color = '';
+                }, 2000);
+            });
+        });
+
+        // Back to Top Button
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Progress Bar
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            
+            progressBar.style.width = scrolled + '%';
+        });
+
+        // Random Numbers
+        setInterval(() => {
+            document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
+        }, 1000);
+
+        // Smooth Scrolling for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (mobileMenu.classList.contains('active')) {
+                        mobileMenu.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

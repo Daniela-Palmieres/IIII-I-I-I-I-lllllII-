@@ -1,0 +1,3160 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonimato 100% - CyberHack</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .home-btn {
+            background: linear-gradient(45deg, #4b0082, #8a2be2);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(74, 0, 130, 0.4);
+            transition: all 0.3s ease !important;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 0, 130, 0.6);
+            color: #fff !important;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .page-title {
+            text-align: center;
+            margin: 50px 0 30px;
+        }
+
+        .page-title h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            position: relative;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+        }
+
+        .page-title p {
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .content-section {
+            margin-bottom: 60px;
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: -150%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 105, 180, 0.05), transparent);
+            transform: rotate(25deg);
+            animation: glare 10s linear infinite;
+        }
+
+        @keyframes glare {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(100%) rotate(25deg); }
+        }
+
+        .section-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .section-header h2 {
+            font-size: 28px;
+            color: #ff69b4;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .section-content p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 3px solid #ff69b4;
+        }
+
+        .info-card h3 {
+            color: #ff69b4;
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .info-card p {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .info-card ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .info-card li {
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .command-block {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00c3ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-block code {
+            color: #00c3ff;
+            display: block;
+            white-space: pre;
+            font-size: 14px;
+        }
+
+        .command-block .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 195, 255, 0.2);
+            border: 1px solid rgba(0, 195, 255, 0.5);
+            color: #00c3ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .command-block .copy-btn:hover {
+            background: rgba(0, 195, 255, 0.3);
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .tool-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.2);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+
+        .tool-card h3 {
+            color: #ff69b4;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tool-card h3 i {
+            margin-right: 10px;
+            color: #ff69b4;
+        }
+
+        .tool-card p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .tool-card .tool-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 5px;
+            color: #ff69b4;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card .tool-link:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: rgba(255, 105, 180, 0.1);
+            color: #ff69b4;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .comparison-table td {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .warning-box {
+            background: rgba(255, 87, 34, 0.1);
+            border-left: 4px solid #ff5722;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box h4 {
+            color: #ff5722;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .warning-box h4 i {
+            margin-right: 10px;
+        }
+
+        .warning-box p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .tip-box {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid #4CAF50;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .tip-box h4 {
+            color: #4CAF50;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tip-box h4 i {
+            margin-right: 10px;
+        }
+
+        .tip-box p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .step-list {
+            margin: 20px 0;
+        }
+
+        .step-list li {
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            padding-left: 35px;
+            list-style-type: none;
+        }
+
+        .step-list li::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #ff69b4;
+            color: #000;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .toggle-content {
+            margin-top: 10px;
+        }
+
+        .toggle-btn {
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn i {
+            margin-right: 8px;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255, 105, 180, 0.2);
+        }
+
+        .toggle-content-body {
+            display: none;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-content.active .toggle-content-body {
+            display: block;
+        }
+
+        .digital-numbers {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #random-numbers {
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            margin-top: 60px;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+        
+        .toc {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .toc h3 {
+            color: #ff69b4;
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+        }
+        
+        .toc ul li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .toc ul li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+        }
+        
+        .toc a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .toc a:hover {
+            color: #ff69b4;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 30px;
+        }
+        
+        .main-content {
+            order: 1;
+        }
+        
+        .sidebar {
+            order: 2;
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            width: 0%;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.7);
+        }
+        
+        @media (max-width: 992px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                order: 2;
+            }
+            
+            .sidebar {
+                order: 1;
+            }
+            
+            .toc {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-title h1 {
+                font-size: 36px;
+            }
+            
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .content-section {
+                padding: 30px 20px;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 250px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            z-index: 1000;
+            border-left: 1px solid rgba(255, 105, 180, 0.3);
+            overflow-y: auto;
+            transition: right 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 50px;
+            padding: 0 20px;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+            transition: color 0.3s;
+        }
+
+        .mobile-nav-links a:hover {
+            color: #ff69b4;
+        }
+        
+        .mobile-home-btn {
+            background: linear-gradient(45deg, #4b0082, #8a2be2);
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 15px;
+            box-shadow: 0 3px 10px rgba(74, 0, 130, 0.4);
+            border-bottom: none !important;
+        }
+        
+        .mobile-home-btn:hover {
+            color: #fff !important;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+
+        #overlay.active {
+            display: block;
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 105, 180, 0.2);
+            border: 1px solid rgba(255, 105, 180, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff69b4;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 900;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background: rgba(255, 105, 180, 0.3);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="index.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+                <a href="#introducao">Introdução</a>
+                <a href="#tor">Rede TOR</a>
+                <a href="#vpn">VPNs</a>
+                <a href="#proxies">Proxies</a>
+                <a href="#anti-fingerprinting">Anti-Fingerprinting</a>
+                <a href="#sistemas">Sistemas OS</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+
+        <div class="page-title">
+            <h1>Anonimato 100%</h1>
+            <p>Protocolos de anonimização, redes TOR/I2P, VPNs com criptografia forte, proxies em cascata e técnicas anti-fingerprinting</p>
+        </div>
+
+        <div class="grid-container">
+            <div class="main-content">
+                <section id="introducao" class="content-section">
+                    <div class="section-header">
+                        <h2>Introdução ao Anonimato Online</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>O anonimato na internet tornou-se uma necessidade fundamental para quem valoriza sua privacidade. Em um mundo digital onde quase todas as ações são monitoradas, rastreadas e catalogadas, dominar técnicas de anonimização se torna essencial para preservar informações pessoais e manter a liberdade de navegação.</p>
+
+                        <div class="info-card">
+                            <h3>Por que buscar o anonimato online?</h3>
+                            <ul>
+                                <li><strong>Proteção contra vigilância:</strong> Governos, empresas e hackers coletam constantemente informações sobre você</li>
+                                <li><strong>Liberdade de expressão:</strong> Em muitos países, opiniões divergentes podem resultar em perseguição</li>
+                                <li><strong>Segurança de dados:</strong> Evitar vazamentos de informações pessoais e financeiras</li>
+                                <li><strong>Proteção contra discriminação:</strong> Evitar que seu comportamento online afete decisões sobre você</li>
+                                <li><strong>Proteção contra marketing predatório:</strong> Dificultar o rastreamento para publicidade direcionada</li>
+                            </ul>
+                        </div>
+
+                        <p>Neste guia completo, vamos abordar em detalhes todas as técnicas, ferramentas e métodos para alcançar o máximo de anonimato possível durante a navegação e uso da internet. É importante entender que o anonimato 100% absoluto é um ideal difícil de alcançar, mas podemos nos aproximar bastante dele através da combinação adequada de diversas técnicas.</p>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Aviso Importante</h4>
+                            <p>As técnicas e ferramentas apresentadas neste guia são destinadas exclusivamente para proteção de privacidade e uso ético. Nunca utilize estas informações para atividades ilegais. O anonimato deve ser usado para proteger direitos legítimos, não para violar a lei.</p>
+                        </div>
+
+                        <p>Para alcançar o maior nível de anonimato possível, adotaremos uma abordagem em camadas, combinando várias técnicas complementares. Quanto mais camadas de proteção, mais difícil será rastrear suas atividades online.</p>
+                    </div>
+                </section>
+
+                <section id="principios" class="content-section">
+                    <div class="section-header">
+                        <h2>Princípios Fundamentais de Anonimização</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Antes de mergulhar nas ferramentas específicas, é essencial compreender os princípios básicos que regem o anonimato online eficaz:</p>
+
+                        <div class="info-card">
+                            <h3>1. Criptografia de Dados</h3>
+                            <p>A criptografia é o processo de codificar informações de modo que apenas as partes autorizadas possam acessá-las. É a base de quase todos os sistemas de anonimato, garantindo que mesmo que seus dados sejam interceptados, permaneçam ilegíveis.</p>
+                            <p>Tipos principais de criptografia usados para anonimato:</p>
+                            <ul>
+                                <li><strong>Criptografia Simétrica:</strong> Usa a mesma chave para criptografar e descriptografar dados</li>
+                                <li><strong>Criptografia Assimétrica:</strong> Usa pares de chaves públicas e privadas</li>
+                                <li><strong>Criptografia de Ponta-a-Ponta (E2E):</strong> Apenas o remetente e o destinatário podem ler as mensagens</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>2. Separação de Identidades</h3>
+                            <p>Nunca misture suas diferentes identidades online. Cada atividade que você deseja manter separada deve usar:</p>
+                            <ul>
+                                <li>Diferentes endereços de email</li>
+                                <li>Diferentes nomes de usuário (nunca reutilize nomes ou variações)</li>
+                                <li>Diferentes senhas (use gerenciadores de senha)</li>
+                                <li>Diferentes navegadores ou perfis de navegador</li>
+                                <li>Idealmente, diferentes máquinas ou sistemas operacionais virtualizados</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>3. Camadas de Proteção</h3>
+                            <p>O anonimato eficaz funciona em camadas, como uma cebola. Quanto mais camadas, mais difícil é chegar ao centro. Algumas camadas comuns são:</p>
+                            <ul>
+                                <li><strong>Sistema Operacional Seguro →</strong> VPN → Rede TOR → Navegador Hardened → Extensões de Privacidade</li>
+                                <li><strong>Sistema Operacional Seguro →</strong> VPN → Proxy → Rede I2P → Navegador Seguro</li>
+                            </ul>
+                            <p>Cada camada adicional aumenta a segurança, mas pode reduzir a velocidade e usabilidade.</p>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>4. Minimização de Pegada Digital</h3>
+                            <p>Minimize a quantidade de informações que você deixa online:</p>
+                            <ul>
+                                <li>Use apenas serviços estritamente necessários</li>
+                                <li>Não forneça informações pessoais reais a menos que absolutamente necessário</li>
+                                <li>Desative serviços de localização e cookies quando possível</li>
+                                <li>Prefira serviços que não exijam registro</li>
+                                <li>Use aliases e emails temporários quando precisar se registrar</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>5. OPSEC (Segurança Operacional)</h3>
+                            <p>OPSEC é o processo de identificar informações críticas e analisar ações que podem expô-las. Princípios básicos:</p>
+                            <ul>
+                                <li>Identifique o que você está tentando proteger</li>
+                                <li>Analise suas vulnerabilidades</li>
+                                <li>Avalie os riscos</li>
+                                <li>Aplique contramedidas apropriadas</li>
+                                <li>Monitore e melhore continuamente</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Dica Profissional</h4>
+                            <p>Mesmo as melhores ferramentas de anonimato podem ser derrotadas por maus hábitos. Sempre pratique a compartimentalização: mantenha suas diferentes atividades online completamente separadas umas das outras.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tor" class="content-section">
+                    <div class="section-header">
+                        <h2>Rede TOR (The Onion Router)</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>A rede TOR é uma das tecnologias mais potentes e acessíveis para anonimato online. Ela funciona roteando sua conexão através de uma série de nós voluntários espalhados pelo mundo, criptografando os dados em múltiplas camadas (daí o nome "cebola" ou "onion").</p>
+
+                        <div class="info-card">
+                            <h3>Como o TOR funciona?</h3>
+                            <p>Quando você usa o TOR:</p>
+                            <ol>
+                                <li>Sua conexão é criptografada em múltiplas camadas</li>
+                                <li>O tráfego passa por pelo menos 3 nós TOR aleatórios (Guard, Middle, Exit)</li>
+                                <li>Cada nó só conhece o nó anterior e o próximo, nunca a rota completa</li>
+                                <li>O nó de saída (Exit Node) faz a requisição final ao destino</li>
+                            </ol>
+                            <p>Isso torna extremamente difícil rastrear sua localização real ou identidade.</p>
+                        </div>
+
+                        <h3>Como instalar e configurar o Navegador TOR</h3>
+                        <p>O Navegador TOR é a maneira mais fácil e segura de acessar a rede TOR. É um navegador pré-configurado baseado no Firefox.</p>
+
+                        <ol class="step-list">
+                            <li data-step="1">Acesse o site oficial do Projeto TOR: <a href="https://www.torproject.org/" target="_blank">https://www.torproject.org/</a></li>
+                            <li data-step="2">Baixe a versão do Navegador TOR para seu sistema operacional</li>
+                            <li data-step="3">Verifique a assinatura do arquivo baixado (altamente recomendado para segurança)</li>
+                            <li data-step="4">Instale ou extraia o navegador (não precisa de instalação no Windows)</li>
+                            <li data-step="5">Execute o navegador TOR</li>
+                        </ol>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Verificação da assinatura do Navegador TOR no Linux
+# Primeiro, importe a chave PGP do Tor Project
+gpg --keyserver pgp.mit.edu --recv-keys 0x4E2C6E8793298290
+
+# Verifique a assinatura
+gpg --verify tor-browser-linux64-11.0.9_en-US.tar.xz.asc tor-browser-linux64-11.0.9_en-US.tar.xz
+
+# Extraia o arquivo
+tar -xf tor-browser-linux64-11.0.9_en-US.tar.xz
+
+# Inicie o navegador
+cd tor-browser_en-US
+./start-tor-browser.desktop</code>
+                        </div>
+
+                        <h3>Configurações Avançadas do TOR</h3>
+                        <p>Para maximizar sua segurança no TOR, considere estas configurações avançadas:</p>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-cog"></i> Configurações de Segurança</button>
+                            <div class="toggle-content-body">
+                                <p>No Navegador TOR, clique no ícone do escudo (canto superior direito) e ajuste o nível de segurança:</p>
+                                <ul>
+                                    <li><strong>Padrão:</strong> Todas as funcionalidades do navegador estão habilitadas</li>
+                                    <li><strong>Mais Seguro:</strong> Desabilita JavaScript em sites não-HTTPS, alguns formatos de vídeo e fontes</li>
+                                    <li><strong>Mais Seguro Possível:</strong> JavaScript é completamente desabilitado, alguns sites podem não funcionar</li>
+                                </ul>
+                                <p>Recomendação: Use o nível "Mais Seguro" para equilíbrio entre segurança e usabilidade.</p>
+                            </div>
+                        </div>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-route"></i> Bridges e Circumvenção</button>
+                            <div class="toggle-content-body">
+                                <p>Se o acesso ao TOR for bloqueado em sua região, você pode usar bridges (pontes):</p>
+                                <ol>
+                                    <li>Abra Configurações (clique no ícone ⋮) → Tor → Bridges</li>
+                                    <li>Selecione "Use a Bridge"</li>
+                                    <li>Escolha entre "Use a Built-in Bridge" ou "Provide a Bridge I Know"</li>
+                                </ol>
+                                <p>Para obter bridges não incluídas no navegador:</p>
+                                <ul>
+                                    <li>Visite <a href="https://bridges.torproject.org/" target="_blank">bridges.torproject.org</a></li>
+                                    <li>Ou envie um email para bridges@torproject.org com "get bridges" no corpo da mensagem</li>
+                                    <li>Ou use o bot Telegram @GetBridgesBot</li>
+                                </ul>
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code># Exemplo de configuração de bridges Snowflake (uma das mais eficientes)
+Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72
+Bridge snowflake 198.51.100.40:443 8838024498816A039FCBBAB14E6F40A0843051FA</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-terminal"></i> Executando TOR via Linha de Comando</button>
+                            <div class="toggle-content-body">
+                                <p>Para usuários avançados, o TOR pode ser instalado e executado via linha de comando:</p>
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code># Instalação no Debian/Ubuntu
+sudo apt update
+sudo apt install tor
+
+# Iniciar o serviço TOR
+sudo systemctl start tor
+sudo systemctl enable tor
+
+# Verificar status
+sudo systemctl status tor
+
+# Configurar aplicações para usar o proxy SOCKS do TOR
+# Edite o arquivo torrc
+sudo nano /etc/tor/torrc
+
+# Descomente ou adicione estas linhas:
+# SOCKSPort 9050
+# ControlPort 9051
+# CookieAuthentication 1
+
+# Reinicie o serviço
+sudo systemctl restart tor</code>
+                                </div>
+                                <p>Para usar o proxy TOR com outras aplicações, configure-as para usar o proxy SOCKS5 em 127.0.0.1:9050.</p>
+                            </div>
+                        </div>
+
+                        <h3>Hidden Services (Serviços Ocultos)</h3>
+                        <p>Os Hidden Services são sites que existem apenas dentro da rede TOR e são acessíveis somente via TOR. Eles têm endereços que terminam em .onion e oferecem anonimato tanto para o visitante quanto para o servidor.</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Configurando um Hidden Service básico (servidor web anônimo)
+# Edite o arquivo torrc
+sudo nano /etc/tor/torrc
+
+# Adicione estas linhas:
+HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 80 127.0.0.1:8080
+
+# Reinicie o TOR
+sudo systemctl restart tor
+
+# Obtenha o endereço .onion do seu serviço
+sudo cat /var/lib/tor/hidden_service/hostname</code>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Limitações do TOR</h4>
+                            <p>O TOR tem algumas limitações importantes que você deve conhecer:</p>
+                            <ul>
+                                <li>O nó de saída pode ver seu tráfego se não estiver criptografado (sempre use HTTPS)</li>
+                                <li>É significativamente mais lento que a navegação normal</li>
+                                <li>Alguns sites bloqueiam o acesso via TOR</li>
+                                <li>Não protege contra malware ou scripts maliciosos</li>
+                                <li>Pode chamar atenção em alguns países onde o uso do TOR é monitorado</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Melhores Práticas para TOR</h4>
+                            <ul>
+                                <li>Nunca maximize a janela do navegador TOR (isso pode ser usado para fingerprinting)</li>
+                                <li>Não instale extensões adicionais no navegador TOR</li>
+                                <li>Não faça login em contas pessoais enquanto usa o TOR</li>
+                                <li>Não baixe torrents através do TOR</li>
+                                <li>Sempre use HTTPS (verifique o cadeado na barra de endereços)</li>
+                                <li>Considere usar TOR em conjunto com uma VPN (VPN → TOR)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="i2p" class="content-section">
+                    <div class="section-header">
+                        <h2>Rede I2P (Invisible Internet Project)</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>O I2P é uma alternativa ao TOR, projetada especificamente para comunicações anônimas dentro da sua própria rede. Enquanto o TOR é otimizado para acessar a internet comum anonimamente, o I2P é melhor para serviços internos e comunicação entre usuários I2P.</p>
+
+                        <div class="info-card">
+                            <h3>Diferenças entre I2P e TOR</h3>
+                            <ul>
+                                <li>I2P usa tunelamento bidirecional (enquanto TOR cria circuitos unidirecionais)</li>
+                                <li>I2P tem foco em comunicação interna da rede (TOR foca em acesso anônimo à internet)</li>
+                                <li>I2P é mais eficiente para compartilhamento P2P anônimo</li>
+                                <li>I2P tem menos nós, mas geralmente mais velocidade para serviços internos</li>
+                                <li>Cada "roteador" I2P contribui com largura de banda para a rede</li>
+                            </ul>
+                        </div>
+
+                        <h3>Instalação e Configuração do I2P</h3>
+
+                        <ol class="step-list">
+                            <li data-step="1">Acesse o site oficial: <a href="https://geti2p.net/en/download" target="_blank">https://geti2p.net/en/download</a></li>
+                            <li data-step="2">Baixe a versão adequada para seu sistema operacional</li>
+                            <li data-step="3">Instale o I2P seguindo as instruções para seu sistema</li>
+                            <li data-step="4">Inicie o serviço I2P (geralmente abre um console web em http://127.0.0.1:7657)</li>
+                            <li data-step="5">Configure seu navegador para usar o proxy I2P</li>
+                        </ol>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação do I2P no Linux (Debian/Ubuntu)
+sudo apt-add-repository ppa:i2p-maintainers/i2p
+sudo apt update
+sudo apt install i2p i2p-keyring
+
+# Iniciar I2P
+i2prouter start
+
+# Verificar status
+i2prouter status
+
+# Parar I2P
+i2prouter stop</code>
+                        </div>
+
+                        <h3>Configuração do Navegador para I2P</h3>
+                        <p>Para acessar sites na rede I2P (chamados "eepsites"), você precisa configurar seu navegador para usar o proxy I2P:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Configurações do proxy I2P
+Proxy HTTP: 127.0.0.1 Porta: 4444
+Proxy HTTPS: 127.0.0.1 Porta: 4445
+Proxy SOCKS: 127.0.0.1 Porta: 4447</code>
+                        </div>
+
+                        <p>Para facilitar o uso, existem navegadores pré-configurados e plugins:</p>
+                        <ul>
+                            <li><strong>I2P Browser Bundle:</strong> Navegador baseado no Firefox já configurado para I2P</li>
+                            <li><strong>Extensão I2P para Firefox:</strong> Configura automaticamente o Firefox para acessar I2P</li>
+                        </ul>
+
+                        <h3>Criando um Serviço Oculto no I2P</h3>
+                        <p>Para hospedar um site ou serviço anônimo no I2P:</p>
+
+                        <ol class="step-list">
+                            <li data-step="1">Acesse o console I2P em http://127.0.0.1:7657</li>
+                            <li data-step="2">Vá para "Hidden Services Manager"</li>
+                            <li data-step="3">Clique em "Serviços Locais" → "Criar"</li>
+                            <li data-step="4">Configure seu serviço (tipo, porta, nome)</li>
+                            <li data-step="5">Para um site web, configure para direcionar para seu servidor web local</li>
+                        </ol>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Dicas para uso eficiente do I2P</h4>
+                            <ul>
+                                <li>Mantenha seu roteador I2P ligado por longos períodos para melhorar a integração com a rede</li>
+                                <li>Aumente a largura de banda compartilhada se possível (ajuda toda a rede)</li>
+                                <li>Use um navegador dedicado apenas para I2P</li>
+                                <li>Explore o "addressbook" para encontrar sites .i2p</li>
+                                <li>Considere usar I2P em conjunto com TOR para máximo anonimato</li>
+                            </ul>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Importante</h4>
+                            <p>Assim como o TOR, o I2P não é 100% seguro. Tenha cuidado com o que compartilha e nunca revele informações pessoais. O I2P protege seu anonimato na rede, mas não protege contra erros de usuário ou malware.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="vpn" class="content-section">
+                    <div class="section-header">
+                        <h2>VPNs com Criptografia Forte</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>As VPNs (Redes Virtuais Privadas) são uma ferramenta essencial para anonimato básico, criptografando seu tráfego e mascarando seu IP real. Embora não ofereçam o mesmo nível de anonimato que TOR ou I2P, são muito mais rápidas e versáteis.</p>
+
+                        <div class="info-card">
+                            <h3>Como funcionam as VPNs</h3>
+                            <p>Uma VPN cria um túnel criptografado entre seu dispositivo e um servidor remoto:</p>
+                            <ol>
+                                <li>Todo seu tráfego é criptografado e enviado ao servidor VPN</li>
+                                <li>O servidor VPN descriptografa o tráfego e o envia ao destino final</li>
+                                <li>Sites e serviços veem apenas o IP do servidor VPN, não o seu</li>
+                                <li>Seu ISP (provedor de internet) vê apenas tráfego criptografado indo para o servidor VPN</li>
+                            </ol>
+                        </div>
+
+                        <h3>Protocolos de VPN e sua Segurança</h3>
+                        <p>Nem todos os protocolos VPN oferecem o mesmo nível de segurança. Aqui está uma comparação dos principais:</p>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Protocolo</th>
+                                        <th>Segurança</th>
+                                        <th>Velocidade</th>
+                                        <th>Recomendado?</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>OpenVPN (TCP/UDP)</td>
+                                        <td>Alta (criptografia AES-256)</td>
+                                        <td>Boa (UDP é mais rápido)</td>
+                                        <td><i class="fas fa-check" style="color: #4CAF50;"></i> Sim</td>
+                                    </tr>
+                                    <tr>
+                                        <td>WireGuard</td>
+                                        <td>Alta (criptografa moderna)</td>
+                                        <td>Excelente (mais rápido que OpenVPN)</td>
+                                        <td><i class="fas fa-check" style="color: #4CAF50;"></i> Sim</td>
+                                    </tr>
+                                    <tr>
+                                        <td>IKEv2/IPSec</td>
+                                        <td>Alta</td>
+                                        <td>Muito boa</td>
+                                        <td><i class="fas fa-check" style="color: #4CAF50;"></i> Sim</td>
+                                    </tr>
+                                    <tr>
+                                        <td>L2TP/IPSec</td>
+                                        <td>Média-Alta</td>
+                                        <td>Média</td>
+                                        <td><i class="fas fa-check" style="color: #4CAF50;"></i> Aceitável</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SSTP</td>
+                                        <td>Média</td>
+                                        <td>Média</td>
+                                        <td><i class="fas fa-minus" style="color: #FFC107;"></i> Apenas se necessário</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PPTP</td>
+                                        <td>Baixa (vulnerabilidades conhecidas)</td>
+                                        <td>Alta</td>
+                                        <td><i class="fas fa-times" style="color: #F44336;"></i> Evite</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>Configurando uma VPN OpenVPN Manualmente</h3>
+                        <p>Configurar manualmente sua VPN oferece maior controle e potencialmente mais segurança:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação do OpenVPN no Linux
+sudo apt update
+sudo apt install openvpn network-manager-openvpn
+
+# Configuração manual com arquivo .ovpn
+sudo openvpn --config /caminho/para/arquivo.ovpn
+
+# Para usar com NetworkManager
+# Importe o arquivo .ovpn através da interface gráfica
+# Ou use:
+nmcli connection import type openvpn file /caminho/para/arquivo.ovpn</code>
+                        </div>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Exemplo de arquivo de configuração OpenVPN (cliente)
+client
+dev tun
+proto udp
+remote servidor-vpn.exemplo.com 1194
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+ca ca.crt
+cert cliente.crt
+key cliente.key
+remote-cert-tls server
+cipher AES-256-GCM
+auth SHA256
+verb 3
+# Previne vazamentos de DNS
+script-security 2
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf</code>
+                        </div>
+
+                        <h3>Configurando WireGuard (VPN de nova geração)</h3>
+                        <p>WireGuard é um protocolo VPN mais moderno, mais rápido e mais simples que o OpenVPN:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação do WireGuard no Linux
+sudo apt update
+sudo apt install wireguard
+
+# Gerar chaves privada e pública
+wg genkey | tee privatekey | wg pubkey > publickey
+
+# Exemplo de arquivo de configuração de cliente WireGuard
+# Salve como /etc/wireguard/wg0.conf
+[Interface]
+PrivateKey = CHAVE_PRIVADA_AQUI
+Address = 10.0.0.2/24
+DNS = 1.1.1.1, 1.0.0.1
+
+[Peer]
+PublicKey = CHAVE_PUBLICA_DO_SERVIDOR_AQUI
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = servidor-vpn.exemplo.com:51820
+PersistentKeepalive = 25
+
+# Iniciar a conexão
+sudo wg-quick up wg0
+
+# Verificar status
+sudo wg show
+
+# Desconectar
+sudo wg-quick down wg0</code>
+                        </div>
+
+                        <h3>VPN em Cascata (Multihop VPN)</h3>
+                        <p>Para anonimato avançado, considere usar VPNs em cascata, onde seu tráfego passa por múltiplos servidores VPN em diferentes jurisdições:</p>
+
+                        <div class="info-card">
+                            <h3>Como configurar VPN em cascata</h3>
+                            <p>Existem duas abordagens principais:</p>
+                            <ol>
+                                <li><strong>Usar um provedor VPN que ofereça multihop:</strong> Alguns provedores premium oferecem esta opção nativamente</li>
+                                <li><strong>Configurar manualmente:</strong> Usando múltiplas VPNs em camadas</li>
+                            </ol>
+                        </div>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Configuração manual de VPN em cascata no Linux
+# 1. Configure a primeira VPN (por exemplo, WireGuard)
+sudo wg-quick up wg0
+
+# 2. Configure a segunda VPN (por exemplo, OpenVPN) através da primeira
+sudo openvpn --config /caminho/para/segunda-vpn.ovpn
+
+# Para maior segurança, use cada VPN em uma máquina virtual diferente
+# Exemplo: 
+# VM1 → VPN1 → VM2 → VPN2 → Internet</code>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Limitações das VPNs</h4>
+                            <p>As VPNs têm algumas limitações importantes:</p>
+                            <ul>
+                                <li>Você precisa confiar no provedor VPN (eles podem ver seu tráfego)</li>
+                                <li>Alguns provedores mantêm logs, apesar de afirmarem o contrário</li>
+                                <li>VPNs não protegem contra todas as formas de rastreamento (como cookies e fingerprinting)</li>
+                                <li>Alguns sites bloqueiam acessos via VPN conhecidas</li>
+                                <li>VPNs não são projetadas para anonimato total, apenas para privacidade básica</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Escolhendo um Provedor VPN</h4>
+                            <p>Critérios essenciais para escolher um provedor VPN focado em privacidade:</p>
+                            <ul>
+                                <li>Política estrita de não-logs (verificada por auditoria independente)</li>
+                                <li>Sediado em um país com boas leis de privacidade (fora dos 14 Eyes)</li>
+                                <li>Aceita pagamentos anônimos (cryptocurrency)</li>
+                                <li>Não requer informações pessoais para registro</li>
+                                <li>Oferece servidores em múltiplos países</li>
+                                <li>Suporta protocolos seguros (OpenVPN, WireGuard)</li>
+                                <li>Inclui proteção contra vazamento de DNS e IPv6</li>
+                                <li>Oferece kill switch (corta internet se a VPN cair)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="proxies" class="content-section">
+                    <div class="section-header">
+                        <h2>Proxies em Cascata</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Proxies funcionam como intermediários entre você e os serviços que acessa, mascarando seu IP real. Os proxies em cascata elevam esta proteção ao rotear seu tráfego através de múltiplos servidores proxy em sequência.</p>
+
+                        <div class="info-card">
+                            <h3>Tipos de Proxies</h3>
+                            <ul>
+                                <li><strong>HTTP/HTTPS Proxies:</strong> Funcionam apenas para tráfego web</li>
+                                <li><strong>SOCKS4/5 Proxies:</strong> Mais versáteis, funcionam com qualquer tipo de tráfego</li>
+                                <li><strong>Proxies Transparentes:</strong> Não ocultam que você está usando um proxy</li>
+                                <li><strong>Proxies Anônimos:</strong> Ocultam seu IP, mas revelam que você está usando proxy</li>
+                                <li><strong>Proxies de Elite/High Anonymity:</strong> Ocultam seu IP e o fato de que está usando proxy</li>
+                            </ul>
+                        </div>
+
+                        <p>Para anonimato avançado, você deve usar <strong>SOCKS5</strong> sempre que possível, e apenas proxies de Elite/High Anonymity em uma configuração em cascata.</p>
+
+                        <h3>Configurando Proxychains (Proxies em Cascata)</h3>
+                        <p>O Proxychains é uma ferramenta que permite rotear facilmente o tráfego através de múltiplos proxies em sequência:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação do Proxychains no Linux
+sudo apt update
+sudo apt install proxychains4
+
+# Editar configuração
+sudo nano /etc/proxychains4.conf
+
+# Configurar o modo de encadeamento (escolha um):
+# dynamic_chain - tenta todos os proxies em ordem, pula os falhos
+# strict_chain - usa todos os proxies em ordem exata (falha se um falhar)
+# random_chain - escolhe proxies aleatoriamente da lista
+
+# Adicione seus proxies ao final do arquivo no formato:
+# socks5 IP_ADDRESS PORT [USERNAME] [PASSWORD]
+# http IP_ADDRESS PORT [USERNAME] [PASSWORD]
+# Exemplo:
+socks5 127.0.0.1 9050 # Proxy local TOR
+socks5 192.168.1.100 1080 usuario senha
+http 45.67.89.10 8080
+
+# Use proxychains com qualquer comando
+proxychains4 firefox
+proxychains4 curl https://check.torproject.org
+proxychains4 ssh usuario@servidor.com</code>
+                        </div>
+
+                        <h3>Criando uma Configuração Avançada de Proxies em Cascata</h3>
+                        <p>Para máximo anonimato, combine diferentes tipos de proxies através de diferentes redes:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Exemplo de configuração avançada para proxychains
+# Edite /etc/proxychains4.conf:
+
+# Ative dynamic_chain para melhor desempenho
+dynamic_chain
+
+# Configurações de DNS (evita vazamentos)
+proxy_dns
+
+# Adicione os seguintes proxies em ordem:
+# 1. VPN local (se estiver usando)
+# 2. Proxy SOCKS5 local
+socks5 127.0.0.1 1080
+
+# 3. Proxy TOR
+socks5 127.0.0.1 9050
+
+# 4. Proxy Comercial em outro país
+socks5 45.67.89.10 1080 usuario senha
+
+# 5. Proxy SOCKS5 final
+socks5 98.76.54.32 1080</code>
+                        </div>
+
+                        <h3>Configurando um Proxy SOCKS5 Local</h3>
+                        <p>Você pode criar seu próprio servidor proxy SOCKS5 para maior controle:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Usando SSH para criar um proxy SOCKS5 local
+# Este método cria um proxy SOCKS5 através de um túnel SSH
+ssh -D 1080 -q -C -N usuario@servidor.com
+
+# -D 1080: Cria um proxy SOCKS dinâmico na porta 1080
+# -q: Modo silencioso
+# -C: Compressão de dados
+# -N: Não executa comandos remotos
+
+# Para usar com aplicações, configure o proxy SOCKS5:
+# Host: 127.0.0.1
+# Porta: 1080</code>
+                        </div>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalando e configurando Dante (servidor SOCKS5)
+sudo apt update
+sudo apt install dante-server
+
+# Configurando o servidor
+sudo nano /etc/danted.conf
+
+# Exemplo de configuração:
+logoutput: syslog
+user.privileged: root
+user.unprivileged: nobody
+
+# Interfaces internas
+internal: 127.0.0.1 port=1080
+
+# Interface externa
+external: eth0
+
+# Métodos de autenticação
+socksmethod: username
+clientmethod: none
+
+# Regras de acesso
+client pass {
+    from: 127.0.0.1/32 to: 0.0.0.0/0
+    log: error connect disconnect
+}
+
+socks pass {
+    from: 127.0.0.1/32 to: 0.0.0.0/0
+    protocol: tcp udp
+    log: error connect disconnect
+}
+
+# Iniciar o serviço
+sudo systemctl start danted
+sudo systemctl enable danted</code>
+                        </div>
+
+                        <h3>Detectando e Usando Proxies Anônimos</h3>
+                        <p>Ferramentas para encontrar e verificar proxies anônimos:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalando e usando ProxyBroker
+pip install proxybroker
+
+# Encontrar proxies anônimos de alta qualidade
+proxybroker find --types SOCKS5 --lvl High --countries US CA --strict -l 10</code>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Riscos dos Proxies Públicos</h4>
+                            <p>Tenha muito cuidado com proxies gratuitos encontrados na internet:</p>
+                            <ul>
+                                <li>Muitos monitoram e registram seu tráfego</li>
+                                <li>Alguns injetam anúncios ou malware</li>
+                                <li>Podem ser honeypots operados por entidades maliciosas</li>
+                                <li>Geralmente são lentos e não confiáveis</li>
+                                <li>Podem ser bloqueados por muitos serviços</li>
+                            </ul>
+                            <p>Se possível, use apenas proxies que você mesmo configura ou de serviços pagos confiáveis.</p>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Combinando Proxies, VPN e TOR</h4>
+                            <p>Para anonimato de altíssimo nível, você pode combinar todas estas tecnologias em camadas:</p>
+                            <ol>
+                                <li>Comece com um sistema operacional seguro (como Tails ou Whonix)</li>
+                                <li>Conecte-se a uma VPN confiável (que não mantém logs)</li>
+                                <li>Configure proxychains com múltiplos proxies SOCKS5</li>
+                                <li>Adicione o TOR como última camada</li>
+                                <li>Use um navegador endurecido com anti-fingerprinting</li>
+                            </ol>
+                            <p>Esta configuração é extremamente lenta, mas oferece múltiplas camadas de proteção.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="anti-fingerprinting" class="content-section">
+                    <div class="section-header">
+                        <h2>Técnicas Anti-Fingerprinting</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>O fingerprinting (impressão digital) do navegador é uma técnica avançada de rastreamento que identifica usuários com base nas características únicas de seu navegador e sistema, independentemente do IP ou cookies. Combater este tipo de rastreamento é essencial para o anonimato completo.</p>
+
+                        <div class="info-card">
+                            <h3>O que é exposto no seu fingerprint?</h3>
+                            <ul>
+                                <li>Resolução e profundidade de cor da tela</li>
+                                <li>Fontes instaladas</li>
+                                <li>Plugins e extensões do navegador</li>
+                                <li>Configurações de idioma e fuso horário</li>
+                                <li>User-Agent e cabeçalhos HTTP</li>
+                                <li>Canvas fingerprinting (renderização gráfica única)</li>
+                                <li>WebGL fingerprinting (processamento 3D)</li>
+                                <li>AudioContext fingerprinting (processamento de áudio)</li>
+                                <li>Comportamento do JavaScript e detalhes do hardware</li>
+                            </ul>
+                        </div>
+
+                        <h3>Verificando sua Vulnerabilidade ao Fingerprinting</h3>
+                        <p>Antes de aplicar técnicas anti-fingerprinting, verifique o quão único é seu navegador:</p>
+                        <ul>
+                            <li><a href="https://amiunique.org/" target="_blank">AmIUnique</a> - Análise detalhada do fingerprint</li>
+                            <li><a href="https://browserleaks.com/" target="_blank">BrowserLeaks</a> - Testes abrangentes de vazamento de informações</li>
+                            <li><a href="https://coveryourtracks.eff.org/" target="_blank">Cover Your Tracks (EFF)</a> - Teste de resistência a rastreamento</li>
+                        </ul>
+
+                        <h3>Técnicas de Mitigação de Fingerprinting</h3>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-user-secret"></i> Modificando o User-Agent</button>
+                            <div class="toggle-content-body">
+                                <p>O User-Agent é uma das informações mais identificáveis do seu navegador. Você pode modificá-lo com extensões ou ferramentas:</p>
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code># Usando curl com User-Agent personalizado
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" https://www.exemplo.com
+
+# Exemplo de User-Agent comum (Chrome/Windows)
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36
+
+# Exemplo de User-Agent comum (Firefox/Linux)
+Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0
+
+# Exemplo de User-Agent comum (Safari/Mac)
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15</code>
+                                </div>
+                                <p>Importante: Use apenas User-Agents comuns. User-Agents muito específicos ou raros podem torná-lo mais identificável.</p>
+                            </div>
+                        </div>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-random"></i> Aleatorização de Fingerprints</button>
+                            <div class="toggle-content-body">
+                                <p>Em vez de tentar esconder seu fingerprint, você pode aleatorizar certos aspectos para dificultar o rastreamento consistente:</p>
+                                <ul>
+                                    <li><strong>Extensão Canvas Blocker:</strong> Adiciona ruído aleatório ao Canvas fingerprinting</li>
+                                    <li><strong>Extensão Privacy Possum:</strong> Fornece informações falsas aos rastreadores</li>
+                                    <li><strong>Extensão Chameleon:</strong> Altera periodicamente o User-Agent e outros identificadores</li>
+                                </ul>
+                                <p>Configuração em Firefox about:config para reduzir fingerprinting:</p>
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code># Digite na barra de endereços: about:config
+# Procure e defina os seguintes valores:
+
+# Desabilitar WebRTC (pode vazar IP real mesmo com VPN)
+media.peerconnection.enabled = false
+
+# Resistência a Fingerprinting
+privacy.resistFingerprinting = true
+
+# Desabilitar WebGL
+webgl.disabled = true
+
+# Desabilitar histórico de formulários
+browser.formfill.enable = false
+
+# Desabilitar telemetria
+toolkit.telemetry.enabled = false
+toolkit.telemetry.unified = false
+toolkit.telemetry.archive.enabled = false</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-shield-alt"></i> Navegador com Endurecimento (Hardening)</button>
+                            <div class="toggle-content-body">
+                                <p>Técnicas de hardening tornam seu navegador mais resistente a rastreamento, embora possam quebrar alguns sites:</p>
+                                <h4>Firefox Hardening</h4>
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code># Configurações avançadas em about:config
+
+# Desabilitar JavaScript (apenas sites confiáveis)
+javascript.enabled = false
+
+# Desabilitar armazenamento de DOM
+dom.storage.enabled = false
+
+# Limitar referrers
+network.http.referer.XOriginPolicy = 2
+
+# Desabilitar cache do disco
+browser.cache.disk.enable = false
+
+# Desabilitar geolocalização
+geo.enabled = false
+
+# Desabilitar detecção de bateria
+dom.battery.enabled = false
+
+# Desabilitar detecção de dispositivos USB
+dom.gamepad.enabled = false
+
+# Desabilitar acesso a sensores de dispositivo
+device.sensors.enabled = false</code>
+                                </div>
+                                <h4>Extensões Recomendadas</h4>
+                                <ul>
+                                    <li>uBlock Origin (modo avançado)</li>
+                                    <li>Privacy Badger</li>
+                                    <li>HTTPS Everywhere</li>
+                                    <li>Decentraleyes</li>
+                                    <li>Cookie AutoDelete</li>
+                                    <li>NoScript</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Técnicas Avançadas Anti-Fingerprinting</h3>
+
+                        <div class="info-card">
+                            <h3>Virtualização e Isolamento</h3>
+                            <p>O isolamento completo oferece a melhor proteção contra fingerprinting:</p>
+                            <ul>
+                                <li><strong>Máquinas Virtuais Descartáveis:</strong> Use VMs que são resetadas após cada uso</li>
+                                <li><strong>Containerização:</strong> Cada atividade em um container isolado</li>
+                                <li><strong>Navegador Dedicado:</strong> Use um navegador específico apenas para atividades anônimas</li>
+                                <li><strong>Whonix em Qubes OS:</strong> Isolamento extremo com VMs específicas para cada atividade</li>
+                            </ul>
+                        </div>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Criando um perfil isolado no Firefox
+# Inicie o Firefox com um perfil novo:
+firefox -P -no-remote
+
+# No Gerenciador de Perfis, crie um novo perfil "anônimo"
+# Inicie o Firefox com este perfil específico:
+firefox -P anonimo -no-remote
+
+# Para isolar ainda mais, use o Firejail (sandbox)
+sudo apt install firejail
+firejail firefox -P anonimo -no-remote</code>
+                        </div>
+
+                        <h3>Proteção contra Vazamento de DNS</h3>
+                        <p>Suas consultas DNS podem revelar sua atividade mesmo usando VPN ou TOR:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalando e configurando DNSCrypt-proxy
+sudo apt install dnscrypt-proxy
+
+# Edite a configuração em /etc/dnscrypt-proxy/dnscrypt-proxy.toml
+
+# Servidores DNS privados recomendados:
+server_names = ['cloudflare', 'quad9']
+
+# Ativar anonimização de DNS
+anonymized_dns = true
+
+# Evitar logs
+log_level = 0
+log_files_max_size = 0
+
+# Reinicie o serviço
+sudo systemctl restart dnscrypt-proxy
+
+# Configure seu sistema para usar 127.0.0.1 como servidor DNS</code>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Regras Comportamentais Anti-Fingerprinting</h4>
+                            <p>Mesmo as melhores ferramentas não protegem contra erros de comportamento:</p>
+                            <ul>
+                                <li>Nunca use o mesmo navegador para atividades anônimas e normais</li>
+                                <li>Nunca faça login em contas pessoais durante sessões anônimas</li>
+                                <li>Não maximize a janela do navegador (use tamanhos padrão)</li>
+                                <li>Evite plugins e extensões desnecessárias</li>
+                                <li>Limpe tudo após cada sessão</li>
+                                <li>Seja consistente com o fuso horário do seu perfil anônimo</li>
+                                <li>Preste atenção ao seu estilo de escrita (pode ser identificável)</li>
+                                <li>Utilize navegadores diferentes para identidades diferentes</li>
+                            </ul>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Ataques Avançados de Fingerprinting</h4>
+                            <p>Esteja ciente que existem técnicas avançadas de fingerprinting que são muito difíceis de evitar:</p>
+                            <ul>
+                                <li><strong>Timing attacks:</strong> Medição do desempenho preciso do hardware</li>
+                                <li><strong>Font rendering:</strong> Pequenas diferenças na renderização de fontes</li>
+                                <li><strong>Keystroke dynamics:</strong> Padrão único de digitação</li>
+                                <li><strong>Mouse movement patterns:</strong> Como você move o mouse</li>
+                                <li><strong>Browser plugin fingerprinting:</strong> Detecção de extensões instaladas</li>
+                            </ul>
+                            <p>A defesa mais eficaz contra estes ataques é o uso de sistemas operacionais dedicados à privacidade, como Tails OS ou Whonix.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="sistemas" class="content-section">
+                    <div class="section-header">
+                        <h2>Sistemas Operacionais para Anonimato</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Para anonimato de altíssimo nível, um sistema operacional dedicado à privacidade é essencial. Estes sistemas são projetados desde o início para maximizar o anonimato e minimizar riscos de vazamento de informações.</p>
+
+                        <div class="tool-grid">
+                            <div class="tool-card">
+                                <h3><i class="fab fa-linux"></i> Tails OS</h3>
+                                <p>Sistema operacional amnésico que não deixa rastros. Inicia a partir de um pendrive e esquece tudo ao desligar.</p>
+                                <ul>
+                                    <li>Roteamento automático via TOR</li>
+                                    <li>Não deixa vestígios no computador host</li>
+                                    <li>Inclui ferramentas de criptografia e privacidade</li>
+                                    <li>Configuração mínima necessária</li>
+                                </ul>
+                                <a href="https://tails.boum.org/" target="_blank" class="tool-link">Site Oficial</a>
+                            </div>
+
+                            <div class="tool-card">
+                                <h3><i class="fab fa-linux"></i> Whonix</h3>
+                                <p>Sistema baseado em duas máquinas virtuais isoladas: Gateway (conecta à rede TOR) e Workstation (onde você trabalha).</p>
+                                <ul>
+                                    <li>Isolamento completo entre rede e aplicações</li>
+                                    <li>Proteção contra vazamentos de DNS e IP</li>
+                                    <li>Funciona dentro de VirtualBox ou KVM</li>
+                                    <li>Alto nível de personalização</li>
+                                </ul>
+                                <a href="https://www.whonix.org/" target="_blank" class="tool-link">Site Oficial</a>
+                            </div>
+
+                            <div class="tool-card">
+                                <h3><i class="fab fa-linux"></i> Qubes OS</h3>
+                                <p>Sistema baseado em isolamento extremo. Cada atividade ocorre em um domínio virtualizado separado.</p>
+                                <ul>
+                                    <li>Isolamento baseado em Xen Hypervisor</li>
+                                    <li>Diferentes VMs para diferentes níveis de confiança</li>
+                                    <li>Integração com Whonix para máximo anonimato</li>
+                                    <li>Requer hardware potente e compatível</li>
+                                </ul>
+                                <a href="https://www.qubes-os.org/" target="_blank" class="tool-link">Site Oficial</a>
+                            </div>
+
+                            <div class="tool-card">
+                                <h3><i class="fab fa-linux"></i> Parrot Security OS</h3>
+                                <p>Distribuição focada em segurança com ferramentas para privacidade e testes de penetração.</p>
+                                <ul>
+                                    <li>Modo anônimo com TOR integrado</li>
+                                    <li>Leve e funciona em hardware modesto</li>
+                                    <li>Ferramentas de forense e segurança</li>
+                                    <li>Adequado para uso diário e segurança</li>
+                                </ul>
+                                <a href="https://parrotsec.org/" target="_blank" class="tool-link">Site Oficial</a>
+                            </div>
+                        </div>
+
+                        <h3>Instalando e Configurando Tails OS</h3>
+                        <p>Tails é uma excelente primeira opção por sua simplicidade e segurança:</p>
+
+                        <ol class="step-list">
+                            <li data-step="1">Baixe a imagem ISO do Tails de <a href="https://tails.boum.org/install/" target="_blank">tails.boum.org</a></li>
+                            <li data-step="2">Verifique a assinatura criptográfica do arquivo para autenticidade</li>
+                            <li data-step="3">Crie um pendrive inicializável usando Etcher, Rufus ou o Tails Installer</li>
+                            <li data-step="4">Reinicie o computador e boot pelo pendrive USB</li>
+                            <li data-step="5">Selecione as opções de inicialização (como senha de administrador, se necessário)</li>
+                            <li data-step="6">Configure conexões TOR, incluindo bridges se necessário</li>
+                            <li data-step="7">Use o sistema de forma anônima - tudo será esquecido após desligar</li>
+                        </ol>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Verificando a assinatura do Tails no Linux
+# 1. Importe a chave
+gpg --keyserver keyserver.ubuntu.com --recv-keys A490D0F4D311A4153E2BB7CADBB802B258ACD84F
+
+# 2. Verifique a imagem
+gpg --verify tails-amd64-4.20.img.sig tails-amd64-4.20.img
+
+# 3. Crie o pendrive bootável
+sudo dd if=tails-amd64-4.20.img of=/dev/sdX bs=16M status=progress
+
+# Substitua /dev/sdX pelo dispositivo USB correto (CUIDADO para não errar!)</code>
+                        </div>
+
+                        <h3>Configurando Whonix em VirtualBox</h3>
+                        <p>Whonix oferece mais flexibilidade e pode ser usado junto com seu sistema principal:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação do Whonix no Linux
+# 1. Instale VirtualBox
+sudo apt install virtualbox
+
+# 2. Adicione a chave do repositório Whonix
+wget https://www.whonix.org/patrick.asc
+sudo apt-key add patrick.asc
+
+# 3. Adicione o repositório
+echo "deb https://deb.whonix.org buster main" | sudo tee /etc/apt/sources.list.d/whonix.list
+
+# 4. Atualize e instale
+sudo apt update
+sudo apt install whonix-gateway whonix-workstation
+
+# 5. Inicie as VMs através do VirtualBox:
+# Primeiro inicie Whonix-Gateway, depois Whonix-Workstation</code>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Configurações Avançadas do Whonix</h3>
+                            <p>Para aumentar ainda mais a segurança do Whonix:</p>
+                            <ul>
+                                <li><strong>Isolamento de Hardware:</strong> Configure o VirtualBox para limitar recursos de hardware visíveis às VMs</li>
+                                <li><strong>Bridges TOR:</strong> Configure bridges no Whonix Gateway para casos onde TOR é bloqueado</li>
+                                <li><strong>VPN antes do TOR:</strong> Configure uma VPN no sistema host antes de iniciar o Whonix</li>
+                                <li><strong>Isolamento de Stream TOR:</strong> Separe diferentes tipos de tráfego por circuitos TOR independentes</li>
+                            </ul>
+                        </div>
+
+                        <h3>Configuração de USB Anti-Vazamento</h3>
+                        <p>Dispositivos USB podem armazenar identificadores únicos e comprometer seu anonimato:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Verificando identificadores USB no Linux
+lsusb -v | grep -i serial
+
+# Desabilitando USB no Kernel (medida extrema)
+# Adicione ao grub:
+GRUB_CMDLINE_LINUX_DEFAULT="nousb"
+
+# Para desabilitar apenas armazenamento USB:
+GRUB_CMDLINE_LINUX_DEFAULT="usbcore.authorized_default=0"
+
+# Atualizar grub
+sudo update-grub</code>
+                        </div>
+
+                        <h3>Isolamento de Hardware com Qubes OS</h3>
+                        <p>Qubes OS representa o auge do isolamento e segurança:</p>
+
+                        <div class="info-card">
+                            <h3>Configuração Recomendada para Qubes OS</h3>
+                            <p>Domínios separados para diferentes níveis de confiança:</p>
+                            <ul>
+                                <li><strong>dom0:</strong> Domínio privilegiado (nunca conectado à internet)</li>
+                                <li><strong>sys-net:</strong> VM para hardware de rede</li>
+                                <li><strong>sys-firewall:</strong> VM para filtragem de tráfego</li>
+                                <li><strong>sys-whonix:</strong> Gateway TOR (Whonix)</li>
+                                <li><strong>anon-whonix:</strong> Workstation para atividades anônimas</li>
+                                <li><strong>untrusted:</strong> VM para atividades de alto risco</li>
+                                <li><strong>vault:</strong> VM desconectada para dados sensíveis</li>
+                            </ul>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Limites do Anonimato com Sistemas Operacionais</h4>
+                            <p>Mesmo os melhores sistemas de anonimato têm limitações:</p>
+                            <ul>
+                                <li>Não protegem contra erros de usuário (compartilhar informações pessoais)</li>
+                                <li>Podem ser comprometidos se baixar e executar malware</li>
+                                <li>Não oferecem proteção contra ataques físicos (keyloggers de hardware)</li>
+                                <li>Vulneráveis a análise de tráfego por entidades com capacidades avançadas</li>
+                                <li>Não podem garantir anonimato se o hardware tiver backdoors ou firmware malicioso</li>
+                                <li>A performance pode ser significativamente reduzida</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Dicas de Uso para Máxima Segurança</h4>
+                            <ul>
+                                <li>Use hardware limpo e idealmente dedicado só para anonimato</li>
+                                <li>Considere usar hardware mais antigo (menos recursos de rastreamento)</li>
+                                <li>Desabilite todas as tecnologias sem fio quando não estiver usando (WiFi, Bluetooth)</li>
+                                <li>Nunca use o mesmo hardware para atividades anônimas e não-anônimas</li>
+                                <li>Considere remover componentes físicos desnecessários (câmeras, microfones)</li>
+                                <li>Use uma instância fresca do sistema a cada sessão crítica</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="criptografia" class="content-section">
+                    <div class="section-header">
+                        <h2>Criptografia de Dados e Comunicações</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>A criptografia é o pilar fundamental da privacidade digital. Mesmo que suas outras camadas de proteção sejam comprometidas, dados criptografados corretamente permanecem protegidos.</p>
+
+                        <div class="info-card">
+                            <h3>Principais Ferramentas de Criptografia</h3>
+                            <ul>
+                                <li><strong>Criptografia de Arquivos:</strong> VeraCrypt, LUKS, eCryptfs</li>
+                                <li><strong>Criptografia de Email:</strong> PGP/GPG, ProtonMail</li>
+                                <li><strong>Criptografia de Mensagens:</strong> Signal, Matrix + Element</li>
+                                <li><strong>Criptografia de Disco:</strong> LUKS, BitLocker, FileVault</li>
+                                <li><strong>Criptografia de Tráfego:</strong> WireGuard, OpenVPN</li>
+                            </ul>
+                        </div>
+
+                        <h3>Configurando GPG para Criptografia de Emails e Arquivos</h3>
+                        <p>GPG (GNU Privacy Guard) é uma implementação livre do padrão OpenPGP, permitindo criptografar emails e arquivos:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação do GPG no Linux
+sudo apt update
+sudo apt install gnupg
+
+# Gerando um novo par de chaves
+gpg --full-generate-key
+
+# Escolha o tipo de chave (recomendado: RSA e RSA)
+# Tamanho da chave (recomendado: 4096 bits)
+# Data de validade (recomendado: 2 anos)
+# Seu nome e email
+
+# Listando suas chaves
+gpg --list-keys
+
+# Exportando sua chave pública (para compartilhar)
+gpg --armor --export seu_email@exemplo.com > minha_chave_publica.asc
+
+# Importando chave pública de outra pessoa
+gpg --import chave_de_outra_pessoa.asc
+
+# Criptografar um arquivo para um destinatário
+gpg --encrypt --recipient email_do_destinatario@exemplo.com arquivo.txt
+
+# Descriptografar um arquivo
+gpg --decrypt arquivo.txt.gpg > arquivo_descriptografado.txt
+
+# Assinar um arquivo (para provar autenticidade)
+gpg --sign arquivo.txt
+
+# Verificar assinatura
+gpg --verify arquivo.txt.gpg</code>
+                        </div>
+
+                        <h3>Configurando VeraCrypt para Contêineres Criptografados</h3>
+                        <p>VeraCrypt permite criar volumes criptografados que podem armazenar arquivos sensíveis com segurança:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação do VeraCrypt no Linux
+# Baixe o instalador do site oficial veracrypt.fr
+chmod +x veracrypt-1.24-setup.tar.bz2
+tar xjf veracrypt-1.24-setup.tar.bz2
+sudo ./veracrypt-1.24-setup-gui-x64
+
+# Criando um contêiner criptografado via terminal
+veracrypt -t -c
+
+# Montando um contêiner criptografado
+veracrypt /caminho/para/contêiner.vc /mnt/veracrypt1
+
+# Desmontando o contêiner
+veracrypt -d /mnt/veracrypt1
+
+# Criando volume com negação plausível (hidden volume)
+veracrypt -t -c --volume-type=hidden</code>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Negação Plausível com VeraCrypt</h3>
+                            <p>A negação plausível permite proteger dados mesmo sob coerção:</p>
+                            <ol>
+                                <li>Crie um volume criptografado normal</li>
+                                <li>Coloque arquivos "chamariz" que pareçam sensíveis, mas que você estaria disposto a revelar</li>
+                                <li>Crie um volume oculto dentro deste volume principal</li>
+                                <li>Armazene seus dados realmente sensíveis no volume oculto</li>
+                                <li>Se forçado a revelar sua senha, forneça apenas a senha do volume externo</li>
+                            </ol>
+                            <p>Isso permite negar de forma plausível a existência do volume oculto contendo seus dados mais sensíveis.</p>
+                        </div>
+
+                        <h3>Criptografia de Disco Completo com LUKS</h3>
+                        <p>LUKS (Linux Unified Key Setup) permite criptografar partições inteiras, incluindo o sistema operacional:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação de ferramentas LUKS
+sudo apt install cryptsetup
+
+# Criptografar uma partição
+sudo cryptsetup luksFormat /dev/sdXY
+
+# Abrir a partição criptografada
+sudo cryptsetup luksOpen /dev/sdXY nome_descritor
+
+# Formatar a partição criptografada
+sudo mkfs.ext4 /dev/mapper/nome_descritor
+
+# Montar a partição
+sudo mount /dev/mapper/nome_descritor /mnt/seguro
+
+# Fechar a partição criptografada
+sudo umount /mnt/seguro
+sudo cryptsetup luksClose nome_descritor
+
+# Adicionar senha adicional (até 8 senhas)
+sudo cryptsetup luksAddKey /dev/sdXY
+
+# Remover senha
+sudo cryptsetup luksRemoveKey /dev/sdXY</code>
+                        </div>
+
+                        <h3>Configurando Mensageria Segura</h3>
+                        <p>Para comunicações sensíveis, use aplicativos de mensagem com criptografia de ponta-a-ponta:</p>
+
+                        <div class="info-card">
+                            <h3>Signal: Configuração Anônima</h3>
+                            <p>O Signal é considerado o padrão ouro para mensagens seguras, mas requer número de telefone. Para uso anônimo:</p>
+                            <ol>
+                                <li>Obtenha um número de telefone não vinculado à sua identidade (SIM descartável)</li>
+                                <li>Use o número apenas para verificação do Signal</li>
+                                <li>Instale Signal através de Aurora Store ou F-Droid (sem Google Play)</li>
+                                <li>Desative backups e notificações que mostram conteúdo</li>
+                                <li>Ative desaparecimento de mensagens para todas as conversas</li>
+                                <li>Configure PIN seguro e bloqueio de tela</li>
+                            </ol>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Matrix + Element: Mensageria Descentralizada</h3>
+                            <p>O Matrix é um protocolo aberto e descentralizado que não requer número de telefone:</p>
+                            <ol>
+                                <li>Registre-se em um servidor Matrix anônimo (através de TOR)</li>
+                                <li>Use email temporário para verificação se necessário</li>
+                                <li>Instale o cliente Element (anteriormente Riot)</li>
+                                <li>Ative criptografia de ponta-a-ponta para todas as conversas</li>
+                                <li>Verifique manualmente as chaves de criptografia dos contatos</li>
+                                <li>Use salas privadas com convite apenas</li>
+                            </ol>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Riscos da Criptografia</h4>
+                            <p>Mesmo com criptografia, existem riscos importantes:</p>
+                            <ul>
+                                <li>Implementações defeituosas podem conter backdoors</li>
+                                <li>Senhas fracas anulam a criptografia forte</li>
+                                <li>Metadados ainda podem revelar informações valiosas</li>
+                                <li>Alguns países podem exigir legalmente que você revele senhas</li>
+                                <li>Ataques de "evil maid" podem comprometer dispositivos desacompanhados</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Melhores Práticas de Criptografia</h4>
+                            <ul>
+                                <li>Use senhas fortes e diferentes para cada sistema criptografado</li>
+                                <li>Considere usar frases-senha longas (mais de 20 caracteres)</li>
+                                <li>Mantenha backups seguros das suas chaves de recuperação</li>
+                                <li>Verifique sempre a integridade do software de criptografia</li>
+                                <li>Prefira soluções de código aberto auditadas por especialistas</li>
+                                <li>Atualize regularmente para as versões mais recentes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="opsec" class="content-section">
+                    <div class="section-header">
+                        <h2>OPSEC Avançada para Anonimato</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>OPSEC (Segurança Operacional) é um processo sistemático para identificar, controlar e proteger informações críticas. Originário de contextos militares, é essencial para manter o anonimato digital.</p>
+
+                        <div class="info-card">
+                            <h3>Os 5 Passos do Processo OPSEC</h3>
+                            <ol>
+                                <li><strong>Identificação de Informações Críticas:</strong> O que você está tentando proteger?</li>
+                                <li><strong>Análise de Ameaças:</strong> Quem são seus adversários e o que eles querem?</li>
+                                <li><strong>Análise de Vulnerabilidades:</strong> Quais são os pontos fracos na sua segurança?</li>
+                                <li><strong>Avaliação de Riscos:</strong> Qual é a probabilidade e impacto de cada ameaça?</li>
+                                <li><strong>Contramedidas:</strong> Implementação de proteções específicas</li>
+                            </ol>
+                        </div>
+
+                        <h3>Técnicas de OPSEC para Anonimato Digital</h3>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-user-secret"></i> Compartimentalização</button>
+                            <div class="toggle-content-body">
+                                <p>A compartimentalização envolve separar suas atividades em "compartimentos" isolados:</p>
+                                <ul>
+                                    <li><strong>Identidades Separadas:</strong> Nunca reutilize usernames, emails ou senhas entre identidades</li>
+                                    <li><strong>Dispositivos Dedicados:</strong> Use hardware diferente para atividades sensíveis</li>
+                                    <li><strong>Isolamento de Redes:</strong> Redes diferentes para diferentes propósitos</li>
+                                    <li><strong>Separação Temporal:</strong> Não alterne entre identidades na mesma sessão</li>
+                                    <li><strong>Contenção de Danos:</strong> Se um compartimento for comprometido, os outros permanecem seguros</li>
+                                </ul>
+                                <p>Exemplo de configuração de compartimentalização:</p>
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code># Criando usuários separados no Linux para compartimentalização
+sudo adduser --encrypt-home usuario_anonimo
+
+# Configurando ambiente isolado com firejail
+sudo apt install firejail
+firejail --net=enp3s0 --dns=9.9.9.9 --noprofile firefox
+
+# Configurando VM isolada para atividade específica
+virt-install --name=vm_anonima --memory=2048 --vcpus=2 --os-variant=debian10 \
+  --disk path=/var/lib/libvirt/images/vm_anonima.qcow2,size=20 \
+  --cdrom=/path/to/tails.iso --graphics vnc --noautoconsole</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-clock"></i> Disciplina Temporal</button>
+                            <div class="toggle-content-body">
+                                <p>Seus padrões de uso do tempo podem revelar sua identidade:</p>
+                                <ul>
+                                    <li>Evite padrões consistentes de conexão</li>
+                                    <li>Considere seu fuso horário ao se comunicar</li>
+                                    <li>Varie seus horários de atividade para evitar correlação</li>
+                                    <li>Não responda imediatamente a mensagens em contextos anônimos</li>
+                                    <li>Use programadores de tarefas para atividades em horários aleatórios</li>
+                                </ul>
+                                <p>Ferramenta para automatizar ações em tempos aleatórios:</p>
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code># Script para executar ações em horários aleatórios
+#!/bin/bash
+# Salve como random_activity.sh
+
+# Define intervalo (em minutos)
+MIN_DELAY=30
+MAX_DELAY=120
+
+while true; do
+  # Calcula atraso aleatório
+  DELAY=$((RANDOM % (MAX_DELAY - MIN_DELAY + 1) + MIN_DELAY))
+  
+  echo "Próxima atividade em $DELAY minutos"
+  sleep ${DELAY}m
+  
+  # Executar ação
+  # Exemplo: acessar site via curl através do TOR
+  torsocks curl -s https://check.torproject.org > /dev/null
+  
+  echo "Atividade executada em $(date)"
+done</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-pen-fancy"></i> Estilometria e Análise Linguística</button>
+                            <div class="toggle-content-body">
+                                <p>Sua forma de escrever é única como uma impressão digital:</p>
+                                <ul>
+                                    <li>Mantenha estilos de escrita distintos para diferentes identidades</li>
+                                    <li>Evite palavras ou frases favoritas</li>
+                                    <li>Varie a complexidade de frases e vocabulário</li>
+                                    <li>Cuidado com erros ortográficos consistentes</li>
+                                    <li>Use ferramentas de "higienização" de texto para comunicações críticas</li>
+                                </ul>
+                                <p>Exemplo de como alterar seu estilo de escrita:</p>
+                                <div class="info-card">
+                                    <h3>Transformação de Estilo</h3>
+                                    <p><strong>Original:</strong> "Acredito que devemos considerar as implicações éticas desta decisão antes de prosseguir com o projeto."</p>
+                                    <p><strong>Alterado:</strong> "A equipe precisa avaliar questões éticas antes de seguir com este trabalho."</p>
+                                    <p>Observe as diferenças: primeira pessoa vs. terceira pessoa, comprimento da frase, escolha de palavras, estrutura gramatical.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-map-marked-alt"></i> Localização e Metadados</button>
+                            <div class="toggle-content-body">
+                                <p>Informações de localização podem vazar de várias formas:</p>
+                                <ul>
+                                    <li>Metadados EXIF em fotos e arquivos</li>
+                                    <li>Serviços baseados em localização</li>
+                                    <li>Referências indiretas (clima local, eventos)</li>
+                                    <li>Triangulação de torres celulares</li>
+                                    <li>Padrões de conexão Wi-Fi</li>
+                                </ul>
+                                <p>Ferramentas para limpar metadados:</p>
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code># Instalação do exiftool para gerenciar metadados
+sudo apt install exiftool
+
+# Visualizar todos os metadados de uma imagem
+exiftool imagem.jpg
+
+# Remover todos os metadados
+exiftool -all= imagem.jpg
+
+# Remover apenas dados de GPS
+exiftool -gps:all= imagem.jpg
+
+# Verificar se ainda existem dados de localização
+exiftool -grep GPS imagem.jpg
+
+# Limpar metadados de vários arquivos de uma vez
+exiftool -all= -if "$filetype eq 'JPEG'" diretorio/</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3>Verificações Anti-Doxing</h3>
+                        <p>Doxing é a prática de expor informações pessoais de alguém online. Proteja-se realizando verificações periódicas:</p>
+
+                        <ol class="step-list">
+                            <li data-step="1">Pesquise seu nome real, usernames, emails e números de telefone</li>
+                            <li data-step="2">Verifique bases de dados de vazamentos (haveibeenpwned.com)</li>
+                            <li data-step="3">Procure suas informações em diretórios públicos e redes sociais</li>
+                            <li data-step="4">Examine sites de busca de pessoas e registros públicos</li>
+                            <li data-step="5">Solicite a remoção de informações sensíveis encontradas</li>
+                        </ol>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Script básico para verificar vazamentos de email
+#!/bin/bash
+# Salve como check_leaks.sh
+
+EMAIL=$1
+
+if [ -z "$EMAIL" ]; then
+  echo "Uso: $0 seu_email@exemplo.com"
+  exit 1
+fi
+
+echo "Verificando vazamentos para $EMAIL..."
+
+# Verificando através da API do HaveIBeenPwned (requer chave API)
+# curl -s -H "hibp-api-key: SUA_CHAVE_API" \
+#      -H "User-Agent: LeakChecker" \
+#      "https://haveibeenpwned.com/api/v3/breachedaccount/$EMAIL"
+
+# Verificação alternativa usando dehashed (requer conta)
+# curl -s -u "seu_email:sua_senha" \
+#      "https://api.dehashed.com/search?query=email:$EMAIL"
+
+# Método manual - executar consultas em sites populares
+# via TOR para anonimato
+echo "Executando verificações manuais..."
+torsocks curl -s "https://leakedsource.ru/?s=$EMAIL" > /dev/null
+torsocks curl -s "https://leakcheck.io/search?query=$EMAIL" > /dev/null
+
+echo "Verificação completa. Verifique os resultados nos sites."</code>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Ataques Sociais e Humanos</h4>
+                            <p>A engenharia social frequentemente supera as melhores defesas técnicas:</p>
+                            <ul>
+                                <li>Phishing direcionado (spear phishing)</li>
+                                <li>Pretexting (criar cenários falsos para obter informações)</li>
+                                <li>Exploração de relacionamentos pessoais</li>
+                                <li>Ataques de "honey pot" (armadilhas para atrair vítimas)</li>
+                                <li>Técnicas de elicitação (extrair informações através de conversa)</li>
+                            </ul>
+                            <p>Nenhuma quantidade de ferramentas técnicas protege contra erros humanos básicos. Mantenha-se vigilante.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="ferramentas" class="content-section">
+                    <div class="section-header">
+                        <h2>Ferramentas Essenciais para Anonimato</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Além das grandes categorias já discutidas, existem ferramentas específicas que podem melhorar significativamente seu anonimato online:</p>
+
+                        <div class="tool-grid">
+                            <div class="tool-card">
+                                <h3><i class="fas fa-mask"></i> Mullvad Browser</h3>
+                                <p>Navegador baseado no Firefox, otimizado para privacidade e anti-fingerprinting. Desenvolvido pelo Projeto TOR em parceria com a Mullvad VPN.</p>
+                                <ul>
+                                    <li>Proteção contra fingerprinting avançada</li>
+                                    <li>Configurado para privacidade máxima por padrão</li>
+                                    <li>Suporte para bridges e proxies</li>
+                                </ul>
+                                <a href="https://mullvad.net/en/browser" target="_blank" class="tool-link">Site Oficial</a>
+                            </div>
+
+                            <div class="tool-card">
+                                <h3><i class="fas fa-eraser"></i> BleachBit</h3>
+                                <p>Ferramenta de limpeza para remover completamente rastros de atividade do seu sistema.</p>
+                                <ul>
+                                    <li>Limpa caches, históricos e cookies</li>
+                                    <li>Esvazia lixeira com métodos seguros</li>
+                                    <li>Sobrescreve espaço livre para prevenir recuperação</li>
+                                </ul>
+                                <a href="https://www.bleachbit.org/" target="_blank" class="tool-link">Site Oficial</a>
+                            </div>
+
+                            <div class="tool-card">
+                                <h3><i class="fas fa-shield-alt"></i> Nipe</h3>
+                                <p>Ferramenta que roteia todo o tráfego do sistema através da rede TOR, não apenas o navegador.</p>
+                                <ul>
+                                    <li>Transforma qualquer aplicativo em TOR-habilitado</li>
+                                    <li>Protege contra vazamentos de IP em nível de sistema</li>
+                                    <li>Fácil de instalar e configurar</li>
+                                </ul>
+                                <a href="https://github.com/GouveaHeitor/nipe" target="_blank" class="tool-link">GitHub</a>
+                            </div>
+
+                            <div class="tool-card">
+                                <h3><i class="fas fa-eye-slash"></i> MAT2 (Metadata Anonymisation Toolkit)</h3>
+                                <p>Remove metadados de diversos tipos de arquivos para prevenir vazamento de informações.</p>
+                                <ul>
+                                    <li>Suporta PDFs, imagens, documentos Office</li>
+                                    <li>Interface gráfica e linha de comando</li>
+                                    <li>Integração com Nautilus/Dolphin</li>
+                                </ul>
+                                <a href="https://0xacab.org/jvoisin/mat2" target="_blank" class="tool-link">Site Oficial</a>
+                            </div>
+                        </div>
+
+                        <h3>Ferramentas de Linha de Comando para Anonimato</h3>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Instalação e uso do proxychains
+sudo apt install proxychains
+# Edite /etc/proxychains.conf para configurar seus proxies
+# Use com qualquer comando:
+proxychains firefox
+proxychains nmap -sT -P0 alvo.com
+
+# Instalação e uso do Nipe (TOR para todo o sistema)
+git clone https://github.com/GouveaHeitor/nipe
+cd nipe
+sudo cpan install Switch JSON LWP::UserAgent
+sudo perl nipe.pl install
+sudo perl nipe.pl start
+sudo perl nipe.pl status
+
+# Instalação e uso do MAT2 (Metadata Anonymisation Toolkit)
+sudo apt install mat2
+# Limpar metadados
+mat2 arquivo_com_metadados.jpg
+# Verificar metadados
+mat2 --show arquivo.jpg
+
+# Instalação e uso do macchanger (altera MAC address)
+sudo apt install macchanger
+# Desative a interface primeiro
+sudo ifconfig wlan0 down
+# Altere para um MAC aleatório
+sudo macchanger -r wlan0
+# Ou para um MAC específico
+sudo macchanger -m 00:11:22:33:44:55 wlan0
+# Ative a interface novamente
+sudo ifconfig wlan0 up</code>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Melhores Extensões para Navegadores</h3>
+                            <p>Use apenas extensões essenciais, pois muitas podem aumentar seu fingerprint:</p>
+                            <ul>
+                                <li><strong>uBlock Origin:</strong> Bloqueador de anúncios e rastreadores</li>
+                                <li><strong>Privacy Badger:</strong> Bloqueio inteligente de rastreadores</li>
+                                <li><strong>NoScript/uMatrix:</strong> Controle granular de JavaScript</li>
+                                <li><strong>HTTPS Everywhere:</strong> Força conexões HTTPS</li>
+                                <li><strong>Cookie AutoDelete:</strong> Remove cookies automaticamente</li>
+                                <li><strong>CanvasBlocker:</strong> Previne canvas fingerprinting</li>
+                                <li><strong>Decentraleyes:</strong> Armazena localmente recursos CDN comuns</li>
+                            </ul>
+                            <p>Para o Navegador TOR, <strong>não instale extensões adicionais</strong> - ele já vem otimizado.</p>
+                        </div>
+
+                        <h3>Scripts e Ferramentas Personalizadas</h3>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-terminal"></i> Script de Conexão Anônima</button>
+                            <div class="toggle-content-body">
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code>#!/bin/bash
+# anon_connect.sh - Script para conexão anônima completa
+
+echo "Iniciando procedimentos de anonimização..."
+
+# 1. Alterar endereço MAC
+echo "Alterando endereço MAC..."
+sudo ifconfig wlan0 down
+sudo macchanger -r wlan0
+sudo ifconfig wlan0 up
+
+# 2. Limpar DNS
+echo "Limpando cache DNS..."
+sudo systemd-resolve --flush-caches
+sudo resolvectl flush-caches
+
+# 3. Iniciar VPN
+echo "Conectando à VPN..."
+sudo openvpn --config /etc/openvpn/secure.ovpn &
+VPN_PID=$!
+sleep 10
+
+# 4. Verificar VPN
+IP_ANTES=$(curl -s ifconfig.me)
+echo "IP antes do TOR: $IP_ANTES"
+
+# 5. Iniciar TOR
+echo "Iniciando TOR..."
+sudo service tor start
+sleep 5
+
+# 6. Configurar regras de firewall para evitar vazamentos
+echo "Configurando firewall..."
+sudo iptables -F
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT DROP
+sudo iptables -A INPUT -i lo -j ACCEPT
+sudo iptables -A OUTPUT -o lo -j ACCEPT
+sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -A OUTPUT -p tcp --dport 9050 -j ACCEPT  # TOR
+sudo iptables -A OUTPUT -p tcp --dport 9051 -j ACCEPT  # TOR control
+sudo iptables -A OUTPUT -p tcp --dport 1194 -j ACCEPT  # OpenVPN
+sudo iptables -A OUTPUT -p udp --dport 1194 -j ACCEPT  # OpenVPN
+sudo iptables -A OUTPUT -p udp --dport 53 -j ACCEPT    # DNS
+
+# 7. Verificar TOR
+echo "Verificando conexão TOR..."
+torsocks curl -s https://check.torproject.org | grep -q "Congratulations"
+if [ $? -eq 0 ]; then
+    echo "TOR conectado com sucesso!"
+else
+    echo "ERRO: TOR não está funcionando corretamente!"
+fi
+
+echo "Configuração anônima concluída!"
+echo "Para desconectar, pressione Ctrl+C"
+
+# Limpeza ao encerrar
+function cleanup {
+    echo "Desconectando e limpando..."
+    sudo service tor stop
+    kill $VPN_PID
+    sudo iptables -F
+    sudo iptables -P INPUT ACCEPT
+    sudo iptables -P FORWARD ACCEPT
+    sudo iptables -P OUTPUT ACCEPT
+    echo "Limpeza concluída!"
+    exit 0
+}
+
+trap cleanup SIGINT
+wait</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-content">
+                            <button class="toggle-btn"><i class="fas fa-broom"></i> Script de Limpeza de Rastros</button>
+                            <div class="toggle-content-body">
+                                <div class="command-block">
+                                    <div class="copy-btn">Copiar</div>
+                                    <code>#!/bin/bash
+# secure_cleanup.sh - Limpa rastros de atividade no sistema
+
+echo "Iniciando limpeza segura do sistema..."
+
+# 1. Limpar histórico do bash
+echo "Limpando histórico de comandos..."
+cat /dev/null > ~/.bash_history
+history -c
+
+# 2. Limpar arquivos temporários
+echo "Removendo arquivos temporários..."
+sudo rm -rf /tmp/*
+sudo rm -rf /var/tmp/*
+
+# 3. Limpar logs do sistema
+echo "Limpando logs do sistema..."
+sudo find /var/log -type f -exec sh -c "cat /dev/null > {}" \;
+
+# 4. Limpar caches do navegador (Firefox)
+echo "Limpando caches do navegador..."
+rm -rf ~/.mozilla/firefox/*.default*/cache2/
+rm -rf ~/.mozilla/firefox/*.default*/cookies.sqlite
+rm -rf ~/.mozilla/firefox/*.default*/places.sqlite
+rm -rf ~/.mozilla/firefox/*.default*/formhistory.sqlite
+
+# 5. Limpar thumbnails
+echo "Limpando thumbnails..."
+rm -rf ~/.cache/thumbnails/*
+
+# 6. Limpar histórico de arquivos recentes
+echo "Limpando histórico de arquivos recentes..."
+rm -f ~/.local/share/recently-used.xbel
+
+# 7. Limpar memória RAM
+echo "Limpando memória RAM..."
+sudo sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+
+# 8. Sobreescrever espaço livre (em partição atual)
+echo "Deseja sobreescrever espaço livre para prevenir recuperação de dados? (s/n)"
+read resposta
+if [ "$resposta" = "s" ]; then
+    echo "Sobreescrevendo espaço livre (isso pode demorar)..."
+    dd if=/dev/zero of=zero.tmp bs=1M
+    sync
+    rm -f zero.tmp
+fi
+
+echo "Limpeza concluída!"</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Cuidado com as Ferramentas</h4>
+                            <p>Nem todas as ferramentas "de privacidade" são confiáveis:</p>
+                            <ul>
+                                <li>Use apenas software de código aberto e revisado pela comunidade</li>
+                                <li>Verifique a reputação dos desenvolvedores</li>
+                                <li>Desconfie de soluções "mágicas" que prometem anonimato perfeito</li>
+                                <li>Verifique a origem das ferramentas antes de instalar</li>
+                                <li>Algumas ferramentas "de privacidade" são honeypots</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="monitoramento" class="content-section">
+                    <div class="section-header">
+                        <h2>Evitando Monitoramento e Vigilância</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Mesmo com as melhores ferramentas de anonimato, você ainda pode ser monitorado por técnicas avançadas. Entender estas técnicas ajuda a se proteger melhor.</p>
+
+                        <div class="info-card">
+                            <h3>Métodos de Vigilância Comuns</h3>
+                            <ul>
+                                <li><strong>DPI (Deep Packet Inspection):</strong> Análise profunda do conteúdo de pacotes de dados</li>
+                                <li><strong>Análise de Tráfego:</strong> Identificação de padrões em comunicações criptografadas</li>
+                                <li><strong>Ataques de Correlação:</strong> Relacionar atividades em diferentes pontos da rede</li>
+                                <li><strong>Monitoramento de Metadados:</strong> Análise de quem fala com quem, quando e por quanto tempo</li>
+                                <li><strong>Ataques de Injeção de Código:</strong> Inserção de código para identificação de usuários</li>
+                            </ul>
+                        </div>
+
+                        <h3>Técnicas para Evitar DPI (Deep Packet Inspection)</h3>
+                        <p>O DPI examina o conteúdo dos pacotes para identificar o tipo de tráfego, mesmo quando criptografado:</p>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Usar Obfsproxy para mascarar tráfego TOR
+sudo apt install obfs4proxy
+
+# Edite /etc/tor/torrc e adicione:
+UseBridges 1
+ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
+Bridge obfs4 X.X.X.X:YYYY FINGERPRINT
+
+# Ou use Meek para disfarçar tráfego como HTTPS regular
+ClientTransportPlugin meek exec /usr/bin/meek-client
+Bridge meek 0.0.2.0:2 url=https://meek-reflect.appspot.com/ front=www.google.com
+
+# Reinicie o TOR
+sudo systemctl restart tor</code>
+                        </div>
+
+                        <h3>Contramedidas para Análise de Tráfego</h3>
+                        <p>A análise de tráfego identifica padrões nas comunicações, mesmo sem ver o conteúdo:</p>
+
+                        <div class="info-card">
+                            <h3>Estratégias contra Análise de Tráfego</h3>
+                            <ul>
+                                <li><strong>Tráfego de Cobertura:</strong> Gerar tráfego adicional para ocultar comunicações reais</li>
+                                <li><strong>Timing Aleatório:</strong> Adicionar atrasos aleatórios às comunicações</li>
+                                <li><strong>Padding de Pacotes:</strong> Enviar pacotes de tamanho consistente para ocultar tamanho real</li>
+                                <li><strong>Conexões Mistas:</strong> Misturar diferentes tipos de tráfego para dificultar classificação</li>
+                            </ul>
+                        </div>
+
+                        <div class="command-block">
+                            <div class="copy-btn">Copiar</div>
+                            <code># Script para gerar tráfego de cobertura
+#!/bin/bash
+# traffic_noise.sh - Gera tráfego de cobertura para confundir análise
+
+# Lista de sites populares para gerar tráfego aleatório
+SITES=(
+    "https://www.wikipedia.org"
+    "https://www.cnn.com"
+    "https://www.nytimes.com"
+    "https://www.bbc.com"
+    "https://www.reddit.com"
+    "https://www.youtube.com"
+    "https://www.amazon.com"
+    "https://www.github.com"
+    "https://www.weather.com"
+)
+
+# Duração em segundos
+DURATION=3600
+
+echo "Gerando tráfego de cobertura por ${DURATION} segundos..."
+end=$((SECONDS+DURATION))
+
+while [ $SECONDS -lt $end ]; do
+    # Escolhe um site aleatório
+    RANDOM_SITE=${SITES[$RANDOM % ${#SITES[@]}]}
+    
+    # Gera um atraso aleatório (1-30 segundos)
+    DELAY=$((RANDOM % 30 + 1))
+    
+    echo "Acessando $RANDOM_SITE após $DELAY segundos"
+    sleep $DELAY
+    
+    # Acessa o site através do TOR
+    torsocks curl -s "$RANDOM_SITE" > /dev/null
+    
+    # 30% de chance de fazer mais requisições em um mesmo site
+    if [ $((RANDOM % 10)) -lt 3 ]; then
+        sleep $((RANDOM % 5 + 1))
+        torsocks curl -s "${RANDOM_SITE}/about" > /dev/null
+    fi
+done
+
+echo "Geração de tráfego de cobertura concluída."</code>
+                        </div>
+
+                        <h3>Proteção contra Ataques de Correlação</h3>
+                        <p>Ataques de correlação analisam o tempo e volume de dados entrando e saindo da rede TOR/VPN:</p>
+
+                        <div class="info-card">
+                            <h3>Defesas contra Correlação</h3>
+                            <ul>
+                                <li><strong>Minimizar Volume:</strong> Reduzir a quantidade de dados transferidos</li>
+                                <li><strong>Evitar Padrões:</strong> Não estabelecer rotinas previsíveis de uso</li>
+                                <li><strong>Múltiplas Camadas:</strong> VPN → TOR → Proxy em vez de apenas TOR</li>
+                                <li><strong>Sessões Curtas:</strong> Mudar de identidade frequentemente</li>
+                                <li><strong>Misturar Tráfego:</strong> Combinar atividades diversas para confundir padrões</li>
+                            </ul>
+                        </div>
+
+                        <h3>Defesa contra Vigilância Física</h3>
+                        <p>Nem toda vigilância é digital - proteção física também é importante:</p>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Riscos Físicos</h4>
+                            <ul>
+                                <li>Câmeras de segurança e CCTV</li>
+                                <li>Keyloggers de hardware</li>
+                                <li>Dispositivos de escuta</li>
+                                <li>Monitoramento de sinais eletromagnéticos (TEMPEST)</li>
+                                <li>Vigilância tradicional ("shoulder surfing")</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Contramedidas Físicas</h4>
+                            <ul>
+                                <li>Use filtros de privacidade na tela do computador</li>
+                                <li>Desative dispositivos quando não estiver usando (microfonee, câmera, Wi-Fi, Bluetooth)</li>
+                                <li>Use computadores em áreas sem câmeras</li>
+                                <li>Considere "faraday bags" para dispositivos móveis</li>
+                                <li>Verifique dispositivos quanto a hardware não autorizado</li>
+                                <li>Seja consciente do seu ambiente físico ao trabalhar com dados sensíveis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="conclusao" class="content-section">
+                    <div class="section-header">
+                        <h2>Conclusão e Melhores Práticas</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>O anonimato online eficaz não é alcançado por uma única ferramenta ou técnica, mas sim pela combinação cuidadosa de várias camadas de proteção, aliadas a boas práticas comportamentais.</p>
+
+                        <div class="info-card">
+                            <h3>Camadas de Proteção Recomendadas (do mais básico ao mais avançado)</h3>
+                            <ol>
+                                <li><strong>Nível 1 - Privacidade Básica:</strong>
+                                    <ul>
+                                        <li>Navegador Firefox com configurações de privacidade</li>
+                                        <li>VPN confiável</li>
+                                        <li>Extensões básicas: uBlock Origin, Privacy Badger</li>
+                                        <li>Uso de DNS privados (1.1.1.1, 9.9.9.9)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Nível 2 - Anonimato Moderado:</strong>
+                                    <ul>
+                                        <li>Navegador TOR</li>
+                                        <li>VPN que não mantém logs + TOR</li>
+                                        <li>Sistema operacional regular com máquina virtual para atividades sensíveis</li>
+                                        <li>Higienização regular de metadados</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Nível 3 - Alto Anonimato:</strong>
+                                    <ul>
+                                        <li>Tails OS em pendrive dedicado</li>
+                                        <li>VPN → TOR com bridges</li>
+                                        <li>Compartimentalização rigorosa de identidades</li>
+                                        <li>Conexão em redes Wi-Fi públicas longe de casa/trabalho</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Nível 4 - Anonimato Máximo:</strong>
+                                    <ul>
+                                        <li>Qubes OS com Whonix</li>
+                                        <li>VPN → Proxies em cascata → TOR → I2P</li>
+                                        <li>Hardware dedicado usado apenas para atividades anônimas</li>
+                                        <li>OPSEC rigorosa em todos os aspectos</li>
+                                        <li>Técnicas avançadas anti-fingerprinting e anti-correlação</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Regras de Ouro para Anonimato</h4>
+                            <ol>
+                                <li><strong>Nunca misture identidades:</strong> Mantenha suas diferentes personas online totalmente separadas</li>
+                                <li><strong>Menos é mais:</strong> Quanto menos informações você compartilhar, melhor</li>
+                                <li><strong>Assuma o pior cenário:</strong> Configure seu anonimato pensando no adversário mais poderoso possível</li>
+                                <li><strong>Consistência é crucial:</strong> Um único deslize pode comprometer anos de cuidado</li>
+                                <li><strong>Atualize-se constantemente:</strong> As técnicas de rastreamento evoluem; seu anonimato também deve evoluir</li>
+                                <li><strong>Nunca confie cegamente:</strong> Mesmo as melhores ferramentas podem ter falhas</li>
+                                <li><strong>Pratique antes de precisar:</strong> Não deixe para aprender técnicas de anonimato quando já estiver em risco</li>
+                            </ol>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Limitações do Anonimato</h4>
+                            <p>É importante reconhecer que o anonimato perfeito é extremamente difícil de alcançar:</p>
+                            <ul>
+                                <li>Entidades com recursos suficientes (estados-nação) podem superar muitas proteções</li>
+                                <li>Erros humanos são inevitáveis e podem comprometer sistemas de segurança</li>
+                                <li>Algumas técnicas de anonimato atraem mais atenção do que usar a internet normalmente</li>
+                                <li>Equilibrar usabilidade e anonimato é um desafio constante</li>
+                            </ul>
+                        </div>
+
+                        <p>Lembre-se que o anonimato é uma ferramenta que deve ser usada para fins legítimos como proteger sua privacidade, expressar-se livremente sem perseguição, realizar jornalismo investigativo ou ativismo em regimes repressivos, ou simplesmente exercer seu direito fundamental à privacidade em um mundo cada vez mais vigilante.</p>
+
+                        <p>Continue aprendendo e adaptando suas técnicas à medida que novas tecnologias e ameaças emergem. O campo da privacidade e anonimato digital está em constante evolução.</p>
+
+                        <div class="cta-container" style="text-align: center; margin-top: 30px;">
+                            <a href="index.html" class="home-btn" style="font-size: 18px; padding: 12px 25px;">
+                                <i class="fas fa-home"></i> Voltar para Home
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="sidebar">
+                <div class="toc">
+                    <h3>Índice</h3>
+                    <ul>
+                        <li><a href="#introducao">Introdução ao Anonimato</a></li>
+                        <li><a href="#principios">Princípios Fundamentais</a></li>
+                        <li><a href="#tor">Rede TOR</a></li>
+                        <li><a href="#i2p">Rede I2P</a></li>
+                        <li><a href="#vpn">VPNs com Criptografia Forte</a></li>
+                        <li><a href="#proxies">Proxies em Cascata</a></li>
+                        <li><a href="#anti-fingerprinting">Técnicas Anti-Fingerprinting</a></li>
+                        <li><a href="#sistemas">Sistemas Operacionais</a></li>
+                        <li><a href="#criptografia">Criptografia de Dados</a></li>
+                        <li><a href="#opsec">OPSEC Avançada</a></li>
+                        <li><a href="#ferramentas">Ferramentas Essenciais</a></li>
+                        <li><a href="#monitoramento">Evitando Monitoramento</a></li>
+                        <li><a href="#conclusao">Conclusão</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">FAQ</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="overlay"></div>
+    <div class="mobile-menu">
+        <button class="mobile-menu-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mobile-nav-links">
+            <a href="index.html" class="mobile-home-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="#introducao">Introdução</a>
+            <a href="#principios">Princípios Fundamentais</a>
+            <a href="#tor">Rede TOR</a>
+            <a href="#i2p">Rede I2P</a>
+            <a href="#vpn">VPNs com Criptografia</a>
+            <a href="#proxies">Proxies em Cascata</a>
+            <a href="#anti-fingerprinting">Anti-Fingerprinting</a>
+            <a href="#sistemas">Sistemas Operacionais</a>
+            <a href="#criptografia">Criptografia de Dados</a>
+            <a href="#opsec">OPSEC Avançada</a>
+            <a href="#ferramentas">Ferramentas Essenciais</a>
+            <a href="#monitoramento">Evitando Monitoramento</a>
+            <a href="#conclusao">Conclusão</a>
+        </div>
+    </div>
+    
+    <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
+    
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        // Canvas background animation
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const sizes = new Float32Array(particlesCount);
+        
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 20;
+            positions[i + 1] = (Math.random() - 0.5) * 20;
+            positions[i + 2] = (Math.random() - 0.5) * 20;
+            
+            colors[i] = Math.random() * 0.5 + 0.5;
+            colors[i + 1] = Math.random() * 0.2;
+            colors[i + 2] = Math.random() * 0.5 + 0.5;
+            
+            sizes[i/3] = Math.random() * 0.5 + 0.5;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true,
+            map: createCircleTexture()
+        });
+        
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2.5;
+            
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            
+            const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+            
+            context.fillStyle = gradient;
+            context.fill();
+            
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+        
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            targetX = mouseX * 0.2;
+            targetY = mouseY * 0.2;
+            
+            particles.rotation.x += 0.0005;
+            particles.rotation.y += 0.001;
+            
+            particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+            particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+            
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        // Outros scripts de funcionalidade
+        document.addEventListener('DOMContentLoaded', function() {
+            // ID aleatório no canto
+            setInterval(() => {
+                document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
+            }, 1000);
+
+            // Menu mobile
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenuClose = document.querySelector('.mobile-menu-close');
+            const overlay = document.getElementById('overlay');
+
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.add('active');
+                overlay.classList.add('active');
+            });
+
+            mobileMenuClose.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+
+            overlay.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+
+            // Toggle content
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    parent.classList.toggle('active');
+                    
+                    if (parent.classList.contains('active')) {
+                        this.innerHTML = `<i class="fas fa-minus"></i> ${this.textContent.trim().substring(2)}`;
+                    } else {
+                        this.innerHTML = `<i class="fas fa-plus"></i> ${this.textContent.trim().substring(2)}`;
+                    }
+                });
+            });
+
+            // Copy buttons
+            const copyBtns = document.querySelectorAll('.copy-btn');
+            copyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const code = this.nextElementSibling.textContent;
+                    navigator.clipboard.writeText(code).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = 'Copiado!';
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    });
+                });
+            });
+
+            // Progress bar
+            window.addEventListener('scroll', function() {
+                let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                let scrolled = (winScroll / height) * 100;
+                document.getElementById("progressBar").style.width = scrolled + "%";
+                
+                // Back to top button
+                const backToTop = document.querySelector('.back-to-top');
+                if (winScroll > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            // Back to top
+            const backToTop = document.querySelector('.back-to-top');
+            backToTop.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Smooth scroll para âncoras
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                        
+                        // Fechar menu mobile se estiver aberto
+                        mobileMenu.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+                                

