@@ -1,9 +1,24 @@
-<!DOCTYPE html>
+<!-- Modal de ID -->
+    <div id="idModal">
+        <h3>Inserir ID</h3>
+        <p>Digite seu ID para acessar áreas restritas do site.</p>
+        <input type="text" id="idInput" placeholder="Digite seu ID...">
+        <div>
+            <button id="submitId">Confirmar</button>
+            <button id="closeIdModal" class="close-btn">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Status do ID -->
+    <div id="idStatus">
+        <span class="login-status logged-out"></span>
+        <span id="idStatusText">Não autenticado</span>
+    </div><!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site-Hack</title>
+    <title>CyberHack</title>
     
     <link rel="icon" href="r.png" type="image/x-icon" />
     <link rel="shortcut icon" href="r.png" type="image/x-icon" />
@@ -164,6 +179,8 @@
         .nav-links a:hover::after {
             width: 100%;
         }
+
+
 
         .hero {
             height: 400px;
@@ -1012,6 +1029,7 @@
             z-index: 1000;
             border-left: 1px solid rgba(255, 105, 180, 0.3);
             overflow-y: auto;
+            transition: right 0.3s ease;
         }
 
         .mobile-menu.active {
@@ -1089,13 +1107,134 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 1);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
         }
 
         #overlay.active {
             display: block;
+        }
+
+        /* Modal de Acesso Negado */
+        #accessDeniedModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #ff1493;
+            border-radius: 10px;
+            padding: 30px;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
+            max-width: 90%;
+            width: 400px;
+        }
+
+        /* Modal de ID */
+        #idModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #8A2BE2;
+            border-radius: 10px;
+            padding: 30px;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+            max-width: 90%;
+            width: 400px;
+            display: none;
+        }
+
+        #idModal h3 {
+            color: #8A2BE2;
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #idModal p {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        #idModal input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #idModal input:focus {
+            border-color: #8A2BE2;
+        }
+
+        #idModal button {
+            background: linear-gradient(45deg, #9932CC, #8A2BE2);
+            border: none;
+            padding: 12px 25px;
+            color: #fff;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        #idModal button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        #idModal .close-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        /* Estilo para indicador de login */
+        .login-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .login-status.logged-out {
+            background-color: #dc3545;
+            box-shadow: 0 0 10px #dc3545;
+        }
+
+        .login-status.logged-in {
+            background-color: #28a745;
+            box-shadow: 0 0 10px #28a745;
+        }
+
+        /* Status do ID */
+        #idStatus {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+            border: 1px solid rgba(138, 43, 226, 0.5);
         }
     </style>
 </head>
@@ -1106,6 +1245,7 @@
             <div class="logo">CyberHack</div>
             <nav class="nav-links">
                 <a href="index.html">Home</a>
+                <a href="#" id="open-id-modal">ID</a>
                 <a href="#about">Sobre</a>
                 <a href="#modules">Módulos</a>
                 <a href="#community">Comunidade</a>
@@ -1200,7 +1340,7 @@
                     <p>Protocolos de anonimização, redes TOR/I2P, VPNs com criptografia forte, proxies em cascata e técnicas anti-fingerprinting.</p>
                 </a>
                 
-                <a href="recursos.html" class="grid-item">
+                <a href="recursos.html" class="grid-item restricted">
                     <div class="scan-line"></div>
                     <i class="fas fa-download"></i>
                     <h3>Recursos & Downloads</h3>
@@ -1214,14 +1354,14 @@
                     <p>Artigos sobre vulnerabilidades recentes, análises de hardware/software e entrevistas com profissionais.</p>
                 </a>
                 
-                <a href="comunidade.html" class="grid-item">
+                <a href="comunidade.html" class="grid-item restricted">
                     <div class="scan-line"></div>
                     <i class="fas fa-users"></i>
                     <h3>Comunidade</h3>
                     <p>Participe do nosso fórum, Discord e eventos online. Compartilhe conhecimento e conecte-se com outros hackers éticos.</p>
                 </a>
                 
-                <a href="contato.html" class="grid-item">
+                <a href="contato.html" class="grid-item restricted">
                     <div class="scan-line"></div>
                     <i class="fas fa-id-card"></i>
                     <h3>Contato & Sobre</h3>
@@ -1267,9 +1407,9 @@
             <div class="footer-container">
                 <div class="footer-logo">CyberHack</div>
                 <div class="footer-links">
-                    <a href="#">Termos de Uso</a>
-                    <a href="#">Política de Privacidade</a>
-                    <a href="#">FAQ</a>
+                    <a href="#" id="terms-link">Termos de Uso</a>
+                    <a href="#" id="privacy-link">Política de Privacidade</a>
+                    <a href="#" id="faq-link">FAQ</a>
                     <a href="contato.html">Contato</a>
                 </div>
                 <div class="social-links">
@@ -1289,6 +1429,7 @@
         </button>
         <div class="mobile-nav-links">
             <a href="index.html">Home</a>
+            <a href="#" id="mobile-id-btn">ID</a>
             <a href="#about">Sobre</a>
             <a href="#modules">Módulos</a>
             <a href="kali.html">Kali Linux</a>
@@ -1301,395 +1442,353 @@
             <a href="ddos.html">Hacks de DDoS</a>
             <a href="invasao.html">Invasão de Sistemas</a>
             <a href="anonimato.html">Anonimato 100%</a>
-            <a href="recursos.html">Recursos & Downloads</a>
+            <a href="recursos.html" class="restricted">Recursos & Downloads</a>
             <a href="blog.html">Blog & Pesquisas</a>
-            <a href="comunidade.html">Comunidade</a>
-            <a href="contato.html">Contato</a>
-            <a href="downloads.html" class="mobile-download-btn"><i class="fas fa-download"></i> Downloads</a>
+            <a href="comunidade.html" class="restricted">Comunidade</a>
+            <a href="contato.html" class="restricted">Contato</a>
+            <a href="downloads.html" class="mobile-download-btn restricted"><i class="fas fa-download"></i> Downloads</a>
+        </div>
+    </div>
+    
+    <!-- Modal de Acesso Negado -->
+    <div id="accessDeniedModal" style="display: none;">
+        <h3 style="color: #ff1493; font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Acesso Negado</h3>
+        <p style="color: #fff; margin-bottom: 20px; font-size: 16px;">ID não cadastrado. Você precisa inserir um ID válido para acessar esta área.</p>
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <button id="openIdFromDenied" style="background: linear-gradient(45deg, #ff1493, #ff69b4); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Inserir ID</button>
+            <button id="closeAccessDenied" style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 105, 180, 0.3); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Termos de Uso -->
+    <div id="termsModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.95); border: 2px solid #ff1493; border-radius: 10px; padding: 30px; z-index: 9999; text-align: left; box-shadow: 0 0 30px rgba(255, 20, 147, 0.5); max-width: 90%; width: 700px; max-height: 80vh; overflow-y: auto;">
+        <h3 style="color: #ff1493; font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Termos de Uso</h3>
+        <div style="color: #fff; margin-bottom: 20px; font-size: 16px; line-height: 1.6;">
+            <p style="margin-bottom: 15px;">Bem-vindo ao CyberHack. Ao acessar este site, você concorda com estes termos e condições de uso.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">1. Uso Responsável</h4>
+            <p>Todo o conteúdo disponibilizado neste site é exclusivamente para fins educacionais e de pesquisa em segurança da informação. Você concorda em utilizar as técnicas, ferramentas e conhecimentos compartilhados apenas em ambientes controlados e com autorização expressa.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">2. Restrições de Uso</h4>
+            <p>É expressamente proibido o uso do conteúdo deste site para:</p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li>Atividades ilegais ou maliciosas</li>
+                <li>Invasão de sistemas sem autorização</li>
+                <li>Danos a terceiros ou a seus equipamentos</li>
+                <li>Violação de privacidade de indivíduos ou organizações</li>
+                <li>Distribuição de malware ou exploração de vulnerabilidades</li>
+            </ul>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">3. Acesso ao Conteúdo</h4>
+            <p>Algumas áreas do site exigem identificação por meio de ID. A obtenção ou compartilhamento não autorizado de IDs é proibido.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">4. Responsabilidade</h4>
+            <p>Você é totalmente responsável por suas ações ao utilizar o conhecimento e ferramentas disponibilizados. A equipe do CyberHack não se responsabiliza pelo uso indevido das informações disponibilizadas.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">5. Modificações</h4>
+            <p>Reservamo-nos o direito de modificar estes termos a qualquer momento. As alterações entram em vigor imediatamente após a publicação no site.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">6. Legislação Aplicável</h4>
+            <p>Estes termos são regidos pela legislação brasileira. Ao utilizar este site, você concorda em cumprir todas as leis nacionais e internacionais aplicáveis.</p>
+            
+            <p style="margin-top: 20px;">Ao continuar a utilizar o CyberHack, você confirma que leu, compreendeu e concordou com estes termos de uso.</p>
+        </div>
+        <div style="text-align: center;">
+            <button class="close-modal" style="background: linear-gradient(45deg, #ff1493, #ff69b4); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Fechar</button>
+        </div>
+    </div>
+    
+    <!-- Modal de Política de Privacidade -->
+    <div id="privacyModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.95); border: 2px solid #ff1493; border-radius: 10px; padding: 30px; z-index: 9999; text-align: left; box-shadow: 0 0 30px rgba(255, 20, 147, 0.5); max-width: 90%; width: 700px; max-height: 80vh; overflow-y: auto;">
+        <h3 style="color: #ff1493; font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Política de Privacidade</h3>
+        <div style="color: #fff; margin-bottom: 20px; font-size: 16px; line-height: 1.6;">
+            <p style="margin-bottom: 15px;">O CyberHack valoriza a privacidade de seus usuários. Esta política descreve como coletamos, usamos e protegemos suas informações.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">1. Informações Coletadas</h4>
+            <p>Podemos coletar as seguintes informações:</p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li>Endereço IP e dados de navegação</li>
+                <li>E-mail (quando fornecido voluntariamente)</li>
+                <li>ID de acesso ao sistema</li>
+                <li>Dados técnicos sobre seu dispositivo e conexão</li>
+            </ul>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">2. Uso das Informações</h4>
+            <p>As informações coletadas são utilizadas para:</p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li>Personalizar a experiência do usuário</li>
+                <li>Melhorar o site e seus conteúdos</li>
+                <li>Controlar o acesso a áreas restritas</li>
+                <li>Enviar newsletters (apenas para usuários que optaram por recebê-las)</li>
+                <li>Garantir a segurança do site</li>
+            </ul>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">3. Segurança dos Dados</h4>
+            <p>Implementamos medidas de segurança técnicas e organizacionais para proteger suas informações. No entanto, nenhum método de transmissão pela internet é 100% seguro.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">4. Cookies e Tecnologias Similares</h4>
+            <p>Utilizamos cookies para melhorar a experiência de navegação. Você pode configurar seu navegador para recusar cookies, mas isso pode afetar a funcionalidade do site.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">5. Compartilhamento de Dados</h4>
+            <p>Não vendemos, trocamos ou transferimos suas informações pessoais para terceiros, exceto quando necessário para fornecer um serviço ou quando exigido por lei.</p>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">6. Seus Direitos</h4>
+            <p>Você tem direito a:</p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li>Acessar, corrigir ou excluir seus dados pessoais</li>
+                <li>Retirar seu consentimento a qualquer momento</li>
+                <li>Solicitar informações sobre o uso de seus dados</li>
+                <li>Opor-se ao processamento de seus dados</li>
+            </ul>
+            
+            <h4 style="color: #ff69b4; margin: 20px 0 10px 0;">7. Alterações à Política</h4>
+            <p>Esta política pode ser atualizada periodicamente. Recomendamos verificá-la regularmente.</p>
+            
+            <p style="margin-top: 20px;">Ao utilizar o CyberHack, você concorda com esta política de privacidade.</p>
+        </div>
+        <div style="text-align: center;">
+            <button class="close-modal" style="background: linear-gradient(45deg, #ff1493, #ff69b4); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Fechar</button>
+        </div>
+    </div>
+    
+    <!-- Modal de FAQ -->
+    <div id="faqModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.95); border: 2px solid #ff1493; border-radius: 10px; padding: 30px; z-index: 9999; text-align: left; box-shadow: 0 0 30px rgba(255, 20, 147, 0.5); max-width: 90%; width: 700px; max-height: 80vh; overflow-y: auto;">
+        <h3 style="color: #ff1493; font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Perguntas Frequentes</h3>
+        <div style="color: #fff; margin-bottom: 20px; font-size: 16px; line-height: 1.6;">
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">O que é o CyberHack?</h4>
+                <p>O CyberHack é uma plataforma educacional dedicada ao ensino de segurança da informação, hacking ético e tecnologias de cybersegurança. Todo o conteúdo é desenvolvido para fins educacionais e deve ser praticado apenas em ambientes controlados e autorizados.</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">Como obtenho um ID de acesso?</h4>
+                <p>Os IDs de acesso são fornecidos aos membros da comunidade após completarem o curso introdutório de ética hacker e assinarem nosso termo de responsabilidade. Para mais informações, entre em contato através da seção "Contato".</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">Qual é a diferença entre hacking ético e ilegal?</h4>
+                <p>O hacking ético é realizado com permissão explícita, segue metodologias estabelecidas e tem como objetivo melhorar a segurança. O hacking ilegal é realizado sem autorização e com intenções maliciosas. O CyberHack promove exclusivamente práticas éticas.</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">O conteúdo é adequado para iniciantes?</h4>
+                <p>Sim, oferecemos conteúdo para todos os níveis de conhecimento, desde iniciantes até profissionais avançados. Recomendamos começar pelos módulos introdutórios para construir uma base sólida.</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">Posso utilizar as ferramentas e técnicas em ambientes reais?</h4>
+                <p>Somente com autorização expressa do proprietário do sistema. Utilizar técnicas de hacking sem permissão é ilegal e antiético, mesmo para fins educacionais.</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">Como posso contribuir para o CyberHack?</h4>
+                <p>Aceitamos contribuições de conteúdo, correções e sugestões. Entre em contato conosco através da seção "Contato" ou participe de nossa comunidade para mais informações.</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">As ferramentas disponibilizadas são seguras?</h4>
+                <p>Todas as ferramentas passam por verificação rigorosa antes de serem disponibilizadas. No entanto, recomendamos utilizá-las apenas em ambientes isolados e seguros, como máquinas virtuais.</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">Com que frequência o conteúdo é atualizado?</h4>
+                <p>Atualizamos regularmente o conteúdo para refletir as tecnologias e práticas mais recentes em segurança cibernética. Inscreva-se em nossa newsletter para receber notificações sobre novas atualizações.</p>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <button class="close-modal" style="background: linear-gradient(45deg, #ff1493, #ff69b4); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Fechar</button>
         </div>
     </div>
     
     <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
-    
-    <div id="accessDeniedModal" class="access-denied" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.95); border: 2px solid #ff1493; border-radius: 10px; padding: 30px; z-index: 9999; text-align: center; box-shadow: 0 0 30px rgba(255, 20, 147, 0.5); max-width: 90%; width: 400px;">
-        <h3 style="color: #ff1493; font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Acesso Negado</h3>
-        <p style="color: #fff; margin-bottom: 20px; font-size: 16px;">ID não cadastrado. Você não tem permissão para acessar esta área.</p>
-        <button id="closeAccessDenied" style="background: linear-gradient(45deg, #ff1493, #ff69b4); border: none; padding: 10px 20px; color: #fff; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Entendi</button>
-    </div>
 
     <script>
-        document.getElementById('closeAccessDenied').addEventListener('click', function() {
-            document.getElementById('accessDeniedModal').style.display = 'none';
-        });
+        let isLoggedIn = false;
+        const correctId = "782025";
+        const restrictedPages = ["downloads.html", "recursos.html", "comunidade.html", "contato.html"];
+        
+        const accessDeniedModal = document.getElementById('accessDeniedModal');
+        const idModal = document.getElementById('idModal');
+        const idInput = document.getElementById('idInput');
+        const idStatus = document.getElementById('idStatus');
+        const idStatusText = document.getElementById('idStatusText');
+        const overlay = document.getElementById('overlay');
+        
+        function showIdStatus() {
+            idStatus.style.display = 'block';
+            setTimeout(() => {
+                idStatus.style.opacity = '0';
+                setTimeout(() => {
+                    idStatus.style.display = 'none';
+                    idStatus.style.opacity = '1';
+                }, 500);
+            }, 3000);
+        }
+        
+        function checkId(id) {
+            if (id === correctId) {
+                isLoggedIn = true;
+                idStatusText.textContent = "Autenticado: ID" + id;
+                idStatus.querySelector('.login-status').classList.remove('logged-out');
+                idStatus.querySelector('.login-status').classList.add('logged-in');
+                showIdStatus();
+                return true;
+            } else {
+                isLoggedIn = false;
+                idStatusText.textContent = "ID inválido";
+                idStatus.querySelector('.login-status').classList.remove('logged-in');
+                idStatus.querySelector('.login-status').classList.add('logged-out');
+                showIdStatus();
+                return false;
+            }
+        }
+        
+        function openIdModal() {
+            idModal.style.display = 'block';
+            overlay.style.display = 'block';
+            idInput.focus();
+        }
+        
+        function closeIdModal() {
+            idModal.style.display = 'none';
+            overlay.style.display = 'none';
+            idInput.value = '';
+        }
+        
+        function openAccessDeniedModal() {
+            accessDeniedModal.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+        
+        function closeAccessDeniedModal() {
+            accessDeniedModal.style.display = 'none';
+            overlay.style.display = 'none';
+        }
+        
+        function isRestrictedLink(href) {
+            return restrictedPages.some(page => href.includes(page));
+        }
         
         document.addEventListener('DOMContentLoaded', function() {
-            const allLinks = document.querySelectorAll('a');
-            const allButtons = document.querySelectorAll('button:not(#closeAccessDenied):not(.tab-btn):not(#ip-search-btn):not(#cep-search-btn)');
-            
-            function showAccessDenied(e) {
+            document.getElementById('open-id-modal').addEventListener('click', function(e) {
                 e.preventDefault();
-                e.stopPropagation();
-                document.getElementById('accessDeniedModal').style.display = 'block';
-            }
-            
-            allLinks.forEach(function(link) {
-                link.addEventListener('click', showAccessDenied);
+                openIdModal();
             });
             
-            allButtons.forEach(function(button) {
-                button.addEventListener('click', showAccessDenied);
+            document.getElementById('mobile-id-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                openIdModal();
             });
             
-            document.querySelectorAll('.grid-item').forEach(function(item) {
-                item.addEventListener('click', showAccessDenied);
+            document.getElementById('closeIdModal').addEventListener('click', closeIdModal);
+            document.getElementById('closeAccessDenied').addEventListener('click', closeAccessDeniedModal);
+            document.getElementById('openIdFromDenied').addEventListener('click', function() {
+                closeAccessDeniedModal();
+                openIdModal();
             });
             
-            document.querySelector('.hero-btn').addEventListener('click', showAccessDenied);
+            document.getElementById('submitId').addEventListener('click', function() {
+                const id = idInput.value.trim();
+                if (checkId(id)) {
+                    closeIdModal();
+                } else {
+                    idInput.style.borderColor = '#dc3545';
+                    setTimeout(() => {
+                        idInput.style.borderColor = 'rgba(138, 43, 226, 0.5)';
+                    }, 1500);
+                }
+            });
             
-            const formButton = document.querySelector('.form-group button');
-            if (formButton) {
-                formButton.addEventListener('click', showAccessDenied);
-            }
+            idInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('submitId').click();
+                }
+            });
             
-            
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tabId = btn.getAttribute('data-tab');
+            document.addEventListener('click', function(e) {
+                if (isLoggedIn) {
+                    if (e.target.closest('a') && isRestrictedLink(e.target.closest('a').href)) {
+                        e.preventDefault();
+                        openAccessDeniedModal();
+                    }
+                    return;
+                }
+                
+                if (e.target.tagName === 'A' || e.target.closest('a')) {
+                    const link = e.target.tagName === 'A' ? e.target : e.target.closest('a');
                     
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    tabContents.forEach(c => c.classList.remove('active'));
+                    if (link.getAttribute('href') && link.getAttribute('href').startsWith('#')) {
+                        return;
+                    }
                     
-                    btn.classList.add('active');
-                    document.getElementById(tabId + '-content').classList.add('active');
+                    if (link.id === 'open-id-modal' || link.id === 'mobile-id-btn') {
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    openAccessDeniedModal();
+                }
+                
+                if (e.target.tagName === 'BUTTON' && e.target.closest('.form-group')) {
+                    e.preventDefault();
+                    openAccessDeniedModal();
+                }
+            });
+            
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenuClose = document.querySelector('.mobile-menu-close');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.add('active');
+                overlay.classList.add('active');
+            });
+            
+            mobileMenuClose.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+            
+            
+            overlay.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                closeIdModal();
+                closeAccessDeniedModal();
+                closeAllModals();
+            });
+            
+            document.getElementById('terms-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('termsModal').style.display = 'block';
+                overlay.style.display = 'block';
+            });
+            
+            document.getElementById('privacy-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('privacyModal').style.display = 'block';
+                overlay.style.display = 'block';
+            });
+            
+            document.getElementById('faq-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('faqModal').style.display = 'block';
+                overlay.style.display = 'block';
+            });
+            
+            document.querySelectorAll('.close-modal').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    closeAllModals();
                 });
             });
             
-            
-            fetchUserIPInfo();
-            
-            
-            document.getElementById('ip-search-btn').addEventListener('click', function() {
-                const ipAddress = document.getElementById('ip-search').value.trim();
-                if (ipAddress) {
-                    lookupIP(ipAddress);
-                }
-            });
-            
-            
-            document.getElementById('cep-search-btn').addEventListener('click', function() {
-                const cep = document.getElementById('cep-search').value.trim().replace(/\D/g, '');
-                if (cep && cep.length === 8) {
-                    lookupCEP(cep);
-                }
-            });
-            
-            
-            document.getElementById('ip-search').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('ip-search-btn').click();
-                }
-            });
-            
-            document.getElementById('cep-search').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('cep-search-btn').click();
-                }
-            });
+            function closeAllModals() {
+                document.getElementById('termsModal').style.display = 'none';
+                document.getElementById('privacyModal').style.display = 'none';
+                document.getElementById('faqModal').style.display = 'none';
+                overlay.style.display = 'none';
+            }
         });
-        
-        function fetchUserIPInfo() {
-            fetch('https://ipapi.co/json/')
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector('.ip-loading').style.display = 'none';
-                    document.querySelector('.ip-results').style.display = 'block';
-                    
-                    document.getElementById('current-ip').textContent = data.ip;
-                    document.getElementById('current-location').textContent = `${data.city || '-'}, ${data.region || '-'}`;
-                    document.getElementById('current-isp').textContent = data.org || data.asn || '-';
-                    document.getElementById('current-country').textContent = `${data.country_name || '-'} (${data.country_code || '-'})`;
-                    document.getElementById('current-timezone').textContent = data.timezone || '-';
-                    
-                    
-                    const userAgent = navigator.userAgent;
-                    let system = "Desconhecido";
-                    let browser = "Desconhecido";
-                    
-                    
-                    if (userAgent.indexOf("Windows") !== -1) system = "Windows";
-                    else if (userAgent.indexOf("Mac") !== -1) system = "MacOS";
-                    else if (userAgent.indexOf("Linux") !== -1) system = "Linux";
-                    else if (userAgent.indexOf("Android") !== -1) system = "Android";
-                    else if (userAgent.indexOf("iPhone") !== -1 || userAgent.indexOf("iPad") !== -1) system = "iOS";
-                    
-                    
-                    if (userAgent.indexOf("Chrome") !== -1 && userAgent.indexOf("Edg") === -1) browser = "Chrome";
-                    else if (userAgent.indexOf("Firefox") !== -1) browser = "Firefox";
-                    else if (userAgent.indexOf("Safari") !== -1 && userAgent.indexOf("Chrome") === -1) browser = "Safari";
-                    else if (userAgent.indexOf("Edg") !== -1) browser = "Edge";
-                    else if (userAgent.indexOf("Opera") !== -1 || userAgent.indexOf("OPR") !== -1) browser = "Opera";
-                    
-                    document.getElementById('current-system').textContent = system;
-                    document.getElementById('current-browser').textContent = browser;
-                    
-                    
-                    const mapElement = document.getElementById('ip-map');
-                    if (data.latitude && data.longitude) {
-                        mapElement.innerHTML = `<iframe width="100%" height="100%" frameborder="0" style="border-radius:10px;" 
-                            src="https://maps.google.com/maps?q=${data.latitude},${data.longitude}&z=10&output=embed"></iframe>`;
-                    } else {
-                        mapElement.innerHTML = '<p style="color: #fff; text-align: center; padding: 20px;">Localização não disponível para este IP</p>';
-                    }
-                })
-                .catch(error => {
-                console.error('Error fetching IP data:', error);
-                document.querySelector('.ip-loading').innerHTML =
-                  '<p>Erro ao carregar dados do IP. Tente novamente mais tarde.</p>';
-            });
-    }
-        
-        function lookupIP(ipAddress) {
-            document.getElementById('ip-lookup-results').style.display = 'block';
-            document.getElementById('lookup-ip-address').textContent = ipAddress;
-            document.getElementById('lookup-location').innerHTML = '<span style="color:#00c3ff">Carregando...</span>';
-            document.getElementById('lookup-isp').innerHTML = '<span style="color:#00c3ff">Carregando...</span>';
-            document.getElementById('lookup-country').innerHTML = '<span style="color:#00c3ff">Carregando...</span>';
-            document.getElementById('lookup-timezone').innerHTML = '<span style="color:#00c3ff">Carregando...</span>';
-            document.getElementById('lookup-map').innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100%;color:#00c3ff">Carregando mapa...</div>';
-            
-            fetch(`https://ipapi.co/${ipAddress}/json/`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert('IP inválido ou não encontrado. Tente novamente.');
-                        return;
-                    }
-                    
-                    document.getElementById('lookup-ip-address').textContent = data.ip;
-                    document.getElementById('lookup-location').textContent = `${data.city || '-'}, ${data.region || '-'}`;
-                    document.getElementById('lookup-isp').textContent = data.org || data.asn || '-';
-                    document.getElementById('lookup-country').textContent = `${data.country_name || '-'} (${data.country_code || '-'})`;
-                    document.getElementById('lookup-timezone').textContent = data.timezone || '-';
-                    
-                    
-                    const mapElement = document.getElementById('lookup-map');
-                    if (data.latitude && data.longitude) {
-                        mapElement.innerHTML = `<iframe width="100%" height="100%" frameborder="0" style="border-radius:10px;" 
-                            src="https://maps.google.com/maps?q=${data.latitude},${data.longitude}&z=10&output=embed"></iframe>`;
-                    } else {
-                        mapElement.innerHTML = '<p style="color: #fff; text-align: center; padding: 20px;">Localização não disponível para este IP</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error looking up IP:', error);
-                    alert('Erro ao buscar informações do IP. Tente novamente mais tarde.');
-                });
-        }
-        
-        function fetchIPBackup(ipAddress) {
-            fetch(`https://ipwho.is/${ipAddress}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success === false) {
-                        alert('IP inválido ou não encontrado. Tente novamente.');
-                        return;
-                    }
-                    
-                    document.getElementById('ip-lookup-results').style.display = 'block';
-                    document.getElementById('lookup-ip-address').textContent = data.ip;
-                    document.getElementById('lookup-location').textContent = `${data.city || '-'}, ${data.region || '-'}`;
-                    document.getElementById('lookup-isp').textContent = data.connection?.isp || '-';
-                    document.getElementById('lookup-country').textContent = `${data.country || '-'} (${data.country_code || '-'})`;
-                    document.getElementById('lookup-timezone').textContent = data.timezone?.id || '-';
-                    
-                    
-                    const mapElement = document.getElementById('lookup-map');
-                    if (data.latitude && data.longitude) {
-                        mapElement.innerHTML = `<iframe width="100%" height="100%" frameborder="0" style="border-radius:10px;" 
-                            src="https://maps.google.com/maps?q=${data.latitude},${data.longitude}&z=10&output=embed"></iframe>`;
-                    } else {
-                        mapElement.innerHTML = '<p style="color: #fff; text-align: center; padding: 20px;">Localização não disponível para este IP</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error with backup IP lookup:', error);
-                    
-                    
-                    fetch(`https://ipinfo.io/${ipAddress}/json`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.error) {
-                                alert('IP inválido ou não encontrado. Tente novamente.');
-                                return;
-                            }
-                            
-                            document.getElementById('ip-lookup-results').style.display = 'block';
-                            document.getElementById('lookup-ip-address').textContent = data.ip;
-                            
-                            
-                            let city = '-', region = '-';
-                            if (data.city) city = data.city;
-                            if (data.region) region = data.region;
-                            document.getElementById('lookup-location').textContent = `${city}, ${region}`;
-                            
-                            document.getElementById('lookup-isp').textContent = data.org || data.asn || '-';
-                            document.getElementById('lookup-country').textContent = `${data.country || '-'}`;
-                            document.getElementById('lookup-timezone').textContent = data.timezone || '-';
-                            
-                            
-                            const mapElement = document.getElementById('lookup-map');
-                            if (data.loc) {
-                                const [lat, lon] = data.loc.split(',');
-                                mapElement.innerHTML = `<iframe width="100%" height="100%" frameborder="0" style="border-radius:10px;" 
-                                    src="https://maps.google.com/maps?q=${lat},${lon}&z=10&output=embed"></iframe>`;
-                            } else {
-                                mapElement.innerHTML = '<p style="color: #fff; text-align: center; padding: 20px;">Localização não disponível para este IP</p>';
-                            }
-                        })
-                        .catch(err => {
-                            console.error('All IP lookup attempts failed:', err);
-                            alert('Erro ao buscar informações do IP. Tente novamente mais tarde.');
-                        });
-                });
-        
-        }
-        
-        function lookupCEP(cep) {
-            fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.erro) {
-                        alert('CEP não encontrado. Verifique o número e tente novamente.');
-                        return;
-                    }
-                    
-                    document.getElementById('cep-lookup-results').style.display = 'block';
-                    document.getElementById('lookup-cep').textContent = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
-                    document.getElementById('cep-logradouro').textContent = data.logradouro || '-';
-                    document.getElementById('cep-bairro').textContent = data.bairro || '-';
-                    document.getElementById('cep-cidade').textContent = data.localidade || '-';
-                    document.getElementById('cep-estado').textContent = `${data.uf || '-'}`;
-                    
-                    
-                    const mapElement = document.getElementById('cep-map');
-                    const address = `${data.logradouro}, ${data.localidade}, ${data.uf}, Brasil`;
-                    mapElement.innerHTML = `<iframe width="100%" height="100%" frameborder="0" style="border-radius:10px;" 
-                        src="https://maps.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed"></iframe>`;
-                    
-                    
-                    const resultDetails = document.querySelector('#cep-lookup-results .result-details');
-                    
-                    
-                    if (!document.getElementById('cep-complemento')) {
-                        
-                        const complementoItem = document.createElement('div');
-                        complementoItem.className = 'result-item';
-                        complementoItem.innerHTML = `
-                            <div class="result-label"><i class="fas fa-info-circle"></i> Complemento</div>
-                            <div class="result-value" id="cep-complemento">${data.complemento || '-'}</div>
-                        `;
-                        resultDetails.appendChild(complementoItem);
-                        
-                        
-                        const dddItem = document.createElement('div');
-                        dddItem.className = 'result-item';
-                        dddItem.innerHTML = `
-                            <div class="result-label"><i class="fas fa-phone"></i> DDD</div>
-                            <div class="result-value" id="cep-ddd">${data.ddd || '-'}</div>
-                        `;
-                        resultDetails.appendChild(dddItem);
-                        
-                        
-                        const ibgeItem = document.createElement('div');
-                        ibgeItem.className = 'result-item';
-                        ibgeItem.innerHTML = `
-                            <div class="result-label"><i class="fas fa-building"></i> Código IBGE</div>
-                            <div class="result-value" id="cep-ibge">${data.ibge || '-'}</div>
-                        `;
-                        resultDetails.appendChild(ibgeItem);
-                        
-                        
-                        const siafiItem = document.createElement('div');
-                        siafiItem.className = 'result-item';
-                        siafiItem.innerHTML = `
-                            <div class="result-label"><i class="fas fa-landmark"></i> Código SIAFI</div>
-                            <div class="result-value" id="cep-siafi">${data.siafi || '-'}</div>
-                        `;
-                        resultDetails.appendChild(siafiItem);
-                    } else {
-                        
-                        document.getElementById('cep-complemento').textContent = data.complemento || '-';
-                        document.getElementById('cep-ddd').textContent = data.ddd || '-';
-                        document.getElementById('cep-ibge').textContent = data.ibge || '-';
-                        document.getElementById('cep-siafi').textContent = data.siafi || '-';
-                    }
-                    
-                    
-                    if (data.ibge) {
-                        fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/municipios/${data.ibge}`)
-                            .then(response => response.json())
-                            .then(cityData => {
-                                if (!document.getElementById('cep-regiao')) {
-                                    // Região
-                                    const regiaoItem = document.createElement('div');
-                                    regiaoItem.className = 'result-item';
-                                    regiaoItem.innerHTML = `
-                                        <div class="result-label"><i class="fas fa-map"></i> Região</div>
-                                        <div class="result-value" id="cep-regiao">${cityData.microrregiao?.mesorregiao?.UF?.regiao?.nome || '-'}</div>
-                                    `;
-                                    resultDetails.appendChild(regiaoItem);
-                                    
-                                    
-                                    const mesorregiaoItem = document.createElement('div');
-                                    mesorregiaoItem.className = 'result-item';
-                                    mesorregiaoItem.innerHTML = `
-                                        <div class="result-label"><i class="fas fa-map-marked-alt"></i> Mesorregião</div>
-                                        <div class="result-value" id="cep-mesorregiao">${cityData.microrregiao?.mesorregiao?.nome || '-'}</div>
-                                    `;
-                                    resultDetails.appendChild(mesorregiaoItem);
-                                } else {
-                                    
-                                    document.getElementById('cep-regiao').textContent = cityData.microrregiao?.mesorregiao?.UF?.regiao?.nome || '-';
-                                    document.getElementById('cep-mesorregiao').textContent = cityData.microrregiao?.mesorregiao?.nome || '-';
-                                }
-                            })
-                            .catch(err => console.error('Erro ao buscar dados adicionais da cidade:', err));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error looking up CEP:', error);
-                    
-                    
-                    fetch(`https://brasilapi.com.br/api/cep/v1/${cep}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.errors) {
-                                alert('CEP não encontrado. Verifique o número e tente novamente.');
-                                return;
-                            }
-                            
-                            document.getElementById('cep-lookup-results').style.display = 'block';
-                            document.getElementById('lookup-cep').textContent = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
-                            document.getElementById('cep-logradouro').textContent = data.street || '-';
-                            document.getElementById('cep-bairro').textContent = data.neighborhood || '-';
-                            document.getElementById('cep-cidade').textContent = data.city || '-';
-                            document.getElementById('cep-estado').textContent = data.state || '-';
-                            
-                            
-                            const mapElement = document.getElementById('cep-map');
-                            const address = `${data.street}, ${data.city}, ${data.state}, Brasil`;
-                            mapElement.innerHTML = `<iframe width="100%" height="100%" frameborder="0" style="border-radius:10px;" 
-                                src="https://maps.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed"></iframe>`;
-                        })
-                        .catch(err => {
-                            console.error('Todas as tentativas de buscar o CEP falharam:', err);
-                            alert('Erro ao buscar informações do CEP. Tente novamente mais tarde.');
-                        });
-                });
-        }
 
         const canvas = document.getElementById('canvas');
         const renderer = new THREE.WebGLRenderer({
@@ -1811,11 +1910,15 @@
         const gridItems = document.querySelectorAll('.grid-item');
         gridItems.forEach(item => {
             item.addEventListener('mouseenter', () => {
-                item.querySelector('.scan-line').style.opacity = '1';
+                if (item.querySelector('.scan-line')) {
+                    item.querySelector('.scan-line').style.opacity = '1';
+                }
             });
             
             item.addEventListener('mouseleave', () => {
-                item.querySelector('.scan-line').style.opacity = '0';
+                if (item.querySelector('.scan-line')) {
+                    item.querySelector('.scan-line').style.opacity = '0';
+                }
             });
         });
 
